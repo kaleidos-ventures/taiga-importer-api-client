@@ -1,0 +1,42 @@
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.0.3'
+    }
+}
+
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy:2.3.6'
+    // compile 'log4j:log4j:1.2.17'
+
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+}
+
+String mainClass = 'net.kaleidos.taiga.TaigaToRedmine'
+
+task run(type: JavaExec) {
+    main = mainClass
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClass
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
