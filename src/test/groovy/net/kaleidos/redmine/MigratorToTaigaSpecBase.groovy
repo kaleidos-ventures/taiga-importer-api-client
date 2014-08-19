@@ -10,7 +10,10 @@ import com.taskadapter.redmineapi.RedmineManager
 class MigratorToTaigaSpecBase extends Specification {
 
     TaigaClient createTaigaClient() {
-        return new TaigaClient()
+        def config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').toURL())
+        def client = new TaigaClient(config.host)
+
+        return client
     }
 
 }
