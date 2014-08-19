@@ -19,12 +19,16 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile 'org.codehaus.groovy:groovy:2.3.6'
-    // compile 'log4j:log4j:1.2.17'
+    compile 'log4j:log4j:1.2.17'
+
+    compile 'com.github.groovy-wslite:groovy-wslite:1.1.0', {
+        exclude module: 'groovy-all'
+    }
 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 }
 
-String mainClass = 'net.kaleidos.taiga.TaigaToRedmine'
+String mainClass = 'net.kaleidos.TaigaToRedmine'
 
 task run(type: JavaExec) {
     main = mainClass
