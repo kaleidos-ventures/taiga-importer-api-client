@@ -23,7 +23,7 @@ class RedmineMigrator {
         }
 
         Closure<TaigaProject> savedProjects = { TaigaProject tp ->
-            return taigaClient.save(tp)
+            return taigaClient.saveProject(tp)
         }
 
         return redmineClient
