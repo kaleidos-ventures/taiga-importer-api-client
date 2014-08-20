@@ -1,6 +1,8 @@
 package net.kaleidos.redmine
 
 import net.kaleidos.taiga.TaigaClient
+import net.kaleidos.redmine.convert.Converters
+import net.kaleidos.domain.project.Project
 import com.taskadapter.redmineapi.RedmineManager
 
 class RedmineMigrator {
@@ -13,8 +15,8 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    List<String> listAllProjectNames() {
-        return redmineClient.projects.name
+    List<Project> listAllProject() {
+        return redmineClient.projects.collect(Converters.project())
     }
 
 

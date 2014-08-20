@@ -4,6 +4,7 @@ import spock.lang.Shared
 import spock.lang.IgnoreIf
 
 import com.taskadapter.redmineapi.RedmineManager
+import net.kaleidos.domain.project.Project
 
 //@IgnoreIf(NoRedmineFound)
 class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
@@ -13,9 +14,9 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             RedmineMigrator migrator =
                 new RedmineMigrator(createRedmineClient(), createTaigaClient())
         when: 'invoking all names'
-            def names = migrator.listAllProjectNames()
+            List<Project> projectList = migrator.listAllProject()
         then: 'names should be at least one'
-            names.size() > 0
+            projectList.size() > 0
     }
 
     RedmineManager createRedmineClient() {
