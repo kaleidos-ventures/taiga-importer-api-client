@@ -4,6 +4,9 @@ import net.kaleidos.domain.issue.IssuePriority
 import net.kaleidos.domain.issue.IssueStatus
 import net.kaleidos.domain.issue.IssueType
 import net.kaleidos.domain.project.Project
+import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
+import net.kaleidos.taiga.binding.issue.IssueStatusBinding
+import net.kaleidos.taiga.binding.issue.IssueTypeBinding
 import net.kaleidos.taiga.binding.project.ProjectBinding
 
 @Log4j
@@ -52,6 +55,16 @@ class TaigaClient extends BaseClient {
         this
     }
 
+    IssueType addIssueType(String name, Project project) {
+        def params = [project: project.id, name: name]
+        def response = this.doPost(URLS.issueTypes, params)
+
+        def issueType = IssueTypeBinding.bind(new IssueType(), response)
+        project.issueTypes << issueType
+
+        issueType
+    }
+
     TaigaClient deleteAllIssueStatuses(Project project) {
         def issueStatuses = project.issueStatuses
         issueStatuses.each { IssueStatus is ->
@@ -60,6 +73,16 @@ class TaigaClient extends BaseClient {
         project.issueStatuses = []
 
         this
+    }
+
+    IssueStatus addIssueStatus(String name, Project project) {
+        def params = [project: project.id, name: name]
+        def response = this.doPost(URLS.issueStatuses, params)
+
+        def issueStatus = IssueStatusBinding.bind(new IssueStatus(), response)
+        project.issueStatuses << issueStatus
+
+        issueStatus
     }
 
     TaigaClient deleteAllIssuePriorities(Project project) {
@@ -72,5 +95,13 @@ class TaigaClient extends BaseClient {
         this
     }
 
+    IssuePriority addIssuePriority(String name, Project project) {
+        def params = [project: project.id, name: name]
+        def response = this.doPost(URLS.issuePriorities, params)
+
+        def issuePriority = IssuePriorityBinding.bind(new IssuePriority(), response)
+        project.issuePriorities << issuePriority
+
+        issuePriority
     }
 }
