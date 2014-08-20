@@ -1,6 +1,8 @@
 package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
+import net.kaleidos.domain.project.Project
+import net.kaleidos.taiga.binding.project.ProjectBinding
 import wslite.rest.RESTClient
 import wslite.rest.Response
 
@@ -8,8 +10,8 @@ import wslite.rest.Response
 class TaigaClient {
 
     private final Map URLS = [
-        auth    : "/api/v1/auth",
-        projects: "/api/v1/projects"
+        auth           : "/api/v1/auth",
+        projects       : "/api/v1/projects",
     ]
 
     private final RESTClient client
@@ -40,6 +42,17 @@ class TaigaClient {
             Response response = client.get(path: URLS.projects)
 
             response.json
+        }
+    }
+
+    Project saveProject(Project project) {
+        withClient { RESTClient client ->
+            def response = client.post(path: URLS.projects) {
+                json name: project.name,
+                    description: project.description
+            }
+
+            ProjectBinding.bind(project, response)
         }
     }
 
