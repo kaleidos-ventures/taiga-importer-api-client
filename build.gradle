@@ -28,7 +28,7 @@ dependencies {
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
 }
 
-String mainClass = 'net.kaleidos.TaigaToRedmine'
+String mainClass = 'net.kaleidos.RedmineToTaiga'
 
 task run(type: JavaExec) {
     main = mainClass
