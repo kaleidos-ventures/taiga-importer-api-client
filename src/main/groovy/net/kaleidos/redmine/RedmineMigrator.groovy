@@ -5,6 +5,9 @@ import net.kaleidos.redmine.convert.Converters
 import net.kaleidos.domain.project.Project
 import com.taskadapter.redmineapi.RedmineManager
 
+import com.taskadapter.redmineapi.bean.Project as RedmineProject
+import net.kaleidos.domain.project.Project as TaigaProject
+
 class RedmineMigrator {
 
     final RedmineManager redmineClient
@@ -15,8 +18,20 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    List<Project> listAllProject() {
-        return redmineClient.projects.collect(Converters.project())
+    List<TaigaProject> migrateAllProjects() {
+        List<TaigaProject> migratedProjects =
+            redmineClient
+                .projects
+                .collect { RedmineProject rp ->
+                    def redmineProperties = [
+                        name: rp.name,
+                        description: rp.description
+                    ]
+
+                    return new TaigaProject(redmineProperties)
+                }
+
+        return migratedProjects
     }
 
 
