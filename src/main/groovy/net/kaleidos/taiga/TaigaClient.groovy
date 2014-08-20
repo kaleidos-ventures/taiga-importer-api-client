@@ -1,16 +1,13 @@
 package net.kaleidos.taiga
-
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.issue.IssuePriority
 import net.kaleidos.domain.issue.IssueStatus
 import net.kaleidos.domain.issue.IssueType
 import net.kaleidos.domain.project.Project
 import net.kaleidos.taiga.binding.project.ProjectBinding
-import wslite.rest.RESTClient
-import wslite.rest.Response
 
 @Log4j
-class TaigaClient {
+class TaigaClient extends BaseClient {
 
     private final Map URLS = [
         auth           : "/api/v1/auth",
@@ -20,89 +17,60 @@ class TaigaClient {
         issuePriorities: "/api/v1/priorities",
     ]
 
-    private final RESTClient client
-
     TaigaClient(String serverUrl) {
-        client = new RESTClient(serverUrl)
-        client.defaultContentTypeHeader = "application/json"
-        client.defaultCharset = "UTF-8"
-        client.defaultAcceptHeader = "application/json"
+        super(serverUrl)
     }
 
     TaigaClient authenticate(String username, String password) {
-        withClient { RESTClient client ->
-            def response = client.post(path: URLS.auth) {
-                json username: username,
-                    password: password,
-                    type: 'normal'
-            }
+        def params = [username: username, password: password, type: 'normal']
 
-            client.httpClient.defaultHeaders = [Authorization: "Bearer ${response.json.auth_token}"]
+        def response = this.doPost(URLS.auth, params)
+        client.httpClient.defaultHeaders = [Authorization: "Bearer ${response.auth_token}"]
 
-            this
-        }
+        this
+    }
+
+
+    Project saveProject(Project project) {
+        def params = [name: project.name, description: project.description]
+        def response = this.doPost(URLS.projects, params)
+
+        ProjectBinding.bind(project, response)
     }
 
     List<Map> getProjects() {
-        withClient { RESTClient client ->
-            Response response = client.get(path: URLS.projects)
-
-            response.json
-        }
-    }
-
-    Project saveProject(Project project) {
-        withClient { RESTClient client ->
-            def response = client.post(path: URLS.projects) {
-                json name: project.name,
-                    description: project.description
-            }
-
-            ProjectBinding.bind(project, response)
-        }
+        this.doGet(URLS.projects)
     }
 
     TaigaClient deleteAllIssueTypes(Project project) {
         def issueTypes = project.issueTypes
-
         issueTypes.each { IssueType it ->
-            withClient { RESTClient client ->
-                client.delete(path: "${URLS.issueTypes}/${it.id}")
-            }
+            this.doDelete("${URLS.issueTypes}/${it.id}")
         }
+        project.issueTypes = []
 
         this
     }
 
     TaigaClient deleteAllIssueStatuses(Project project) {
         def issueStatuses = project.issueStatuses
-
         issueStatuses.each { IssueStatus is ->
-            withClient { RESTClient client ->
-                client.delete(path: "${URLS.issueStatuses}/${is.id}")
-            }
+            this.doDelete("${URLS.issueStatuses}/${is.id}")
         }
+        project.issueStatuses = []
 
         this
     }
 
     TaigaClient deleteAllIssuePriorities(Project project) {
         def issuePriorities = project.issuePriorities
-
         issuePriorities.each { IssuePriority ip ->
-            withClient { RESTClient client ->
-                client.delete(path: "${URLS.issuePriorities}/${ip.id}")
-            }
+            this.doDelete("${URLS.issuePriorities}/${ip.id}")
         }
+        project.issuePriorities = []
 
         this
     }
 
-    private withClient(Closure cl) {
-        try {
-            cl client
-        } catch (Exception e) {
-            log.error "There was an error with Taiga", e
-        }
     }
 }
