@@ -13,7 +13,6 @@ class TaigaClient {
     ]
 
     private final RESTClient client
-    private Map headers = [:]
 
     TaigaClient(String serverUrl) {
         client = new RESTClient(serverUrl)
@@ -30,7 +29,7 @@ class TaigaClient {
                     type: 'normal'
             }
 
-            headers['Authorization'] = "Bearer ${response.json.auth_token}"
+            client.httpClient.defaultHeaders = [Authorization: "Bearer ${response.json.auth_token}"]
 
             this
         }
@@ -38,7 +37,7 @@ class TaigaClient {
 
     List<Map> getProjects() {
         withClient { RESTClient client ->
-            Response response = client.get(path: URLS.projects, headers: headers)
+            Response response = client.get(path: URLS.projects)
 
             response.json
         }
