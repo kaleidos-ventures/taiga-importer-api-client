@@ -3,6 +3,7 @@ package net.kaleidos.taiga
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.issue.IssuePriority
 import net.kaleidos.domain.issue.IssueStatus
+import net.kaleidos.domain.issue.IssueType
 import net.kaleidos.domain.project.Project
 import net.kaleidos.taiga.binding.project.ProjectBinding
 import wslite.rest.RESTClient
@@ -14,6 +15,7 @@ class TaigaClient {
     private final Map URLS = [
         auth           : "/api/v1/auth",
         projects       : "/api/v1/projects",
+        issueTypes     : "/api/v1/issue-types",
         issueStatuses  : "/api/v1/issue-statuses",
         issuePriorities: "/api/v1/priorities",
     ]
@@ -58,6 +60,18 @@ class TaigaClient {
 
             ProjectBinding.bind(project, response)
         }
+    }
+
+    TaigaClient deleteAllIssueTypes(Project project) {
+        def issueTypes = project.issueTypes
+
+        issueTypes.each { IssueType it ->
+            withClient { RESTClient client ->
+                client.delete(path: "${URLS.issueTypes}/${it.id}")
+            }
+        }
+
+        this
     }
 
     TaigaClient deleteAllIssueStatuses(Project project) {
