@@ -11,6 +11,10 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
 
     static final Double HALF_PERCENTAGE = 0.5
 
+    void setup() {
+        deleteTaigaProjects()
+    }
+
     void 'Migrate all active projects'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()

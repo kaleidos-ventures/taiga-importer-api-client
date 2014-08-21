@@ -35,14 +35,24 @@ class TaigaClient extends BaseClient {
 
 
     Project saveProject(Project project) {
+        log.debug "Saving ==> ${project.name}"
+
         def params = [name: project.name, description: project.description]
         def response = this.doPost(URLS.projects, params)
 
-        ProjectBinding.bind(project, response)
+        return ProjectBinding.bind(project, response)
+    }
+
+    TaigaClient deleteProjectById(String id) {
+        log.debug "Deleting ==> ${id}"
+
+        this.doDelete("${URLS.projects}/$id")
+        this
     }
 
     List<Map> getProjects() {
-        this.doGet(URLS.projects)
+        // TODO this has to be paginated
+        return this.doGet("${URLS.projects}?page_size=500")
     }
 
     TaigaClient deleteAllIssueTypes(Project project) {

@@ -48,6 +48,7 @@ class BaseClient {
         try {
             cl client
         } catch (Exception e) {
+            println "======>" + new String(e.response.data)
             log.error "There was an error with Taiga", e
         }
     }
