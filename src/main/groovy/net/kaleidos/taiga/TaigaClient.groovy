@@ -10,7 +10,7 @@ import net.kaleidos.taiga.binding.issue.IssueBinding
 import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
 import net.kaleidos.taiga.binding.issue.IssueStatusBinding
 import net.kaleidos.taiga.binding.issue.IssueTypeBinding
-import net.kaleidos.taiga.binding.project.ProjectBinding
+import net.kaleidos.taiga.builder.ProjectBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -37,21 +37,14 @@ class TaigaClient extends BaseClient {
         this
     }
 
-
-    Project saveProject(Project project) {
+    // PROJECT
+    Project saveProject(String name, String description) {
         log.debug "Saving ==> ${project.name}"
 
-        def params = [name: project.name, description: project.description]
-        def response = this.doPost(URLS.projects, params)
+        def params = [name: name, description: description]
+        def json = this.doPost(URLS.projects, params)
 
-        return ProjectBinding.bind(project, response)
-    }
-
-    TaigaClient deleteProjectById(String id) {
-        log.debug "Deleting ==> ${id}"
-
-        this.doDelete("${URLS.projects}/$id")
-        this
+        new ProjectBuilder().build(json)
     }
 
     List<Map> getProjects() {

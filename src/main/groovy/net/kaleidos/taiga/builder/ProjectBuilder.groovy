@@ -1,14 +1,16 @@
-package net.kaleidos.taiga.binding.project
+package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.project.Project
 import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
 import net.kaleidos.taiga.binding.issue.IssueStatusBinding
 import net.kaleidos.taiga.binding.issue.IssueTypeBinding
-import wslite.json.JSONObject
 
-class ProjectBinding {
+class ProjectBuilder implements TaigaEntityBuilder<Project> {
 
-    static Project bind(Project project, JSONObject json) {
+    @Override
+    Project build(Map json) {
+        Project project = new Project()
+
         project.id = json.id
         project.defaultUsStatus = json.default_us_status
         project.defaultTaskStatus = json.default_task_status
