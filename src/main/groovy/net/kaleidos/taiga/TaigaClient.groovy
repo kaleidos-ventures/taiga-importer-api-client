@@ -1,9 +1,12 @@
 package net.kaleidos.taiga
+
 import groovy.util.logging.Log4j
+import net.kaleidos.domain.issue.Issue
 import net.kaleidos.domain.issue.IssuePriority
 import net.kaleidos.domain.issue.IssueStatus
 import net.kaleidos.domain.issue.IssueType
 import net.kaleidos.domain.project.Project
+import net.kaleidos.taiga.binding.issue.IssueBinding
 import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
 import net.kaleidos.taiga.binding.issue.IssueStatusBinding
 import net.kaleidos.taiga.binding.issue.IssueTypeBinding
@@ -18,6 +21,7 @@ class TaigaClient extends BaseClient {
         issueTypes     : "/api/v1/issue-types",
         issueStatuses  : "/api/v1/issue-statuses",
         issuePriorities: "/api/v1/priorities",
+        issues         : "/api/v1/issues"
     ]
 
     TaigaClient(String serverUrl) {
@@ -53,6 +57,22 @@ class TaigaClient extends BaseClient {
     List<Map> getProjects() {
         // TODO this has to be paginated
         return this.doGet("${URLS.projects}?page_size=500")
+    }
+
+    Issue createIssue(Issue issue) {
+        def params = [
+            type       : issue.type.id,
+            status     : issue.status.id,
+            priority   : issue.priority.id,
+            subject    : issue.subject,
+            description: issue.description,
+            project    : issue.project.id,
+            severity   : issue.project.defaultSeverity
+        ]
+
+        def response = this.doPost(URLS.issues, params)
+
+        IssueBinding.bind(new Issue(), response.json)
     }
 
     TaigaClient deleteAllIssueTypes(Project project) {
