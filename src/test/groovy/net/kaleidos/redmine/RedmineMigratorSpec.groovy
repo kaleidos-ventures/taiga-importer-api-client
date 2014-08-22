@@ -18,18 +18,25 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             TaigaClient taigaClient = createTaigaClient()
             RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
         when: 'invoking all names'
-            List<Project> projectList = migrator.migrateAllProjectBasicStructure()
+            List<RedmineTaigaRef> projectList = migrator.migrateAllProjectBasicStructure()
         then: 'there should be at least one project'
-            projectList.size() > 0
-        and: 'all of them have name'
-            projectList.every(hasName)
+            projectList.taigaProject.size() > 0
+        and: 'all of them have id and name'
+            projectList.taigaProject.every(hasId)
+            projectList.taigaProject.every(hasName)
         and: 'usually most projects have description'
             projectList
+                .taigaProject
                 .count(hasDescription)
                 .div(projectList.size()) > HALF_PERCENTAGE
     }
 
-    Closure<Boolean> hasName = { Project p -> p.name }
+    Closure<Boolean> has = { String field ->
+        return { Project p -> p."$field" }
+    }
+
+    Closure<Boolean> hasId = has('id')
+    Closure<Boolean> hasName = has('name')
     Closure<Boolean> hasDescription = { Project p -> p.description }
 
     RedmineManager createRedmineClient() {

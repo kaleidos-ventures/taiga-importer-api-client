@@ -19,47 +19,50 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    List<TaigaProject> migrateAllProjectBasicStructure() {
+    Closure<Map> addBasicFields = { RedmineProject rp ->
+        return [
+            id: rp.id,
+            name: rp.name,
+            description: rp.description ?: rp.name,
+            identifier: rp.identifier
+        ].asImmutable()
+    }
 
-        Closure<Map> basicFields = { RedmineProject rp ->
-            return [
-                name: rp.name,
-                description: rp.description ?: rp.name,
-                identifier: rp.identifier
-            ].asImmutable()
-        }
-
-        Closure<Map> addIdentifierJustInCase = { final List<String> allNames ->
-            return { Map protoTaigaProject ->
-                def addIdentifier = allNames.count { it == protoTaigaProject.name} > 1 ? true : false
-                def name =
-                    protoTaigaProject.with {
-                        addIdentifier ?  "$name [$identifier]" : name
-                    }
-
-                if (addIdentifier) {
-                    log.warn "Project '${protoTaigaProject.name}' is repeated. Trying with '${name}'"
+    Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
+        return { Map protoTaigaProject ->
+            def addIdentifier = allNames.count { it == protoTaigaProject.name} > 1 ? true : false
+            def name =
+                protoTaigaProject.with {
+                    addIdentifier ?  "$name [$identifier]" : name
                 }
 
-                return [
-                    name: name,
-                    description: protoTaigaProject.description
-                ] as TaigaProject
+            if (addIdentifier) {
+                log.warn "Project '${protoTaigaProject.name}' is repeated. Trying with '${name}'"
             }
-        }
 
-        Closure<TaigaProject> savedProjects = { TaigaProject tp ->
-            return taigaClient.createProject(tp)
-        }
+            return [
+                taigaProject: [name: name, description: protoTaigaProject.description] as TaigaProject,
+                redmineProject: protoTaigaProject as RedmineProject
+            ] as RedmineTaigaRef
 
+        }
+    }
+
+    Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
+        return [
+            taigaProject: taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
+            redmineProject: ref.redmineProject
+        ]
+    }
+
+    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
         return projects.collect(
-            basicFields >>
+            addBasicFields >>
             addIdentifierJustInCase(projects.name) >>
-            savedProjects
+            saveProject
         )
     }
-
 
 }
