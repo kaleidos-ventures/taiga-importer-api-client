@@ -44,7 +44,7 @@ class BaseClient {
         }
     }
 
-    private withClient(Closure cl) {
+    protected withClient(Closure cl) {
         try {
             cl client
         } catch (RESTClientException e) {
