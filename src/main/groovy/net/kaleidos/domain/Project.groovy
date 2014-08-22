@@ -1,9 +1,9 @@
-package net.kaleidos.domain.project
+package net.kaleidos.domain
 
 import groovy.transform.ToString
-import net.kaleidos.domain.issue.IssuePriority
-import net.kaleidos.domain.issue.IssueStatus
-import net.kaleidos.domain.issue.IssueType
+import net.kaleidos.domain.IssuePriority
+import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.IssueType
 
 @ToString
 class Project {

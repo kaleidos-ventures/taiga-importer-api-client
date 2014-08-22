@@ -1,6 +1,6 @@
 package net.kaleidos.taiga.builder
 
-import net.kaleidos.domain.project.Project
+import net.kaleidos.domain.Project
 
 class ProjectBuilder implements TaigaEntityBuilder<Project> {
 

@@ -1,7 +1,6 @@
-package net.kaleidos.domain.issue
+package net.kaleidos.domain
 
 import groovy.transform.ToString
-import net.kaleidos.domain.project.Project
 
 @ToString
 class Issue {

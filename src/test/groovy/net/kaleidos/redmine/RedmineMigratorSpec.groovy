@@ -1,9 +1,6 @@
 package net.kaleidos.redmine
 
-import spock.lang.Shared
-import spock.lang.IgnoreIf
-
-import net.kaleidos.domain.project.Project
+import net.kaleidos.domain.Project
 import net.kaleidos.taiga.TaigaClient
 import com.taskadapter.redmineapi.RedmineManager
 

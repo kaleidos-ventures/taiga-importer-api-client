@@ -1,6 +1,6 @@
 package net.kaleidos.taiga.builder
 
-import net.kaleidos.domain.issue.IssueStatus
+import net.kaleidos.domain.IssueStatus
 
 class IssueStatusBuilder implements TaigaEntityBuilder<IssueStatus> {
 

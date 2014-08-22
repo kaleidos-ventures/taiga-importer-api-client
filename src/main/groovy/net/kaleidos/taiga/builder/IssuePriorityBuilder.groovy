@@ -1,6 +1,6 @@
 package net.kaleidos.taiga.builder
 
-import net.kaleidos.domain.issue.IssuePriority
+import net.kaleidos.domain.IssuePriority
 
 class IssuePriorityBuilder implements TaigaEntityBuilder<IssuePriority> {
 

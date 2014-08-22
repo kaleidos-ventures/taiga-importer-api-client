@@ -1,11 +1,11 @@
 package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
-import net.kaleidos.domain.issue.Issue
-import net.kaleidos.domain.issue.IssuePriority
-import net.kaleidos.domain.issue.IssueStatus
-import net.kaleidos.domain.issue.IssueType
-import net.kaleidos.domain.project.Project
+import net.kaleidos.domain.Issue
+import net.kaleidos.domain.IssuePriority
+import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.IssueType
+import net.kaleidos.domain.Project
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder

@@ -1,5 +1,5 @@
 package net.kaleidos.taiga.builder
-import net.kaleidos.domain.issue.IssueType
+import net.kaleidos.domain.IssueType
 
 class IssueTypeBuilder implements TaigaEntityBuilder<IssueType> {
 
