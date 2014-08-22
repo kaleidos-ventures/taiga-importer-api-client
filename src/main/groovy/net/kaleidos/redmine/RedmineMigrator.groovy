@@ -3,11 +3,10 @@ package net.kaleidos.redmine
 import groovy.util.logging.Log4j
 
 import net.kaleidos.taiga.TaigaClient
-import net.kaleidos.domain.project.Project
 import com.taskadapter.redmineapi.RedmineManager
 
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
-import net.kaleidos.domain.project.Project as TaigaProject
+import net.kaleidos.domain.Project as TaigaProject
 
 @Log4j
 class RedmineMigrator {

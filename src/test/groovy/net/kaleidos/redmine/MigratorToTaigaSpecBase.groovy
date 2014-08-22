@@ -1,14 +1,10 @@
 package net.kaleidos.redmine
 
-import spock.lang.Shared
-import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 import groovy.util.logging.Log4j
 
 import net.kaleidos.taiga.TaigaClient
-import net.kaleidos.domain.project.Project
-import com.taskadapter.redmineapi.RedmineManager
 
 @Log4j
 class MigratorToTaigaSpecBase extends Specification {

@@ -1,13 +1,16 @@
 package net.kaleidos.taiga
+
 import groovy.util.logging.Log4j
-import net.kaleidos.domain.issue.IssuePriority
-import net.kaleidos.domain.issue.IssueStatus
-import net.kaleidos.domain.issue.IssueType
-import net.kaleidos.domain.project.Project
-import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
-import net.kaleidos.taiga.binding.issue.IssueStatusBinding
-import net.kaleidos.taiga.binding.issue.IssueTypeBinding
-import net.kaleidos.taiga.binding.project.ProjectBinding
+import net.kaleidos.domain.Issue
+import net.kaleidos.domain.IssuePriority
+import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.IssueType
+import net.kaleidos.domain.Project
+import net.kaleidos.taiga.builder.IssueBuilder
+import net.kaleidos.taiga.builder.IssuePriorityBuilder
+import net.kaleidos.taiga.builder.IssueStatusBuilder
+import net.kaleidos.taiga.builder.IssueTypeBuilder
+import net.kaleidos.taiga.builder.ProjectBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -18,6 +21,7 @@ class TaigaClient extends BaseClient {
         issueTypes     : "/api/v1/issue-types",
         issueStatuses  : "/api/v1/issue-statuses",
         issuePriorities: "/api/v1/priorities",
+        issues         : "/api/v1/issues"
     ]
 
     TaigaClient(String serverUrl) {
@@ -33,21 +37,14 @@ class TaigaClient extends BaseClient {
         this
     }
 
+    // PROJECT
+    Project saveProject(String name, String description) {
+        log.debug "Saving ==> ${name}"
 
-    Project saveProject(Project project) {
-        log.debug "Saving ==> ${project.name}"
+        def params = [name: name, description: description]
+        def json = this.doPost(URLS.projects, params)
 
-        def params = [name: project.name, description: project.description]
-        def response = this.doPost(URLS.projects, params)
-
-        return ProjectBinding.bind(project, response)
-    }
-
-    TaigaClient deleteProjectById(String id) {
-        log.debug "Deleting ==> ${id}"
-
-        this.doDelete("${URLS.projects}/$id")
-        this
+        new ProjectBuilder().build(json)
     }
 
     List<Map> getProjects() {
@@ -55,6 +52,24 @@ class TaigaClient extends BaseClient {
         return this.doGet("${URLS.projects}?page_size=500")
     }
 
+    // ISSUES
+    Issue createIssue(Project project, String type, String status, String priority, String subject, String description) {
+        def params = [
+            type       : project.findIssueTypeByName(type).id,
+            status     : project.findIssueStatusByName(status).id,
+            priority   : project.findIssuePriorityByName(priority).id,
+            subject    : subject,
+            description: description,
+            project    : project.id,
+            severity   : project.defaultSeverity
+        ]
+
+        def json = this.doPost(URLS.issues, params)
+
+        new IssueBuilder().build(json)
+    }
+
+    // ISSUE TYPES
     TaigaClient deleteAllIssueTypes(Project project) {
         def issueTypes = project.issueTypes
         issueTypes.each { IssueType it ->
@@ -67,14 +82,15 @@ class TaigaClient extends BaseClient {
 
     IssueType addIssueType(String name, Project project) {
         def params = [project: project.id, name: name]
-        def response = this.doPost(URLS.issueTypes, params)
+        def json = this.doPost(URLS.issueTypes, params)
 
-        def issueType = IssueTypeBinding.bind(new IssueType(), response)
+        def issueType = new IssueTypeBuilder().build(json)
         project.issueTypes << issueType
 
         issueType
     }
 
+    // ISSUE STATUSES
     TaigaClient deleteAllIssueStatuses(Project project) {
         def issueStatuses = project.issueStatuses
         issueStatuses.each { IssueStatus is ->
@@ -85,16 +101,17 @@ class TaigaClient extends BaseClient {
         this
     }
 
-    IssueStatus addIssueStatus(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def response = this.doPost(URLS.issueStatuses, params)
+    IssueStatus addIssueStatus(String name, Boolean isClosed, Project project) {
+        def params = [project: project.id, name: name, is_closed: isClosed]
+        def json = this.doPost(URLS.issueStatuses, params)
 
-        def issueStatus = IssueStatusBinding.bind(new IssueStatus(), response)
+        def issueStatus = new IssueStatusBuilder().build(json)
         project.issueStatuses << issueStatus
 
         issueStatus
     }
 
+    // ISSUE PRIORITIES
     TaigaClient deleteAllIssuePriorities(Project project) {
         def issuePriorities = project.issuePriorities
         issuePriorities.each { IssuePriority ip ->
@@ -107,9 +124,9 @@ class TaigaClient extends BaseClient {
 
     IssuePriority addIssuePriority(String name, Project project) {
         def params = [project: project.id, name: name]
-        def response = this.doPost(URLS.issuePriorities, params)
+        def json = this.doPost(URLS.issuePriorities, params)
 
-        def issuePriority = IssuePriorityBinding.bind(new IssuePriority(), response)
+        def issuePriority = new IssuePriorityBuilder().build(json)
         project.issuePriorities << issuePriority
 
         issuePriority

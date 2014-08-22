@@ -1,9 +1,9 @@
-package net.kaleidos.domain.issue
+package net.kaleidos.domain
 
 import groovy.transform.ToString
 
 @ToString
-class IssueType {
+class IssueStatus {
     Long id
     String name
 }
