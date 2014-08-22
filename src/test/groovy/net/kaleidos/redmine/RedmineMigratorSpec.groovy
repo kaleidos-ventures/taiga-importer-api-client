@@ -1,7 +1,14 @@
 package net.kaleidos.redmine
 
+import spock.lang.IgnoreRest
+
+import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.IssueType
+import net.kaleidos.domain.IssueStatus
+
 import net.kaleidos.taiga.TaigaClient
+
 import com.taskadapter.redmineapi.RedmineManager
 
 class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
@@ -29,6 +36,44 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .taigaProject
                 .count(hasDescription)
                 .div(projectList.size()) > HALF_PERCENTAGE
+    }
+
+    void 'Migrate issue trackers from a given project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating issue types of the current project'
+            List<IssueType> projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
+        then: 'there should be some types'
+            projectIssueTypeList.size() > 0
+        and: 'cant be repeated'
+            projectIssueTypeList.unique {it.name}.size() == projectIssueTypeList.size()
+    }
+
+    void 'Migrate issue status from a given project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating issue statuses of the current project'
+            List<IssueStatus> projectIssueStatusList = migrator.migrateIssueStatusesByProject(project)
+        then: 'there should be some types'
+            projectIssueStatusList.size() > 0
+        and: 'cant be repeated'
+            projectIssueStatusList.unique {it.name}.size() == projectIssueStatusList.size()
     }
 
     Closure<Boolean> has = { String field ->
