@@ -1,8 +1,9 @@
 package net.kaleidos
 
-import net.kaleidos.domain.project.Project
+import groovy.util.logging.Log4j
 import net.kaleidos.taiga.TaigaClient
 
+@Log4j
 class RedmineToTaiga {
 
     private static final String SERVER_URL = "http://localhost:8000"
@@ -10,38 +11,43 @@ class RedmineToTaiga {
     static void main(String[] args) {
         TaigaClient taiga = new TaigaClient(SERVER_URL)
 
-        def p1 = new Project(name: "${new Date().time}_", description: "la descripción bla, bla....")
-
         def taigaProject = taiga
             .authenticate("admin", "123123")
-            .saveProject(p1)
+            .saveProject("100_${new Date().time}", "la descripción bla, bla....")
 
-        println taigaProject
+        log.debug "."*100
+        log.debug taigaProject
+        log.debug "."*20
+        log.debug taigaProject.id
+        log.debug "."*100
+
 
         taiga
             .deleteAllIssueTypes(taigaProject)
             .deleteAllIssueStatuses(taigaProject)
             .deleteAllIssuePriorities(taigaProject)
 
-        println "Creando issue types..."
+        log.debug "Creando issue types..."
         ['defecto', 'historia de usuario', 'tarea'].each {
             def issueType = taiga.addIssueType(it, taigaProject)
             println issueType
         }
 
-        println "Creando issue status..."
+        log.debug "Creando issue status..."
         ['nuevo', 'haciendo', 'casi terminado', 'fin'].each {
-            def issueStatus = taiga.addIssueStatus(it, taigaProject)
+            def issueStatus = taiga.addIssueStatus(it, true, taigaProject)
             println issueStatus
         }
 
-        println "Creando issue prioridad..."
+        log.debug "Creando issue prioridad..."
         ['no hace falta', 'hazlo', 'lo quiero para ayer!'].each {
             def issuePriority = taiga.addIssuePriority(it, taigaProject)
             println issuePriority
         }
 
-        println "Migration finished!"
+        taiga.createIssue(taigaProject, 'tarea', 'casi terminado', 'lo quiero para ayer!', 'Dominar el mundo', 'Plan secreto para dominar el mundo...')
+
+        log.debug "Migration finished!"
     }
 
     void getProjects(TaigaClient taiga) {
@@ -50,8 +56,8 @@ class RedmineToTaiga {
             .getProjects()
 
         projects.each { p ->
-            println p.name
-            println p.description
+            log.debug p.name
+            log.debug p.description
         }
     }
 }
