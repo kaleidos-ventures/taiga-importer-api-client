@@ -5,6 +5,8 @@ import net.kaleidos.domain.project.Project
 
 @ToString
 class Issue {
+    Long id
+
     IssueType type
     IssueStatus status
     IssuePriority priority

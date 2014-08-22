@@ -21,4 +21,16 @@ class Project {
     List<IssueStatus> issueStatuses
     List<IssueType> issueTypes
     List<IssuePriority> issuePriorities
+
+    IssueStatus findIssueStatusByName(String name) {
+        issueStatuses.find { it.name == name }
+    }
+
+    IssueType findIssueTypeByName(String name) {
+        issueTypes.find { it.name == name }
+    }
+
+    IssuePriority findIssuePriorityByName(String name) {
+        issuePriorities.find { it.name == name }
+    }
 }

@@ -1,9 +1,6 @@
 package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.project.Project
-import net.kaleidos.taiga.binding.issue.IssuePriorityBinding
-import net.kaleidos.taiga.binding.issue.IssueStatusBinding
-import net.kaleidos.taiga.binding.issue.IssueTypeBinding
 
 class ProjectBuilder implements TaigaEntityBuilder<Project> {
 
@@ -11,16 +8,18 @@ class ProjectBuilder implements TaigaEntityBuilder<Project> {
     Project build(Map json) {
         Project project = new Project()
 
-        project.id = json.id
-        project.defaultUsStatus = json.default_us_status
-        project.defaultTaskStatus = json.default_task_status
-        project.defaultPriority = json.default_priority
-        project.defaultSeverity = json.default_severity
-        project.defaultIssueStatus = json.default_issue_status
-        project.defaultIssueType = json.default_issue_type
-        project.issueStatuses = IssueStatusBinding.create(json.issue_statuses)
-        project.issueTypes = IssueTypeBinding.create(json.issue_types)
-        project.issuePriorities = IssuePriorityBinding.create(json.priorities)
+        project.with {
+            id = json.id
+            defaultUsStatus = json.default_us_status
+            defaultTaskStatus = json.default_task_status
+            defaultPriority = json.default_priority
+            defaultSeverity = json.default_severity
+            defaultIssueStatus = json.default_issue_status
+            defaultIssueType = json.default_issue_type
+            issueStatuses = json.issue_statuses.collect { new IssueStatusBuilder().build(it) }
+            issueTypes = json.issue_types.collect { new IssueTypeBuilder().build(it) }
+            issuePriorities = json.priorities.collect { new IssuePriorityBuilder().build(it) }
+        }
 
         project
     }
