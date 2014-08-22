@@ -2,6 +2,7 @@ package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
 import wslite.rest.RESTClient
+import wslite.rest.RESTClientException
 import wslite.rest.Response
 
 @Log4j
@@ -43,13 +44,12 @@ class BaseClient {
         }
     }
 
-
     private withClient(Closure cl) {
         try {
             cl client
-        } catch (Exception e) {
-            println "======>" + new String(e.response.data)
-            log.error "There was an error with Taiga", e
+        } catch (RESTClientException e) {
+            log.error "Server response ======>" + new String(e.response.data)
+            throw e
         }
     }
 }
