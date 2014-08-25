@@ -31,6 +31,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         and: 'all of them have id and name'
             projectList.taigaProject.every(hasId)
             projectList.taigaProject.every(hasName)
+            projectList.taigaProject.every(has('issueTypes'))
         and: 'usually most projects have description'
             projectList
                 .taigaProject
@@ -38,6 +39,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .div(projectList.size()) > HALF_PERCENTAGE
     }
 
+    //@IgnoreRest
     void 'Migrate issue trackers from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()

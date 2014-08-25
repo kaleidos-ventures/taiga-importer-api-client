@@ -14,6 +14,8 @@ import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project as TaigaProject
 
+import org.apache.http.message.BasicNameValuePair
+
 @Log4j
 class RedmineMigrator {
 
@@ -26,12 +28,20 @@ class RedmineMigrator {
     }
 
     Closure<Map> addBasicFields = { RedmineProject rp ->
+
+        RedmineProject reloaded = redmineClient.getProjectByKey(rp.id.toString())
+
         return [
-            id: rp.id,
-            name: rp.name,
-            description: rp.description ?: rp.name,
-            identifier: rp.identifier
+            id: reloaded.id,
+            name: reloaded.name,
+            trackers: reloaded.trackers,
+            description: reloaded.description ?: reloaded.name,
+            identifier: reloaded.identifier
         ].asImmutable()
+    }
+
+    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
+        return new IssueType(name: tracker.name)
     }
 
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
@@ -47,7 +57,10 @@ class RedmineMigrator {
             }
 
             return [
-                taigaProject: [name: name, description: protoTaigaProject.description] as TaigaProject,
+                taigaProject: [
+                    name: name,
+                    issueTypes: protoTaigaProject.trackers.collect(trackerToIssueType),
+                    description: protoTaigaProject.description] as TaigaProject,
                 redmineProject: protoTaigaProject as RedmineProject
             ] as RedmineTaigaRef
 
@@ -87,8 +100,6 @@ class RedmineMigrator {
         Closure<RedmineTaigaRef> tap = { log.debug("IssueType ==> ${it.name}"); it }
         Closure<IssueType> add = { taigaClient.addIssueType(it.name, ref.taigaProject) }
 
-        // TODO failing
-        //http://redmine.local/projects/yump.json?include=trackers
         return ref.redmineProject.trackers.collect(tap >> add)
     }
 
