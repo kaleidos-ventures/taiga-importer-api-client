@@ -38,7 +38,7 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECT
-    Project saveProject(String name, String description) {
+    Project createProject(String name, String description) {
         log.debug "Saving ==> ${name}"
 
         def params = [name: name, description: description]

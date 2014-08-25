@@ -13,14 +13,13 @@ class RedmineToTaiga {
 
         def taigaProject = taiga
             .authenticate("admin", "123123")
-            .saveProject("100_${new Date().time}", "la descripción bla, bla....")
+            .createProject("100_${new Date().time}", "la descripción bla, bla....")
 
         log.debug "."*100
         log.debug taigaProject
         log.debug "."*20
         log.debug taigaProject.id
         log.debug "."*100
-
 
         taiga
             .deleteAllIssueTypes(taigaProject)
