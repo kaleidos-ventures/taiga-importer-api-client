@@ -48,7 +48,7 @@ class BaseClient {
         try {
             cl client
         } catch (RESTClientException e) {
-            log.error "Server response ======>" + new String(e.response.data)
+            log.error "Server response ===> " + e.response.contentAsString
             throw e
         }
     }
