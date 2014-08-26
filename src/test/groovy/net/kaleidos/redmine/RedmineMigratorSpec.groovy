@@ -20,7 +20,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         deleteTaigaProjects()
     }
 
-    void 'Migrate all active projects'() {
+    void 'Migrate all active projects basic structure'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()
             TaigaClient taigaClient = createTaigaClient()
@@ -94,11 +94,37 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         then: 'there should be some priorities'
             priorities.size() > 0
         and: 'all of them should have name'
-            priorities.every { it.name }
+            priorities.every(hasId)
+            priorities.every(hasName)
     }
 
+    void 'Migrate issues from a given project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating redmine current issues'
+            List<Issue> issues = migrator.migrateIssuesByProject(project)
+        then: 'there should be issues'
+            issues.size() > 0
+            issues.every(has('id'))
+            issues.every(has('project'))
+            issues.every(has('subject'))
+            issues.size() > 0
+            //issues.every(has('status'))
+            //issues.every(has('priority'))
+            //issues.every(has('type'))
+    }
+
+
     Closure<Boolean> has = { String field ->
-        return { Project p -> p."$field" }
+        return { Object p -> p."$field" }
     }
 
     Closure<Boolean> hasId = has('id')
