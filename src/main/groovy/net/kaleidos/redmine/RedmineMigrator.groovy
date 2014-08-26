@@ -12,6 +12,7 @@ import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import net.kaleidos.domain.Issue as TaigaIssue
 import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.IssuePriority
 import net.kaleidos.domain.Project as TaigaProject
 
 import org.apache.http.message.BasicNameValuePair
@@ -96,15 +97,20 @@ class RedmineMigrator {
         saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.first()
     }
 
+    Closure<?> tap = { String type ->
+        return {
+            log.debug("$type ==> ${it.name}")
+            it
+        }
+    }
+
     List<IssueType> migrateIssueTrackersByProject(RedmineTaigaRef ref) {
-        Closure<RedmineTaigaRef> tap = { log.debug("IssueType ==> ${it.name}"); it }
         Closure<IssueType> add = { taigaClient.addIssueType(it.name, ref.taigaProject) }
 
-        return ref.redmineProject.trackers.collect(tap >> add)
+        return ref.redmineProject.trackers.collect(tap("IssueType") >> add)
     }
 
     List<IssueStatus> migrateIssueStatusesByProject(RedmineTaigaRef ref) {
-        Closure<RedmineTaigaRef> tap = { log.debug("IssueStatus ==> ${it.name}"); it }
         Closure<IssueStatus> add = {
             taigaClient.addIssueStatus(
                 it.name,
@@ -113,10 +119,16 @@ class RedmineMigrator {
             )
         }
 
-        return redmineClient.statuses.collect(tap >> add)
+        return redmineClient.statuses.collect(tap("IssueStatus") >> add)
     }
 
-    //List<IssuePriority> migrateIssuePriorities()
+    List<IssuePriority> migrateIssuePriorities(final RedmineTaigaRef ref) {
+        Closure<IssuePriority> add = {
+            taigaClient.addIssuePriority(it.name, ref.taigaProject)
+        }
+
+        return redmineClient.issuePriorities.collect(tap("IssuePriority") >> add)
+    }
 
     List<TaigaIssue> migrateIssuesByProject(RedmineTaigaRef projectRef) {
         println redmineClient.getIssues([project_id: projectRef.redmineProject.id.toString()])

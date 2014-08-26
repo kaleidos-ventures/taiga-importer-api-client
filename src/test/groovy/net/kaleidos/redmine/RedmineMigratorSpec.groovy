@@ -6,6 +6,7 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.IssuePriority
 
 import net.kaleidos.taiga.TaigaClient
 
@@ -39,7 +40,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .div(projectList.size()) > HALF_PERCENTAGE
     }
 
-    //@IgnoreRest
     void 'Migrate issue trackers from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()
@@ -76,6 +76,25 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             projectIssueStatusList.size() > 0
         and: 'cant be repeated'
             projectIssueStatusList.unique {it.name}.size() == projectIssueStatusList.size()
+    }
+
+    void 'Migrate issue priorities from a given project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating issue priorities of the current project'
+            List<IssuePriority> priorities = migrator.migrateIssuePriorities(project)
+        then: 'there should be some priorities'
+            priorities.size() > 0
+        and: 'all of them should have name'
+            priorities.every { it.name }
     }
 
     Closure<Boolean> has = { String field ->
