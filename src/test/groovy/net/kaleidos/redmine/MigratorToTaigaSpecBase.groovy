@@ -10,7 +10,7 @@ import net.kaleidos.taiga.TaigaClient
 class MigratorToTaigaSpecBase extends Specification {
 
     TaigaClient createTaigaClient() {
-        def config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').toURL())
+        def config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').text)
         def client = new TaigaClient(config.host)
 
         return client.authenticate(config.user, config.passwd)

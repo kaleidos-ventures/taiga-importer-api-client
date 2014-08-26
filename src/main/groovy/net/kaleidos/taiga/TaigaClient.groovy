@@ -38,7 +38,7 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECT
-    Project saveProject(String name, String description) {
+    Project createProject(String name, String description) {
         log.debug "Saving ==> ${name}"
 
         def params = [name: name, description: description]
@@ -50,6 +50,16 @@ class TaigaClient extends BaseClient {
     List<Map> getProjects() {
         // TODO this has to be paginated
         return this.doGet("${URLS.projects}?page_size=500")
+    }
+
+    void deleteProject(Project project) {
+        this.doDelete("${URLS.projects}/${project.id}")
+    }
+
+    Project getProjectById(Long projectId) {
+        def json = this.doGet("${URLS.projects}/${projectId}")
+
+        new ProjectBuilder().build(json)
     }
 
     // ISSUES

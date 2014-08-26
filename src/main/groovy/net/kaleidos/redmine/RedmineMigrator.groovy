@@ -49,7 +49,7 @@ class RedmineMigrator {
         }
 
         Closure<TaigaProject> savedProjects = { TaigaProject tp ->
-            return taigaClient.saveProject(tp)
+            return taigaClient.createProject(tp)
         }
 
         List<RedmineProject> projects = redmineClient.projects
