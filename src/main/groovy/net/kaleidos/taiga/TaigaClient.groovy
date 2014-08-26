@@ -52,6 +52,10 @@ class TaigaClient extends BaseClient {
         return this.doGet("${URLS.projects}?page_size=500")
     }
 
+    void deleteProject(Project project) {
+        this.doDelete("${URLS.projects}/${project.id}")
+    }
+
     // ISSUES
     Issue createIssue(Project project, String type, String status, String priority, String subject, String description) {
         def params = [
