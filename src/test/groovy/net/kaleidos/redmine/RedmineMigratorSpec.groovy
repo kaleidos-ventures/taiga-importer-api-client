@@ -33,7 +33,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
     Closure<Boolean> hasDescription = { Project p -> p.description }
 
     RedmineManager createRedmineClient() {
-        def config = new ConfigSlurper().parse(new File('src/test/resources/redmine.groovy').toURL())
+        def config = new ConfigSlurper().parse(new File('src/test/resources/redmine.groovy').text)
         def manager = new RedmineManager(config.host, config.apiKey)
 
         return manager
