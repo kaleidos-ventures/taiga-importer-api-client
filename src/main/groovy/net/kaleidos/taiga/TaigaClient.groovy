@@ -56,6 +56,12 @@ class TaigaClient extends BaseClient {
         this.doDelete("${URLS.projects}/${project.id}")
     }
 
+    Project getProjectById(Long projectId) {
+        def json = this.doGet("${URLS.projects}/${projectId}")
+
+        new ProjectBuilder().build(json)
+    }
+
     // ISSUES
     Issue createIssue(Project project, String type, String status, String priority, String subject, String description) {
         def params = [
