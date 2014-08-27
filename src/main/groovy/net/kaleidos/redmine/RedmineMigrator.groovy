@@ -42,22 +42,19 @@ class RedmineMigrator {
     }
 
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
-        return { RedmineProject protoTaigaProject ->
-            def addIdentifier = allNames.count { it.trim() == protoTaigaProject.name.trim()} > 1 ? true : false
-            def name =
-                protoTaigaProject.with {
-                    addIdentifier ?  "$name [$identifier]" : name
-                }
+        return { RedmineProject source ->
+
+            def addIdentifier = allNames.count { it.trim() == source.name.trim()} > 1 ? true : false
 
             if (addIdentifier) {
-                log.warn "Project '${protoTaigaProject.name}' is repeated. Trying with '${name}'"
+                log.warn "Project '${source.name}' is repeated. Modifying name..."
             }
 
             return [
                 taigaProject: [
-                    name: name,
-                    description: protoTaigaProject.description] as TaigaProject,
-                redmineProject: protoTaigaProject as RedmineProject
+                    name: addIdentifier ? "${source.name} [${source.identifier}]" : source.name,
+                    description: source.description ] as TaigaProject,
+                redmineProject: source
             ] as RedmineTaigaRef
 
         }
