@@ -5,12 +5,18 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.IssuePriority
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.IssueType
+import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.Role
+import net.kaleidos.domain.User
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
 import net.kaleidos.taiga.builder.IssueTypeBuilder
+import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
+import net.kaleidos.taiga.builder.RoleBuilder
+import net.kaleidos.taiga.builder.UserBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -21,7 +27,10 @@ class TaigaClient extends BaseClient {
         issueTypes     : "/api/v1/issue-types",
         issueStatuses  : "/api/v1/issue-statuses",
         issuePriorities: "/api/v1/priorities",
-        issues         : "/api/v1/issues"
+        issues         : "/api/v1/issues",
+        roles          : "/api/v1/roles",
+        memberships    : "/api/v1/memberships",
+        registerUsers  : "/api/v1/auth/register",
     ]
 
     TaigaClient(String serverUrl) {
@@ -67,6 +76,35 @@ class TaigaClient extends BaseClient {
         def json = this.doGet("${URLS.projects}/${projectId}")
 
         new ProjectBuilder().build(json)
+    }
+
+    // ROLES
+    Role addRole(String name, Project project) {
+        def params = [
+            project: project.id,
+            name   : name
+        ]
+        def json = this.doPost(URLS.roles, params)
+
+        def role = new RoleBuilder().build(json)
+        project.roles << role
+
+        role
+    }
+
+    // MEMBERSHIPS
+    Membership createMembership(String email, String role, Project project) {
+        def params = [
+            project: project.id,
+            role: project.findRoleByName(role).id,
+            email: email
+        ]
+        def json = this.doPost(URLS.memberships, params)
+
+        def membership = new MembershipBuilder().build(json, project)
+        project.memberships << membership
+
+        membership
     }
 
     // ISSUES
@@ -147,5 +185,21 @@ class TaigaClient extends BaseClient {
         project.issuePriorities << issuePriority
 
         issuePriority
+    }
+
+    // USERS
+    User registerUser(String email, String password, String token) {
+        def params = [
+            email: email,
+            token: token,
+            username: email,
+            existing: false,
+            full_name: email,
+            password: password,
+            type: 'private',
+        ]
+        def json = this.doPost(URLS.registerUsers, params)
+
+        new UserBuilder().build(json)
     }
 }
