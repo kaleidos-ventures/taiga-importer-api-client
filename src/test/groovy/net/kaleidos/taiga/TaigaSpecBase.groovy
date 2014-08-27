@@ -1,5 +1,6 @@
 package net.kaleidos.taiga
 
+import net.kaleidos.domain.Project
 import spock.lang.Specification
 
 class TaigaSpecBase extends Specification {
@@ -15,5 +16,13 @@ class TaigaSpecBase extends Specification {
 
     def setup() {
         taigaClient = createAuthenticatedTaigaClient()
+    }
+
+    Project createProject() {
+        taigaClient.createProject("name ${new Date().time}", "description")
+    }
+
+    void deleteProject(Project project) {
+        taigaClient.deleteProject(project)
     }
 }

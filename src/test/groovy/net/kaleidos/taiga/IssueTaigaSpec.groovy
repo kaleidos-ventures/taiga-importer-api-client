@@ -6,11 +6,11 @@ class IssueTaigaSpec extends TaigaSpecBase {
     Project project
 
     def setup() {
-        project = taigaClient.createProject("name ${new Date().time}", "description")
+        project = createProject()
     }
 
     def cleanup() {
-        taigaClient.deleteProject(project)
+        deleteProject(project)
     }
 
     void 'delete all issue types of a project'() {
