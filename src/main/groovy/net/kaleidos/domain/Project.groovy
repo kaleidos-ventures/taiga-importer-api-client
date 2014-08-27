@@ -1,9 +1,6 @@
 package net.kaleidos.domain
 
 import groovy.transform.ToString
-import net.kaleidos.domain.IssuePriority
-import net.kaleidos.domain.IssueStatus
-import net.kaleidos.domain.IssueType
 
 @ToString
 class Project {
@@ -26,11 +23,23 @@ class Project {
         issueStatuses.find { it.name == name }
     }
 
+    IssueStatus findIssueStatusById(Long id) {
+        issueStatuses.find { it.id == id }
+    }
+
     IssueType findIssueTypeByName(String name) {
         issueTypes.find { it.name == name }
     }
 
+    IssueType findIssueTypeById(Long id) {
+        issueTypes.find { it.id == id }
+    }
+
     IssuePriority findIssuePriorityByName(String name) {
         issuePriorities.find { it.name == name }
+    }
+
+    IssuePriority findIssuePriorityById(Long id) {
+        issuePriorities.find { it.id == id }
     }
 }
