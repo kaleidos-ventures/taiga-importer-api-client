@@ -12,6 +12,7 @@ class MembershipBuilder implements SafeJson {
             id = json.id
             email = json.email
             userId = nullSafe(json.user)
+            token = json.token
         }
 
         membership

@@ -1,4 +1,5 @@
 package net.kaleidos.taiga
+
 import net.kaleidos.domain.Project
 
 class MembershipTaigaSpec extends TaigaSpecBase {
@@ -13,11 +14,11 @@ class MembershipTaigaSpec extends TaigaSpecBase {
         deleteProject(project)
     }
 
-    void 'add a non existing member to a project'() {
+    void 'add a non existing user to a project'() {
         given: 'a role'
-            def role = taigaClient.addRole(roleName, project)
+            def role = project.roles.first()
 
-        when: 'trying to add it'
+        when: 'adding the user'
             taigaClient.createMembership(email, role.name, project)
 
         then: 'the member is added to Taiga'
@@ -29,10 +30,27 @@ class MembershipTaigaSpec extends TaigaSpecBase {
         and: 'the original project is also updated'
             project.findMembershipByEmail(email) != null
 
-        println project.memberships
+        where:
+            email = "user_${new Date().time}@example.com"
+            roleName = "Boss"
+    }
+
+    void 'add an existing user to a project'() {
+        given: 'a user in taiga'
+            def membership = taigaClient.createMembership(email, project.roles.first().name, project)
+            def user = taigaClient.registerUser(email, 'dragon', membership.token)
+
+        and: 'a new project'
+            def project2 = createProject()
+
+        when: 'adding the existing user in Taiga to the new project'
+            def role2 = project2.roles.first()
+            def membership2 = taigaClient.createMembership(email, role2.name, project2)
+
+        then: 'the member is added to the project as a real user'
+            membership2.userId == user.id
 
         where:
-            email = "user@example.com"
-            roleName = "Boss"
+            email = "user_${new Date().time}@example.com"
     }
 }

@@ -8,6 +8,7 @@ import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
+import net.kaleidos.domain.User
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
@@ -15,6 +16,7 @@ import net.kaleidos.taiga.builder.IssueTypeBuilder
 import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
+import net.kaleidos.taiga.builder.UserBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -28,6 +30,7 @@ class TaigaClient extends BaseClient {
         issues         : "/api/v1/issues",
         roles          : "/api/v1/roles",
         memberships    : "/api/v1/memberships",
+        registerUsers  : "/api/v1/auth/register",
     ]
 
     TaigaClient(String serverUrl) {
@@ -182,5 +185,21 @@ class TaigaClient extends BaseClient {
         project.issuePriorities << issuePriority
 
         issuePriority
+    }
+
+    // USERS
+    User registerUser(String email, String password, String token) {
+        def params = [
+            email: email,
+            token: token,
+            username: email,
+            existing: false,
+            full_name: email,
+            password: password,
+            type: 'private',
+        ]
+        def json = this.doPost(URLS.registerUsers, params)
+
+        new UserBuilder().build(json)
     }
 }
