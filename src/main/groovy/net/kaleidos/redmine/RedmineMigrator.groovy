@@ -1,5 +1,7 @@
 package net.kaleidos.redmine
 
+import static groovyx.gpars.GParsPool.withPool
+
 import groovy.util.logging.Log4j
 
 import net.kaleidos.taiga.TaigaClient
@@ -28,44 +30,40 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    Closure<Map> addBasicFields = { RedmineProject rp ->
+    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
+        List<RedmineProject> projects = redmineClient.projects
 
-        RedmineProject reloaded = redmineClient.getProjectByKey(rp.id.toString())
-
-        return [
-            id: reloaded.id,
-            name: reloaded.name,
-            trackers: reloaded.trackers,
-            description: reloaded.description ?: reloaded.name,
-            identifier: reloaded.identifier
-        ].asImmutable()
+        return map(projects, addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
     }
 
-    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
-        return new IssueType(name: tracker.name)
+    Closure<RedmineProject> addBasicFields = { RedmineProject rp ->
+        return redmineClient.getProjectByKey(rp.id.toString()).with { RedmineProject source ->
+            source.description = source.description ?: source.name
+            source
+        }
     }
 
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
-        return { Map protoTaigaProject ->
-            def addIdentifier = allNames.count { it.trim() == protoTaigaProject.name.trim()} > 1 ? true : false
-            def name =
-                protoTaigaProject.with {
-                    addIdentifier ?  "$name [$identifier]" : name
-                }
+        return { RedmineProject source ->
+
+            def addIdentifier = allNames.count { it.trim() == source.name.trim()} > 1 ? true : false
 
             if (addIdentifier) {
-                log.warn "Project '${protoTaigaProject.name}' is repeated. Trying with '${name}'"
+                log.warn "Project '${source.name}' is repeated. Modifying name..."
             }
 
             return [
                 taigaProject: [
-                    name: name,
-                    issueTypes: protoTaigaProject.trackers.collect(trackerToIssueType),
-                    description: protoTaigaProject.description] as TaigaProject,
-                redmineProject: protoTaigaProject as RedmineProject
+                    name: addIdentifier ? "${source.name} [${source.identifier}]" : source.name,
+                    description: source.description ] as TaigaProject,
+                redmineProject: source
             ] as RedmineTaigaRef
 
         }
+    }
+
+    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
+        return new IssueType(name: tracker.name)
     }
 
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
@@ -76,16 +74,14 @@ class RedmineMigrator {
 
     }
 
-    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
-        List<RedmineProject> projects = redmineClient.projects
-
-        return projects.collect(addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
-    }
-
     RedmineTaigaRef migrateFirstProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
         saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.first()
+    }
+
+    List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
+        return map(ref.redmineProject.trackers, addedIssueType(ref))
     }
 
     Closure<?> tap = { String type, String field = "name" ->
@@ -95,64 +91,65 @@ class RedmineMigrator {
         }
     }
 
-    List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
-
-        Closure<IssueType> add = {
-            taigaClient.addIssueType(
-                it.name,
-                ref.taigaProject
-            )
+    Closure<IssueType> addedIssueType(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssueType(it.name, ref.taigaProject)
         }
-
-        return ref.redmineProject.trackers.collect(tap("IssueType") >> add)
     }
 
     List<IssueStatus> migrateIssueStatusesByProject(final RedmineTaigaRef ref) {
-        Closure<IssueStatus> add = {
-            taigaClient.addIssueStatus(
-                it.name,
-                it.isClosed(),
-                ref.taigaProject
-            )
-        }
+        return map(redmineClient.statuses, addedIssueStatus(ref))
+    }
 
-        return redmineClient.statuses.collect(tap("IssueStatus") >> add)
+    Closure<IssueStatus> addedIssueStatus(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssueStatus(it.name, it.isClosed(), ref.taigaProject)
+        }
     }
 
     List<IssuePriority> migrateIssuePriorities(final RedmineTaigaRef ref) {
-        Closure<IssuePriority> add = {
-            taigaClient.addIssuePriority(it.name, ref.taigaProject)
-        }
-
-        return redmineClient.issuePriorities.collect(tap("IssuePriority") >> add)
+        return map(redmineClient.issuePriorities, addedIssuePriority(ref))
     }
 
-    List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef projectRef) {
+    Closure<IssuePriority> addedIssuePriority(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssuePriority(it.name, ref.taigaProject)
+        }
+    }
 
-        projectRef.taigaProject.with {
-            issueStatuses = migrateIssueStatusesByProject(projectRef)
-            issueTypes = migrateIssueTrackersByProject(projectRef)
-            issuePriorities = migrateIssuePriorities(projectRef)
+    List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef ref) {
+
+        ref.taigaProject.with {
+            issueStatuses = migrateIssueStatusesByProject(ref)
+            issueTypes = migrateIssueTrackersByProject(ref)
+            issuePriorities = migrateIssuePriorities(ref)
         }
 
-        Closure<TaigaIssue> add = {
-            def issue =
-                taigaClient.createIssue(
-                    projectRef.taigaProject,
-                    it.tracker.name,
-                    it.statusName,
-                    it.priorityText,
-                    it.subject,
-                    it.description
-                )
+        return mapParallel(
+            redmineClient.getIssues(project_id: ref.redmineProject.id.toString()),
+            addedTaigaIssue(ref)
+        )
+    }
 
-            issue.project = projectRef.taigaProject
-            issue
+    Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.createIssue(
+                ref.taigaProject,
+                it.tracker.name,
+                it.statusName,
+                it.priorityText,
+                it.subject,
+                it.description
+            )
         }
+    }
 
-        def params = [project_id: projectRef.redmineProject.id.toString()]
+    static <T,U> List<U> map(List<T> collection, Closure<U> collector) {
+        return collection.collect(collector)
+    }
 
-        return redmineClient.getIssues(params).collect(tap("Issue", "subject") >> add)
+    static <T,U> List<U> mapParallel(List<T> collection, Closure<U> collector) {
+        return withPool { collection.collectParallel(collector) }
     }
 
 }
