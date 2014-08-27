@@ -2,9 +2,8 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.IssuePriority
 
-class IssuePriorityBuilder implements TaigaEntityBuilder<IssuePriority> {
+class IssuePriorityBuilder {
 
-    @Override
     IssuePriority build(Map json) {
         def issuePriority = new IssuePriority()
 

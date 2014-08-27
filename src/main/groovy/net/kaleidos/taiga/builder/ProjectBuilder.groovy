@@ -2,9 +2,8 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 
-class ProjectBuilder implements TaigaEntityBuilder<Project> {
+class ProjectBuilder {
 
-    @Override
     Project build(Map json) {
         Project project = new Project()
 
