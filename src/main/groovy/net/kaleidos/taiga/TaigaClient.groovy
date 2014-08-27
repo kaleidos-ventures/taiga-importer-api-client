@@ -5,12 +5,14 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.IssuePriority
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.IssueType
+import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
 import net.kaleidos.taiga.builder.IssueTypeBuilder
+import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
 
@@ -25,6 +27,7 @@ class TaigaClient extends BaseClient {
         issuePriorities: "/api/v1/priorities",
         issues         : "/api/v1/issues",
         roles          : "/api/v1/roles",
+        memberships    : "/api/v1/memberships",
     ]
 
     TaigaClient(String serverUrl) {
@@ -84,6 +87,21 @@ class TaigaClient extends BaseClient {
         project.roles << role
 
         role
+    }
+
+    // MEMBERSHIPS
+    Membership createMembership(String email, String role, Project project) {
+        def params = [
+            project: project.id,
+            role: project.findRoleByName(role).id,
+            email: email
+        ]
+        def json = this.doPost(URLS.memberships, params)
+
+        def membership = new MembershipBuilder().build(json, project)
+        project.memberships << membership
+
+        membership
     }
 
     // ISSUES

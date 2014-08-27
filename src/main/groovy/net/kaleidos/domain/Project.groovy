@@ -20,6 +20,7 @@ class Project {
     List<IssuePriority> issuePriorities
 
     List<Role> roles
+    List<Membership> memberships
 
     IssueStatus findIssueStatusByName(String name) {
         issueStatuses.find { it.name == name }
@@ -51,5 +52,13 @@ class Project {
 
     Role findRoleById(Long id) {
         roles.find { it.id == id }
+    }
+
+    Membership findMembershipByEmail(String email) {
+        memberships.find { it.email == email }
+    }
+
+    Membership findMembershipById(Long id) {
+        memberships.find { it.id == id }
     }
 }

@@ -21,6 +21,7 @@ class ProjectBuilder implements SafeJson {
             issueTypes = json.issue_types.collect { new IssueTypeBuilder().build(it) }
             issuePriorities = json.priorities.collect { new IssuePriorityBuilder().build(it) }
             roles = json.roles.collect { new RoleBuilder().build(it) }
+            memberships = json.memberships.collect { new MembershipBuilder().build(it, project) }
         }
 
         project
