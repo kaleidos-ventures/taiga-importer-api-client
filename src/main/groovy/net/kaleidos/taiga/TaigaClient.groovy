@@ -47,6 +47,12 @@ class TaigaClient extends BaseClient {
         new ProjectBuilder().build(json)
     }
 
+    TaigaClient deleteProjectById(String id) {
+        log.debug "Deleting ==> ${id}"
+        this.doDelete("${URLS.projects}/$id")
+        this
+    }
+
     List<Map> getProjects() {
         // TODO this has to be paginated
         return this.doGet("${URLS.projects}?page_size=500")

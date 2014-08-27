@@ -1,10 +1,11 @@
 package net.kaleidos.redmine
 
+import static groovyx.gpars.GParsPool.withPool
+
 import spock.lang.Specification
-
 import groovy.util.logging.Log4j
-
 import net.kaleidos.taiga.TaigaClient
+import net.kaleidos.domain.Project
 
 @Log4j
 class MigratorToTaigaSpecBase extends Specification {
@@ -22,7 +23,7 @@ class MigratorToTaigaSpecBase extends Specification {
         taigaClient.with {
             projects.each { p ->
                 log.debug "Deleting project '${p.name}' with id ${p.id}"
-                deleteProjectById("${p.id}")
+                deleteProject(new Project(id: p.id))
             }
         }
     }

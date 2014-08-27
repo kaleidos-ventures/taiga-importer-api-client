@@ -8,7 +8,7 @@ class TaigaClientSpec extends Specification {
 
     def setup() {
         config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').text)
-        taigaClient = new TaigaClient("http://localhost:8000")
+        taigaClient = new TaigaClient(config.host)
     }
 
     void 'authenticate a user'() {
