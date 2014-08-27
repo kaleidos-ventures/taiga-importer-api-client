@@ -36,6 +36,8 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             project.issueTypes*.name == ['Bug', 'Question', 'Enhancement']
             project.issuePriorities.size() == 3
             project.issuePriorities*.name == ['Low', 'Normal', 'High']
+            project.roles.size() == 6
+            project.roles*.name == ['UX', 'Design', 'Front', 'Back', 'Product Owner', 'Stakeholder']
 
         cleanup:
             taigaClient.deleteProject(project)

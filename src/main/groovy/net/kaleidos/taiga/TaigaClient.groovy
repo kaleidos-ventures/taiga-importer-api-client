@@ -6,11 +6,13 @@ import net.kaleidos.domain.IssuePriority
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.Role
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
 import net.kaleidos.taiga.builder.IssueTypeBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
+import net.kaleidos.taiga.builder.RoleBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -21,7 +23,8 @@ class TaigaClient extends BaseClient {
         issueTypes     : "/api/v1/issue-types",
         issueStatuses  : "/api/v1/issue-statuses",
         issuePriorities: "/api/v1/priorities",
-        issues         : "/api/v1/issues"
+        issues         : "/api/v1/issues",
+        roles          : "/api/v1/roles",
     ]
 
     TaigaClient(String serverUrl) {
@@ -67,6 +70,20 @@ class TaigaClient extends BaseClient {
         def json = this.doGet("${URLS.projects}/${projectId}")
 
         new ProjectBuilder().build(json)
+    }
+
+    // ROLES
+    Role addRole(String name, Project project) {
+        def params = [
+            project: project.id,
+            name   : name
+        ]
+        def json = this.doPost(URLS.roles, params)
+
+        def role = new RoleBuilder().build(json)
+        project.roles << role
+
+        role
     }
 
     // ISSUES

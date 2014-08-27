@@ -20,6 +20,7 @@ class ProjectBuilder {
             issueStatuses = json.issue_statuses.collect { new IssueStatusBuilder().build(it) }
             issueTypes = json.issue_types.collect { new IssueTypeBuilder().build(it) }
             issuePriorities = json.priorities.collect { new IssuePriorityBuilder().build(it) }
+            roles = json.roles.collect { new RoleBuilder().build(it) }
         }
 
         project

@@ -19,6 +19,8 @@ class Project {
     List<IssueType> issueTypes
     List<IssuePriority> issuePriorities
 
+    List<Role> roles
+
     IssueStatus findIssueStatusByName(String name) {
         issueStatuses.find { it.name == name }
     }
@@ -41,5 +43,13 @@ class Project {
 
     IssuePriority findIssuePriorityById(Long id) {
         issuePriorities.find { it.id == id }
+    }
+
+    Role findRoleByName(String name) {
+        roles.find { it.name == name }
+    }
+
+    Role findRoleById(Long id) {
+        roles.find { it.id == id }
     }
 }
