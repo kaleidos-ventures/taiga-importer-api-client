@@ -2,9 +2,8 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.IssueStatus
 
-class IssueStatusBuilder implements TaigaEntityBuilder<IssueStatus> {
+class IssueStatusBuilder {
 
-    @Override
     IssueStatus build(Map json) {
         def issueStatus = new IssueStatus()
 

@@ -1,21 +1,21 @@
 package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Issue
+import net.kaleidos.domain.Project
 
-class IssueBuilder implements TaigaEntityBuilder<Issue> {
+class IssueBuilder {
 
-    @Override
-    Issue build(Map json) {
+    Issue build(Map json, Project project) {
         def issue = new Issue()
 
         issue.with {
             id = json.id
-            type = null
-            status = null
-            priority = null
+            type = project.findIssueTypeById(json.type)
+            status = project.findIssueStatusById(json.status)
+            priority = project.findIssuePriorityById(json.priority)
             subject = json.subject
             description = json.description
-            project = null
+            delegate.project = project
         }
 
         issue

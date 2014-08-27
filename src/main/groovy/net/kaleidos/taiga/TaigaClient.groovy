@@ -39,7 +39,7 @@ class TaigaClient extends BaseClient {
 
     // PROJECT
     Project createProject(String name, String description) {
-        log.debug "Saving ==> ${name}"
+        log.debug "Saving project ==> ${name}"
 
         def params = [name: name, description: description]
         def json = this.doPost(URLS.projects, params)
@@ -53,6 +53,7 @@ class TaigaClient extends BaseClient {
     }
 
     void deleteProject(Project project) {
+        log.debug "Deleting project ==> ${project.id} - ${project.name}"
         this.doDelete("${URLS.projects}/${project.id}")
     }
 
@@ -76,7 +77,7 @@ class TaigaClient extends BaseClient {
 
         def json = this.doPost(URLS.issues, params)
 
-        new IssueBuilder().build(json)
+        new IssueBuilder().build(json, project)
     }
 
     // ISSUE TYPES
