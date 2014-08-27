@@ -96,49 +96,53 @@ class RedmineMigrator {
     }
 
     List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
+        return ref.redmineProject.trackers.collect(tap("IssueType") >> addedIssueType(ref))
+    }
 
-        Closure<IssueType> add = {
-            taigaClient.addIssueType(
-                it.name,
-                ref.taigaProject
-            )
+    Closure<IssueType> addedIssueType(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssueType(it.name, ref.taigaProject)
         }
-
-        return ref.redmineProject.trackers.collect(tap("IssueType") >> add)
     }
 
     List<IssueStatus> migrateIssueStatusesByProject(final RedmineTaigaRef ref) {
-        Closure<IssueStatus> add = {
-            taigaClient.addIssueStatus(
-                it.name,
-                it.isClosed(),
-                ref.taigaProject
-            )
-        }
+        return redmineClient.statuses.collect(tap("IssueStatus") >> addedIssueStatus(ref))
+    }
 
-        return redmineClient.statuses.collect(tap("IssueStatus") >> add)
+    Closure<IssueStatus> addedIssueStatus(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssueStatus(it.name, it.isClosed(), ref.taigaProject)
+        }
     }
 
     List<IssuePriority> migrateIssuePriorities(final RedmineTaigaRef ref) {
-        Closure<IssuePriority> add = {
-            taigaClient.addIssuePriority(it.name, ref.taigaProject)
-        }
-
-        return redmineClient.issuePriorities.collect(tap("IssuePriority") >> add)
+        return redmineClient.issuePriorities.collect(tap("IssuePriority") >> addedIssuePriority(ref))
     }
 
-    List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef projectRef) {
+    Closure<IssuePriority> addedIssuePriority(final RedmineTaigaRef ref) {
+        return {
+            taigaClient.addIssuePriority(it.name, ref.taigaProject)
+        }
+    }
 
-        projectRef.taigaProject.with {
-            issueStatuses = migrateIssueStatusesByProject(projectRef)
-            issueTypes = migrateIssueTrackersByProject(projectRef)
-            issuePriorities = migrateIssuePriorities(projectRef)
+    List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef ref) {
+
+        ref.taigaProject.with {
+            issueStatuses = migrateIssueStatusesByProject(ref)
+            issueTypes = migrateIssueTrackersByProject(ref)
+            issuePriorities = migrateIssuePriorities(ref)
         }
 
-        Closure<TaigaIssue> add = {
+        return redmineClient
+            .getIssues(project_id: ref.redmineProject.id.toString())
+            .collect(tap("Issue", "subject") >> addedTaigaIssue(ref))
+    }
+
+    Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
+        return {
             def issue =
                 taigaClient.createIssue(
-                    projectRef.taigaProject,
+                    ref.taigaProject,
                     it.tracker.name,
                     it.statusName,
                     it.priorityText,
@@ -146,13 +150,9 @@ class RedmineMigrator {
                     it.description
                 )
 
-            issue.project = projectRef.taigaProject
+            issue.project = ref.taigaProject
             issue
         }
-
-        def params = [project_id: projectRef.redmineProject.id.toString()]
-
-        return redmineClient.getIssues(params).collect(tap("Issue", "subject") >> add)
     }
 
 }
