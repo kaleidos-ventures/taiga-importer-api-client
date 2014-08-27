@@ -84,13 +84,6 @@ class RedmineMigrator {
         return map(ref.redmineProject.trackers, addedIssueType(ref))
     }
 
-    Closure<?> tap = { String type, String field = "name" ->
-        return {
-            log.debug("$type ==> ${field}:" + it."$field")
-            it
-        }
-    }
-
     Closure<IssueType> addedIssueType(final RedmineTaigaRef ref) {
         return {
             taigaClient.addIssueType(it.name, ref.taigaProject)
