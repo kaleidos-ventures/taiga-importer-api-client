@@ -56,7 +56,6 @@ class RedmineMigrator {
             return [
                 taigaProject: [
                     name: name,
-                    issueTypes: protoTaigaProject.trackers.collect(trackerToIssueType),
                     description: protoTaigaProject.description] as TaigaProject,
                 redmineProject: protoTaigaProject as RedmineProject
             ] as RedmineTaigaRef
