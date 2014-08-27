@@ -28,25 +28,21 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    Closure<Map> addBasicFields = { RedmineProject rp ->
+    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
+        List<RedmineProject> projects = redmineClient.projects
 
-        RedmineProject reloaded = redmineClient.getProjectByKey(rp.id.toString())
-
-        return [
-            id: reloaded.id,
-            name: reloaded.name,
-            trackers: reloaded.trackers,
-            description: reloaded.description ?: reloaded.name,
-            identifier: reloaded.identifier
-        ].asImmutable()
+        return projects.collect(addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
     }
 
-    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
-        return new IssueType(name: tracker.name)
+    Closure<RedmineProject> addBasicFields = { RedmineProject rp ->
+        return redmineClient.getProjectByKey(rp.id.toString()).with { RedmineProject source ->
+            source.description = source.description ?: source.name
+            source
+        }
     }
 
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
-        return { Map protoTaigaProject ->
+        return { RedmineProject protoTaigaProject ->
             def addIdentifier = allNames.count { it.trim() == protoTaigaProject.name.trim()} > 1 ? true : false
             def name =
                 protoTaigaProject.with {
@@ -68,6 +64,10 @@ class RedmineMigrator {
         }
     }
 
+    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
+        return new IssueType(name: tracker.name)
+    }
+
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
         return [
             taigaProject: taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
@@ -76,16 +76,14 @@ class RedmineMigrator {
 
     }
 
-    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
-        List<RedmineProject> projects = redmineClient.projects
-
-        return projects.collect(addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
-    }
-
     RedmineTaigaRef migrateFirstProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
         saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.first()
+    }
+
+    List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
+        return ref.redmineProject.trackers.collect(tap("IssueType") >> addedIssueType(ref))
     }
 
     Closure<?> tap = { String type, String field = "name" ->
@@ -93,10 +91,6 @@ class RedmineMigrator {
             log.debug("$type ==> ${field}:" + it."$field")
             it
         }
-    }
-
-    List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
-        return ref.redmineProject.trackers.collect(tap("IssueType") >> addedIssueType(ref))
     }
 
     Closure<IssueType> addedIssueType(final RedmineTaigaRef ref) {
