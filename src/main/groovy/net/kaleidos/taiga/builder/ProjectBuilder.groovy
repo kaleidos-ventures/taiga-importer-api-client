@@ -2,7 +2,7 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 
-class ProjectBuilder {
+class ProjectBuilder implements SafeJson {
 
     Project build(Map json) {
         Project project = new Project()
@@ -24,13 +24,5 @@ class ProjectBuilder {
         }
 
         project
-    }
-
-    /*
-        This method is used to prevent triggering the toString method of the
-        inner class used by wslite.json.JSONObject to manage null types
-     */
-    def nullSafe(whatever) {
-        return whatever ?: null
     }
 }
