@@ -47,7 +47,7 @@ class RedmineMigrator {
 
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
         return { Map protoTaigaProject ->
-            def addIdentifier = allNames.count { it == protoTaigaProject.name} > 1 ? true : false
+            def addIdentifier = allNames.count { it.trim() == protoTaigaProject.name.trim()} > 1 ? true : false
             def name =
                 protoTaigaProject.with {
                     addIdentifier ?  "$name [$identifier]" : name
@@ -69,11 +69,6 @@ class RedmineMigrator {
     }
 
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
-        TaigaProject taigaProject =
-            taigaClient.saveProject(
-                ref.taigaProject.name, ref.taigaProject.description
-            )
-
         return [
             taigaProject: taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
             redmineProject: ref.redmineProject
@@ -84,20 +79,13 @@ class RedmineMigrator {
     List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
-        return projects.collect(
-            addBasicFields >>
-            addIdentifierJustInCase(projects.name) >>
-            saveProject
-        )
+        return projects.collect(addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
     }
 
     RedmineTaigaRef migrateFirstProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
-        saveProject <<
-        addIdentifierJustInCase(projects.name) <<
-        addBasicFields <<
-        projects.first()
+        saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.first()
     }
 
     Closure<?> tap = { String type, String field = "name" ->
