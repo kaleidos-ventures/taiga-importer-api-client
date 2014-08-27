@@ -116,10 +116,9 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('id'))
             issues.every(has('project'))
             issues.every(has('subject'))
-            issues.size() > 0
-            //issues.every(has('status'))
-            //issues.every(has('priority'))
-            //issues.every(has('type'))
+            issues.every(has('status'))
+            issues.every(has('priority'))
+            issues.every(has('type'))
     }
 
 
