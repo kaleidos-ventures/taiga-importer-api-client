@@ -14,7 +14,7 @@ class RoleTaigaSpec extends TaigaSpecBase {
         deleteProject(project)
     }
 
-    void 'get the roles of a project'() {
+    void 'add a role to a project'() {
         when: 'adding a new role to a project'
             taigaClient.addRole(role, project)
 
@@ -27,5 +27,17 @@ class RoleTaigaSpec extends TaigaSpecBase {
 
         where:
             role = 'Boss'
+    }
+
+    void 'delete all roles of a project'() {
+        when: 'delete all roles'
+            taigaClient.deleteAllRoles(project)
+
+        then: 'the roles have been deleted in Taiga'
+            def projectUpdated = taigaClient.getProjectById(project.id)
+            projectUpdated.roles.isEmpty()
+
+        and: 'the original project is also updated'
+            project.roles.isEmpty()
     }
 }
