@@ -92,6 +92,16 @@ class TaigaClient extends BaseClient {
         role
     }
 
+    TaigaClient deleteAllRoles(Project project) {
+        def roles = project.roles
+        roles.each { Role r ->
+            this.doDelete("${URLS.roles}/${r.id}")
+        }
+        project.roles = []
+
+        this
+    }
+
     // MEMBERSHIPS
     Membership createMembership(String email, String role, Project project) {
         def params = [
