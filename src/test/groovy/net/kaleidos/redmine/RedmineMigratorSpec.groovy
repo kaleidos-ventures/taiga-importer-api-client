@@ -139,11 +139,15 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             users.every(has('mail'))
             users.every(has('firstName'))
             users.every(has('lastName'))
+        and: 'making sure there is no duplicates'
+            users.countBy(has('mail')).every(valueIsOne)
     }
 
     Closure<Boolean> has = { String field ->
         return { Object p -> p."$field" }
     }
+
+    Closure<Boolean> valueIsOne = { it.value == 1 }
 
     Closure<Boolean> hasId = has('id')
     Closure<Boolean> hasName = has('name')

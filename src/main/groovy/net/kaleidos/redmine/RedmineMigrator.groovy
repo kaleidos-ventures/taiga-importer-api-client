@@ -141,7 +141,15 @@ class RedmineMigrator {
     }
 
     List<RedmineUser> getUsersByProject(final RedmineTaigaRef ref) {
-        return map(getIssuesByProject(ref),  extractUserFromIssue)
+        final Closure<Boolean> isTheSameAsIssueAuthorId = { Integer it == issue.author.id }
+        final List<RedmineUser> resultList = []
+
+        return getIssuesByProject(ref).inject(resultList) { List<RedmineUser> users, RedmineIssue issue ->
+            if (!users.id.any(isTheSameAsIssueAuthorId))  {
+                users << extractUserFromIssue(issue)
+            }
+            users
+        }
     }
 
     Closure<RedmineUser> extractUserFromIssue = { RedmineIssue issue ->
