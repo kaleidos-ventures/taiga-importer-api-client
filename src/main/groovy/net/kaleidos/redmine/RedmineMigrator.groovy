@@ -7,10 +7,12 @@ import groovy.util.logging.Log4j
 import net.kaleidos.taiga.TaigaClient
 import com.taskadapter.redmineapi.RedmineManager
 
+import com.taskadapter.redmineapi.bean.User as RedmineUser
 import com.taskadapter.redmineapi.bean.Tracker
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
 
+import net.kaleidos.domain.User as TaigaUser
 import net.kaleidos.domain.Issue as TaigaIssue
 import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.IssueStatus
@@ -118,10 +120,11 @@ class RedmineMigrator {
             issuePriorities = migrateIssuePriorities(ref)
         }
 
-        return mapParallel(
-            redmineClient.getIssues(project_id: ref.redmineProject.id.toString()),
-            addedTaigaIssue(ref)
-        )
+        return mapParallel(getIssuesByProject(ref), addedTaigaIssue(ref))
+    }
+
+    private List<RedmineIssue> getIssuesByProject(RedmineTaigaRef ref) {
+        return redmineClient.getIssues(project_id: ref.redmineProject.id.toString())
     }
 
     Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
@@ -135,6 +138,14 @@ class RedmineMigrator {
                 it.description
             )
         }
+    }
+
+    List<RedmineUser> getUsersByProject(final RedmineTaigaRef ref) {
+        return map(getIssuesByProject(ref),  extractUserFromIssue)
+    }
+
+    Closure<RedmineUser> extractUserFromIssue = { RedmineIssue issue ->
+       return redmineClient.getUserById(issue.author.id)
     }
 
     static <T,U> List<U> map(List<T> collection, Closure<U> collector) {

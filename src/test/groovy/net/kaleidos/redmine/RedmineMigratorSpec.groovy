@@ -2,6 +2,9 @@ package net.kaleidos.redmine
 
 import spock.lang.IgnoreRest
 
+import com.taskadapter.redmineapi.bean.User as RedmineUser
+
+import net.kaleidos.domain.User
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.IssueType
@@ -121,6 +124,22 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('type'))
     }
 
+    void 'migrate users by project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+        and: 'migrating users having something to do with the project issues'
+            List<RedmineUser> users = migrator.getUsersByProject(project)
+        then: 'we should make sure we have mandatory fields'
+            users.size() > 0
+            users.every(has('id'))
+            users.every(has('mail'))
+            users.every(has('firstName'))
+            users.every(has('lastName'))
+    }
 
     Closure<Boolean> has = { String field ->
         return { Object p -> p."$field" }
