@@ -11,6 +11,7 @@ import com.taskadapter.redmineapi.bean.User as RedmineUser
 import com.taskadapter.redmineapi.bean.Tracker
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
+import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
 
 import net.kaleidos.domain.User as TaigaUser
 import net.kaleidos.domain.Issue as TaigaIssue
@@ -79,7 +80,9 @@ class RedmineMigrator {
     RedmineTaigaRef migrateFirstProjectBasicStructure() {
         List<RedmineProject> projects = redmineClient.projects
 
-        saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.first()
+        saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.find {
+            it.name.toLowerCase().contains('decathlon')
+        }
     }
 
     List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
@@ -141,15 +144,46 @@ class RedmineMigrator {
     }
 
     List<RedmineUser> getUsersByProject(final RedmineTaigaRef ref) {
-        final Closure<Boolean> isTheSameAsIssueAuthorId = { Integer it == issue.author.id }
         final List<RedmineUser> resultList = []
 
         return getIssuesByProject(ref).inject(resultList) { List<RedmineUser> users, RedmineIssue issue ->
+            Closure<Boolean> isTheSameAsIssueAuthorId = { Integer id -> id == issue.author.id }
             if (!users.id.any(isTheSameAsIssueAuthorId))  {
                 users << extractUserFromIssue(issue)
             }
             users
         }
+    }
+
+    List<TaigaUser> migrateAllUsersByProject(final RedmineTaigaRef ref) {
+        List<RedmineUser> redmineUsers = getUsersByProject(ref)
+        List<RedmineMembership> redmineMemberships = getMembershipsByProject(ref)
+        def roles = []
+
+        return redmineUsers.inject([]) { users, user ->
+            def role = redmineMemberships.find { it.user.id == user.id }.roles.first().name
+
+            if (!roles.contains(role)) {
+                log.debug("Adding role ${role} to project ${ref.taigaProject.name}")
+                roles << role
+                taigaClient.addRole(role, ref.taigaProject)
+            }
+
+            log.debug("Adding membership of ${user.mail} to project ${ref.taigaProject.name}")
+            def membership = taigaClient.createMembership(user.mail, role, ref.taigaProject)
+
+            if (!membership.userId) {
+                log.info("Registering new user ${user.mail} to project ${ref.taigaProject.name}")
+                users << taigaClient.registerUser(user.mail, "123123", membership.token)
+            }
+
+            users << new TaigaUser(email: user.mail)
+            users
+        }
+    }
+
+    List<RedmineMembership> getMembershipsByProject(final RedmineTaigaRef ref) {
+        return redmineClient.getMemberships(ref.redmineProject)
     }
 
     Closure<RedmineUser> extractUserFromIssue = { RedmineIssue issue ->
