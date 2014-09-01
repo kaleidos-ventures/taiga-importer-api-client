@@ -9,6 +9,7 @@ import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
 import net.kaleidos.domain.User
+import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
@@ -18,6 +19,7 @@ import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
 import net.kaleidos.taiga.builder.UserBuilder
+import net.kaleidos.taiga.builder.WikilinkBuilder
 import net.kaleidos.taiga.builder.WikipageBuilder
 
 @Log4j
@@ -34,6 +36,7 @@ class TaigaClient extends BaseClient {
         memberships    : "/api/v1/memberships",
         registerUsers  : "/api/v1/auth/register",
         wikis          : "/api/v1/wiki",
+        wikiLinks      : "/api/v1/wiki-links",
     ]
 
     TaigaClient(String serverUrl) {
@@ -223,9 +226,19 @@ class TaigaClient extends BaseClient {
             content: content,
             project: project.id,
         ]
-
         def json = this.doPost(URLS.wikis, params)
 
         new WikipageBuilder().build(json, project)
+    }
+
+    Wikilink createWikiLink(String title, String href, Project project) {
+        def params = [
+            title  : title,
+            href   : href,
+            project: project.id
+        ]
+        def json = this.doPost(URLS.wikiLinks, params)
+
+        new WikilinkBuilder().build(json, project)
     }
 }
