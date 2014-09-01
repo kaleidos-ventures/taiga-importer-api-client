@@ -9,6 +9,7 @@ import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
 import net.kaleidos.domain.User
+import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
@@ -17,6 +18,7 @@ import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
 import net.kaleidos.taiga.builder.UserBuilder
+import net.kaleidos.taiga.builder.WikipageBuilder
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -31,6 +33,7 @@ class TaigaClient extends BaseClient {
         roles          : "/api/v1/roles",
         memberships    : "/api/v1/memberships",
         registerUsers  : "/api/v1/auth/register",
+        wikis          : "/api/v1/wiki",
     ]
 
     TaigaClient(String serverUrl) {
@@ -106,8 +109,8 @@ class TaigaClient extends BaseClient {
     Membership createMembership(String email, String role, Project project) {
         def params = [
             project: project.id,
-            role: project.findRoleByName(role).id,
-            email: email
+            role   : project.findRoleByName(role).id,
+            email  : email
         ]
         def json = this.doPost(URLS.memberships, params)
 
@@ -118,7 +121,7 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUES
-    Issue createIssue(Project project, String type, String status, String priority, String subject, String description) {
+    Issue createIssue(Project project, String type, String status, String priority, String subject, String description, String userEmail = "") {
         def params = [
             type       : project.findIssueTypeByName(type).id,
             status     : project.findIssueStatusByName(status).id,
@@ -200,16 +203,29 @@ class TaigaClient extends BaseClient {
     // USERS
     User registerUser(String email, String password, String token) {
         def params = [
-            email: email,
-            token: token,
-            username: email,
-            existing: false,
+            email    : email,
+            token    : token,
+            username : email,
+            existing : false,
             full_name: email,
-            password: password,
-            type: 'private',
+            password : password,
+            type     : 'private',
         ]
         def json = this.doPost(URLS.registerUsers, params)
 
         new UserBuilder().build(json)
+    }
+
+    // WIKIS
+    Wikipage createWiki(String slug, String content, Project project) {
+        def params = [
+            slug   : slug,
+            content: content,
+            project: project.id,
+        ]
+
+        def json = this.doPost(URLS.wikis, params)
+
+        new WikipageBuilder().build(json, project)
     }
 }
