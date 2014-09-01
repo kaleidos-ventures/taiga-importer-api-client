@@ -121,7 +121,7 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUES
-    Issue createIssue(Project project, String type, String status, String priority, String subject, String description) {
+    Issue createIssue(Project project, String type, String status, String priority, String subject, String description, String userEmail = "") {
         def params = [
             type       : project.findIssueTypeByName(type).id,
             status     : project.findIssueStatusByName(status).id,
