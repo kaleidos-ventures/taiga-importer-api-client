@@ -12,5 +12,6 @@ class Issue {
 
     String subject
     String description
+    String author
     Project project
 }

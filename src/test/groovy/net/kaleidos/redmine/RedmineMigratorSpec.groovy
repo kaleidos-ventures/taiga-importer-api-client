@@ -2,6 +2,7 @@ package net.kaleidos.redmine
 
 import spock.lang.IgnoreRest
 
+import net.kaleidos.domain.User
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.IssueType
@@ -98,6 +99,31 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             priorities.every(hasName)
     }
 
+    void 'Generating taiga issues with user email'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating redmine current issues'
+            List<Issue> issues =
+                migrator
+                    .getIssuesByProject(project)
+                    .collect(migrator.fullfillUserMail)
+        then: 'there should be issues'
+            issues.size() > 0
+            issues.every(has('tracker'))
+            issues.every(has('subject'))
+            issues.every(has('status'))
+            issues.every(has('priority'))
+            issues.every(has('userMail'))
+    }
+
     void 'Migrate issues from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()
@@ -116,16 +142,16 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('id'))
             issues.every(has('project'))
             issues.every(has('subject'))
-            issues.size() > 0
-            //issues.every(has('status'))
-            //issues.every(has('priority'))
-            //issues.every(has('type'))
+            issues.every(has('status'))
+            issues.every(has('priority'))
+            issues.every(has('type'))
     }
-
 
     Closure<Boolean> has = { String field ->
         return { Object p -> p."$field" }
     }
+
+    Closure<Boolean> valueIsOne = { it.value == 1 }
 
     Closure<Boolean> hasId = has('id')
     Closure<Boolean> hasName = has('name')
