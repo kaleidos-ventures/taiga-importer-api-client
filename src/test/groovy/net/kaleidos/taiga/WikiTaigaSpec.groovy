@@ -14,7 +14,7 @@ class WikiTaigaSpec extends TaigaSpecBase {
         deleteProject(project)
     }
 
-    void 'save a wiki page'() {
+    void 'create a wiki page'() {
         when: 'saving a wiki page'
             def wikipage = taigaClient.createWiki(slug, content, project)
 
@@ -27,5 +27,20 @@ class WikiTaigaSpec extends TaigaSpecBase {
         where:
             slug = 'home'
             content = 'Lorem ipsum...'
+    }
+
+    void 'create a wiki link'() {
+        when: 'saving a wiki link'
+            def wikilink = taigaClient.createWikiLink(title, href, project)
+
+        then: 'the wiki link is created'
+            wikilink != null
+            wikilink.title == title
+            wikilink.href == href
+            wikilink.project.id == project.id
+
+        where:
+            title = 'Link title'
+            href = 'link-title'
     }
 }
