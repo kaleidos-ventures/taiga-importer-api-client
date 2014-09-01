@@ -99,6 +99,31 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             priorities.every(hasName)
     }
 
+    void 'Generating taiga issues with user email'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating redmine current issues'
+            List<Issue> issues =
+                migrator
+                    .getIssuesByProject(project)
+                    .collect(migrator.fullfillUserMail)
+        then: 'there should be issues'
+            issues.size() > 0
+            issues.every(has('tracker'))
+            issues.every(has('subject'))
+            issues.every(has('status'))
+            issues.every(has('priority'))
+            issues.every(has('userMail'))
+    }
+
     void 'Migrate issues from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()
@@ -120,26 +145,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('status'))
             issues.every(has('priority'))
             issues.every(has('type'))
-    }
-
-    @IgnoreRest
-    void 'migrate users by project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
-        when: 'creating a new project and cleaning up its issue structure'
-            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-        and: 'migrating users having something to do with the project issues'
-            List<User> users = migrator.migrateAllUsersByProject(project)
-        then: 'we should make sure we have mandatory fields'
-            users.size() > 0
-            users.every(has('id'))
-            users.every(has('email'))
-            //users.every(has('firstName'))
-            //users.every(has('lastName'))
-        and: 'making sure there is no duplicates'
-            users.countBy(has('mail')).every(valueIsOne)
     }
 
     Closure<Boolean> has = { String field ->

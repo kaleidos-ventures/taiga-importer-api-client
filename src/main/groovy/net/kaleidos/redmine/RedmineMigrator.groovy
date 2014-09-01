@@ -123,67 +123,43 @@ class RedmineMigrator {
             issuePriorities = migrateIssuePriorities(ref)
         }
 
-        return mapParallel(getIssuesByProject(ref), addedTaigaIssue(ref))
+        // Per each redmine issue first we need to add the user mail
+        // and then create a new taiga issue
+        return mapParallel(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
     }
 
-    private List<RedmineIssue> getIssuesByProject(RedmineTaigaRef ref) {
+    List<RedmineIssue> getIssuesByProject(RedmineTaigaRef ref) {
         return redmineClient.getIssues(project_id: ref.redmineProject.id.toString())
     }
 
+    Closure<TaigaIssue> fullfillUserMail = { RedmineIssue source ->
+        return [
+            tracker: source.tracker.name,
+            status: source.statusName,
+            priority: source.priorityText,
+            subject: source.subject,
+            description: source.description,
+            userMail: getUserInfoById(source.author.id).mail
+        ]
+    }
+
     Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
-        return {
+        return { Map partial ->
+            log.debug("TRACKER/TYPE: ${partial.tracker}")
             taigaClient.createIssue(
                 ref.taigaProject,
-                it.tracker.name,
-                it.statusName,
-                it.priorityText,
-                it.subject,
-                it.description
+                partial.tracker,
+                partial.status,
+                partial.priority,
+                partial.subject,
+                partial.description,
+                partial.userMail
             )
         }
     }
 
-    List<RedmineUser> getUsersByProject(final RedmineTaigaRef ref) {
-        final List<RedmineUser> resultList = []
-
-        return getIssuesByProject(ref).inject(resultList) { List<RedmineUser> users, RedmineIssue issue ->
-            Closure<Boolean> isTheSameAsIssueAuthorId = { Integer id -> id == issue.author.id }
-            if (!users.id.any(isTheSameAsIssueAuthorId))  {
-                users << extractUserFromIssue(issue)
-            }
-            users
-        }
-    }
-
-    List<TaigaUser> migrateAllUsersByProject(final RedmineTaigaRef ref) {
-        List<RedmineUser> redmineUsers = getUsersByProject(ref)
-        List<RedmineMembership> redmineMemberships = getMembershipsByProject(ref)
-        def roles = []
-
-        return redmineUsers.inject([]) { users, user ->
-            def role = redmineMemberships.find { it.user.id == user.id }.roles.first().name
-
-            if (!roles.contains(role)) {
-                log.debug("Adding role ${role} to project ${ref.taigaProject.name}")
-                roles << role
-                taigaClient.addRole(role, ref.taigaProject)
-            }
-
-            log.debug("Adding membership of ${user.mail} to project ${ref.taigaProject.name}")
-            def membership = taigaClient.createMembership(user.mail, role, ref.taigaProject)
-
-            if (!membership.userId) {
-                log.info("Registering new user ${user.mail} to project ${ref.taigaProject.name}")
-                users << taigaClient.registerUser(user.mail, "123123", membership.token)
-            }
-
-            users << new TaigaUser(email: user.mail)
-            users
-        }
-    }
-
-    List<RedmineMembership> getMembershipsByProject(final RedmineTaigaRef ref) {
-        return redmineClient.getMemberships(ref.redmineProject)
+    private RedmineUser getUserInfoById(Integer id) {
+        return redmineClient.getUserById(id)
     }
 
     Closure<RedmineUser> extractUserFromIssue = { RedmineIssue issue ->
