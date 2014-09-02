@@ -25,6 +25,10 @@ import net.kaleidos.taiga.builder.WikipageBuilder
 @Log4j
 class TaigaClient extends BaseClient {
 
+    private final Map URLS_IMPORTER = [
+        projects       : "/api/v1/importer",
+    ]
+
     private final Map URLS = [
         auth           : "/api/v1/auth",
         projects       : "/api/v1/projects",
@@ -57,7 +61,7 @@ class TaigaClient extends BaseClient {
         log.debug "Saving project ==> ${name}"
 
         def params = [name: name, description: description]
-        def json = this.doPost(URLS.projects, params)
+        def json = this.doPost(URLS_IMPORTER.projects, params)
 
         new ProjectBuilder().build(json)
     }

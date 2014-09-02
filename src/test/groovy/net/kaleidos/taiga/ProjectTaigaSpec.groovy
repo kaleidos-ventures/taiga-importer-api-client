@@ -28,16 +28,13 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
         then: 'the project is saved'
             project != null
+            project.id != null
             project.name == name
             project.description == description
-            project.issueStatuses.size() == 7
-            project.issueStatuses*.name == ['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed']
-            project.issueTypes.size() == 3
-            project.issueTypes*.name == ['Bug', 'Question', 'Enhancement']
-            project.issuePriorities.size() == 3
-            project.issuePriorities*.name == ['Low', 'Normal', 'High']
-            project.roles.size() == 6
-            project.roles*.name == ['UX', 'Design', 'Front', 'Back', 'Product Owner', 'Stakeholder']
+            project.issueStatuses.size() == 0
+            project.issueTypes.size() == 0
+            project.issuePriorities.size() == 0
+            project.roles.size() == 0
 
         cleanup:
             taigaClient.deleteProject(project)

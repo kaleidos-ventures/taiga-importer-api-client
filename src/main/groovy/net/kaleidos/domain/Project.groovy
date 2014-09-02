@@ -8,19 +8,19 @@ class Project {
     String description
 
     Long id
-    Long defaultUsStatus
-    Long defaultTaskStatus
-    Long defaultPriority
-    Long defaultSeverity
-    Long defaultIssueStatus
-    Long defaultIssueType
+    String defaultUsStatus
+    String defaultTaskStatus
+    String defaultPriority
+    String defaultSeverity
+    String defaultIssueStatus
+    String defaultIssueType
 
     List<IssueStatus> issueStatuses
     List<IssueType> issueTypes
     List<IssuePriority> issuePriorities
 
     List<Role> roles
-    List<Membership> memberships
+//    List<Membership> memberships
 
     IssueStatus findIssueStatusByName(String name) {
         issueStatuses.find { it.name == name }

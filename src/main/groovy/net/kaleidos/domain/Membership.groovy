@@ -6,6 +6,4 @@ import groovy.transform.ToString
 class Membership {
     Long id
     String email
-    Long userId
-    String token
 }
