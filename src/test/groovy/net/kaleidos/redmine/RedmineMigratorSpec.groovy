@@ -2,6 +2,7 @@ package net.kaleidos.redmine
 
 import com.taskadapter.redmineapi.RedmineManager
 import net.kaleidos.domain.Issue
+import net.kaleidos.domain.Wikipage
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.TaigaClient
@@ -140,6 +141,27 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('status'))
             issues.every(has('priority'))
             issues.every(has('type'))
+    }
+
+    @IgnoreRest
+    void 'Migrate wiki pages from a given project'() {
+        setup: 'redmine and taiga clients'
+            RedmineManager redmineClient = createRedmineClient()
+            TaigaClient taigaClient = createTaigaClient()
+            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        when: 'creating a new project and cleaning up its issue structure'
+            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
+            taigaClient
+                .deleteAllIssueTypes(project.taigaProject)
+                .deleteAllIssueStatuses(project.taigaProject)
+                .deleteAllIssuePriorities(project.taigaProject)
+        and: 'migrating redmine current issues'
+            List<Issue> issues = migrator.migrateIssuesByProject(project)
+            List<Wikipage> wikiPages= migrator.migrateWikiPagesByProject(project)
+        then: 'there should be issues'
+            wikiPages.size() > 0
+            wikiPages.every(has('slug'))
+            wikiPages.every(has('content'))
     }
 
     Closure<Boolean> has = { String field ->

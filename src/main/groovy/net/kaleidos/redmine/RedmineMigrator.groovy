@@ -1,17 +1,23 @@
 package net.kaleidos.redmine
 
+import static groovyx.gpars.GParsPool.withPool
 import com.taskadapter.redmineapi.RedmineManager
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.Tracker
 import com.taskadapter.redmineapi.bean.User as RedmineUser
-import groovy.util.logging.Log4j
+import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
+import com.taskadapter.redmineapi.bean.WikiPage as RedmineWikiPageSummary
+import com.taskadapter.redmineapi.bean.WikiPageDetail as RedmineWikiPage
+
+import net.kaleidos.domain.User as TaigaUser
 import net.kaleidos.domain.Issue as TaigaIssue
+import net.kaleidos.domain.Wikipage
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project as TaigaProject
 import net.kaleidos.taiga.TaigaClient
 
-import static groovyx.gpars.GParsPool.withPool
+import groovy.util.logging.Log4j
 
 @Log4j
 class RedmineMigrator {
@@ -146,6 +152,28 @@ class RedmineMigrator {
                 partial.description,
                 partial.userMail
             )
+        }
+    }
+
+    List<Wikipage> migrateWikiPagesByProject(final RedmineTaigaRef ref)  {
+        List<RedmineWikiPageSummary> wikiPageSummaryList =
+            redmineClient.getWikiPagesByProject(ref.redmineProject)
+
+        return map(wikiPageSummaryList, summaryToReal(ref) >> saveWikiPage(ref))
+    }
+
+    Closure<RedmineWikiPage> summaryToReal(final RedmineTaigaRef ref) {
+        return { RedmineWikiPageSummary summary ->
+            redmineClient.getWikiPageDetailByProjectAndTitle(ref.redmineProject, summary.title)
+        }
+    }
+
+    Closure<Wikipage> saveWikiPage(final RedmineTaigaRef ref) {
+        return { RedmineWikiPage wp ->
+            Wikipage taigaWikiPage =
+                taigaClient.createWiki(wp.title, wp.text, ref.taigaProject)
+
+            return taigaWikiPage
         }
     }
 
