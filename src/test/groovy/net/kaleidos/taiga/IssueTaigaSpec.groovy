@@ -95,6 +95,21 @@ class IssueTaigaSpec extends TaigaSpecBase {
             priority = 'I want it now!'
     }
 
+    void 'add a new issue severity'() {
+        when: 'adding a new severity'
+            taigaClient.addIssueSeverity(severity, project)
+
+        then: 'the severity is added to Taiga'
+            def projectUpdated = taigaClient.getProjectById(project.id)
+            projectUpdated.findIssueSeverityByName(severity) != null
+
+        and: 'the original project is also updated'
+            project.findIssueSeverityByName(severity) != null
+
+        where:
+            severity = 'Critical'
+    }
+
     void 'create an issue'() {
         when: 'creating a new issue'
             def issue = taigaClient.createIssue(project, type, status, priority, subject, description)

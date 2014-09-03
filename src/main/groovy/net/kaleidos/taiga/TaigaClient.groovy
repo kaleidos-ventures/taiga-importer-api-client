@@ -3,6 +3,7 @@ package net.kaleidos.taiga
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.IssuePriority
+import net.kaleidos.domain.IssueSeverity
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.Membership
@@ -13,6 +14,7 @@ import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.IssuePriorityBuilder
+import net.kaleidos.taiga.builder.IssueSeverityBuilder
 import net.kaleidos.taiga.builder.IssueStatusBuilder
 import net.kaleidos.taiga.builder.IssueTypeBuilder
 import net.kaleidos.taiga.builder.MembershipBuilder
@@ -29,18 +31,19 @@ class TaigaClient extends BaseClient {
         projects       : "/api/v1/importer",
     ]
 
-    private final Map URLS = [
-        auth           : "/api/v1/auth",
-        projects       : "/api/v1/projects",
-        issueTypes     : "/api/v1/issue-types",
-        issueStatuses  : "/api/v1/issue-statuses",
-        issuePriorities: "/api/v1/priorities",
-        issues         : "/api/v1/issues",
-        roles          : "/api/v1/roles",
-        memberships    : "/api/v1/memberships",
-        registerUsers  : "/api/v1/auth/register",
-        wikis          : "/api/v1/wiki",
-        wikiLinks      : "/api/v1/wiki-links",
+    private static final Map URLS = [
+        auth           : '/api/v1/auth',
+        projects       : '/api/v1/projects',
+        issueTypes     : '/api/v1/issue-types',
+        issueStatuses  : '/api/v1/issue-statuses',
+        issuePriorities: '/api/v1/priorities',
+        issueSeverities: '/api/v1/severities',
+        issues         : '/api/v1/issues',
+        roles          : '/api/v1/roles',
+        memberships    : '/api/v1/memberships',
+        registerUsers  : '/api/v1/auth/register',
+        wikis          : '/api/v1/wiki',
+        wikiLinks      : '/api/v1/wiki-links',
     ]
 
     TaigaClient(String serverUrl) {
@@ -205,6 +208,17 @@ class TaigaClient extends BaseClient {
         project.issuePriorities << issuePriority
 
         issuePriority
+    }
+
+    // ISSUE SEVERITIES
+    IssueSeverity addIssueSeverity(String name, Project project) {
+        def params = [project: project.id, name: name]
+        def json = this.doPost(URLS.issueSeverities, params)
+
+        def issueSeverity = new IssueSeverityBuilder().build(json)
+        project.issueSeverities << issueSeverity
+
+        issueSeverity
     }
 
     // USERS

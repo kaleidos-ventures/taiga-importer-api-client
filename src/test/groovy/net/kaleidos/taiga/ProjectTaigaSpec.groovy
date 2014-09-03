@@ -34,6 +34,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             project.issueStatuses.size() == 0
             project.issueTypes.size() == 0
             project.issuePriorities.size() == 0
+            project.issueSeverities.size() == 0
             project.roles.size() == 0
 
         cleanup:
