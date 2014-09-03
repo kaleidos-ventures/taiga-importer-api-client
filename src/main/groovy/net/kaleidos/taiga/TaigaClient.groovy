@@ -23,6 +23,7 @@ import net.kaleidos.taiga.builder.RoleBuilder
 import net.kaleidos.taiga.builder.UserBuilder
 import net.kaleidos.taiga.builder.WikilinkBuilder
 import net.kaleidos.taiga.builder.WikipageBuilder
+import net.kaleidos.taiga.mapper.Mappers
 
 @Log4j
 class TaigaClient extends BaseClient {
@@ -46,8 +47,6 @@ class TaigaClient extends BaseClient {
         wikiLinks      : '/api/v1/wiki-links',
     ]
 
-    private static final String TAIGA_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-
     TaigaClient(String serverUrl) {
         super(serverUrl)
     }
@@ -62,14 +61,20 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECT
-    Project createProject(String name, String description, Date createdDate = new Date()) {
-        log.debug "Saving project ==> ${name}"
+    List<Map> getProjects() {
+        this.doGet(URLS.projects)
+    }
 
-        def params = [
-            name        : name,
-            description : description,
-            created_date: createdDate.format(TAIGA_DATE_FORMAT),
-        ]
+    Project getProjectById(Long projectId) {
+        def json = this.doGet("${URLS.projects}/${projectId}")
+
+        new ProjectBuilder().build(json)
+    }
+
+    Project createProject(Project project) {
+        log.debug "Saving project ==> ${project.name}"
+
+        def params = Mappers.map(project)
         def json = this.doPost(URLS_IMPORTER.projects, params)
 
         new ProjectBuilder().build(json)
@@ -80,11 +85,7 @@ class TaigaClient extends BaseClient {
         this.doDelete("${URLS.projects}/${project.id}")
     }
 
-    Project getProjectById(Long projectId) {
-        def json = this.doGet("${URLS.projects}/${projectId}")
 
-        new ProjectBuilder().build(json)
-    }
 
     // ROLES
     Role addRole(String name, Project project) {

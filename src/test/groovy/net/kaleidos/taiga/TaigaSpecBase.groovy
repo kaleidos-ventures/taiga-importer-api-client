@@ -19,7 +19,9 @@ class TaigaSpecBase extends Specification {
     }
 
     Project createProject() {
-        taigaClient.createProject("name ${new Date().time}", "description")
+        def project = new Project().setName("name ${new Date().time}").setDescription("description")
+
+        taigaClient.createProject(project)
     }
 
     void deleteProject(Project project) {

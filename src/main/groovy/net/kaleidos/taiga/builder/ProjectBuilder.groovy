@@ -4,12 +4,15 @@ import net.kaleidos.domain.Project
 
 class ProjectBuilder implements SafeJson {
 
+    private static final String TAIGA_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+
     Project build(Map json) {
         Project project = new Project()
 
         project.with {
             id = json.id
             name = json.name
+            createdDate = Date.parse(TAIGA_DATE_FORMAT, json.created_date)
             description = json.description
             defaultUsStatus = nullSafe(json.default_us_status)
             defaultTaskStatus = nullSafe(json.default_task_status)
