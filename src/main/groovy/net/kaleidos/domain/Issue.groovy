@@ -9,6 +9,7 @@ class Issue {
     IssueType type
     IssueStatus status
     IssuePriority priority
+    IssueSeverity severity
 
     String subject
     String description

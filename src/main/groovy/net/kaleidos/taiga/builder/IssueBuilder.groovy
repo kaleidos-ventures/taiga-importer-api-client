@@ -10,9 +10,10 @@ class IssueBuilder {
 
         issue.with {
             id = json.id
-            type = project.findIssueTypeById(json.type)
-            status = project.findIssueStatusById(json.status)
-            priority = project.findIssuePriorityById(json.priority)
+            type = project.findIssueTypeByName(json.type)
+            status = project.findIssueStatusByName(json.status)
+            priority = project.findIssuePriorityByName(json.priority)
+            severity = project.findIssueSeverityByName(json.severity)
             subject = json.subject
             description = json.description
             delegate.project = project
