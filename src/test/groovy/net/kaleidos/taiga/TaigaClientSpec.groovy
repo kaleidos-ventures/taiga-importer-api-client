@@ -17,5 +17,6 @@ class TaigaClientSpec extends Specification {
 
         then: 'the authorization header is set in the client'
             taigaClient.client.httpClient.defaultHeaders.Authorization.contains('Bearer')
+            !taigaClient.client.httpClient.defaultHeaders.Authorization.contains('Bearer null')
     }
 }
