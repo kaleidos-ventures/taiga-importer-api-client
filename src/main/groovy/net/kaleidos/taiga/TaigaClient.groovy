@@ -27,8 +27,8 @@ import net.kaleidos.taiga.builder.WikipageBuilder
 @Log4j
 class TaigaClient extends BaseClient {
 
-    private final Map URLS_IMPORTER = [
-        projects       : "/api/v1/importer",
+    private static final Map URLS_IMPORTER = [
+        projects: '/api/v1/importer',
     ]
 
     private static final Map URLS = [
@@ -46,6 +46,8 @@ class TaigaClient extends BaseClient {
         wikiLinks      : '/api/v1/wiki-links',
     ]
 
+    private static final String TAIGA_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
     TaigaClient(String serverUrl) {
         super(serverUrl)
     }
@@ -60,10 +62,14 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECT
-    Project createProject(String name, String description) {
+    Project createProject(String name, String description, Date createdDate = new Date()) {
         log.debug "Saving project ==> ${name}"
 
-        def params = [name: name, description: description]
+        def params = [
+            name        : name,
+            description : description,
+            created_date: createdDate.format(TAIGA_DATE_FORMAT),
+        ]
         def json = this.doPost(URLS_IMPORTER.projects, params)
 
         new ProjectBuilder().build(json)

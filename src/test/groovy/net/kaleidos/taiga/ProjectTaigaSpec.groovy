@@ -24,7 +24,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'save a project'() {
         when: 'saving a project'
-            def project = taigaClient.createProject(name, description)
+            def project = taigaClient.createProject(name, description, Date.parse("dd/MM/yyyy", "01/01/2010"))
 
         then: 'the project is saved'
             project != null
