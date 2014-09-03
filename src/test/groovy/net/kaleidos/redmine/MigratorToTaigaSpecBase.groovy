@@ -23,7 +23,7 @@ class MigratorToTaigaSpecBase extends Specification {
         taigaClient.with {
             projects.each { p ->
                 log.debug "Deleting project '${p.name}' with id ${p.id}"
-                deleteProject(new Project(id: p.id))
+                deleteProjectById(p.id.toString())
             }
         }
     }
