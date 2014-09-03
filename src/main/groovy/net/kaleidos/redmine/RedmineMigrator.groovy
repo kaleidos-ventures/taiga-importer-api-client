@@ -116,7 +116,7 @@ class RedmineMigrator {
 
         // Per each redmine issue first we need to add the user mail
         // and then create a new taiga issue
-        return mapParallel(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
+        return map(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
     }
 
     List<RedmineIssue> getIssuesByProject(RedmineTaigaRef ref) {
