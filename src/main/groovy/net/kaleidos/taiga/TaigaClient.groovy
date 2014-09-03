@@ -100,16 +100,6 @@ class TaigaClient extends BaseClient {
         role
     }
 
-    TaigaClient deleteAllRoles(Project project) {
-        def roles = project.roles
-        roles.each { Role r ->
-            this.doDelete("${URLS.roles}/${r.id}")
-        }
-        project.roles = []
-
-        this
-    }
-
     // MEMBERSHIPS
     Membership createMembership(String email, String role, Project project) {
         def params = [
@@ -143,16 +133,6 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUE TYPES
-    TaigaClient deleteAllIssueTypes(Project project) {
-        def issueTypes = project.issueTypes
-        issueTypes.each { IssueType it ->
-            this.doDelete("${URLS.issueTypes}/${it.id}")
-        }
-        project.issueTypes = []
-
-        this
-    }
-
     IssueType addIssueType(String name, Project project) {
         def params = [project: project.id, name: name]
         def json = this.doPost(URLS.issueTypes, params)
@@ -164,16 +144,6 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUE STATUSES
-    TaigaClient deleteAllIssueStatuses(Project project) {
-        def issueStatuses = project.issueStatuses
-        issueStatuses.each { IssueStatus is ->
-            this.doDelete("${URLS.issueStatuses}/${is.id}")
-        }
-        project.issueStatuses = []
-
-        this
-    }
-
     IssueStatus addIssueStatus(String name, Boolean isClosed, Project project) {
         def params = [project: project.id, name: name, is_closed: isClosed]
         def json = this.doPost(URLS.issueStatuses, params)
@@ -185,16 +155,6 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUE PRIORITIES
-    TaigaClient deleteAllIssuePriorities(Project project) {
-        def issuePriorities = project.issuePriorities
-        issuePriorities.each { IssuePriority ip ->
-            this.doDelete("${URLS.issuePriorities}/${ip.id}")
-        }
-        project.issuePriorities = []
-
-        this
-    }
-
     IssuePriority addIssuePriority(String name, Project project) {
         def params = [project: project.id, name: name]
         def json = this.doPost(URLS.issuePriorities, params)

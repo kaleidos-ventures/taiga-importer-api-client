@@ -13,18 +13,6 @@ class IssueTaigaSpec extends TaigaSpecBase {
         deleteProject(project)
     }
 
-    void 'delete all issue types of a project'() {
-        when: 'delete all issue types'
-            taigaClient.deleteAllIssueTypes(project)
-
-        then: 'the types have been deleted in Taiga'
-            def projectUpdated = taigaClient.getProjectById(project.id)
-            projectUpdated.issueTypes.isEmpty()
-
-        and: 'the original project is also updated'
-            project.issueTypes.isEmpty()
-    }
-
     void 'add a new issue type'() {
         when: 'adding a new type'
             taigaClient.addIssueType(type, project)
@@ -38,18 +26,6 @@ class IssueTaigaSpec extends TaigaSpecBase {
 
         where:
             type = 'Task'
-    }
-
-    void 'delete all issue statuses of a project'() {
-        when: 'delete all issue statuses'
-            taigaClient.deleteAllIssueStatuses(project)
-
-        then: 'the statuses have been deleted in Taiga'
-            def projectUpdated = taigaClient.getProjectById(project.id)
-            projectUpdated.issueStatuses.isEmpty()
-
-        and: 'the original project is also updated'
-            project.issueStatuses.isEmpty()
     }
 
     void 'add a new issue status'() {
@@ -66,18 +42,6 @@ class IssueTaigaSpec extends TaigaSpecBase {
         where:
             isClosed << [true, false]
             status = 'Pending'
-    }
-
-    void 'delete all issue priorities of a project'() {
-        when: 'delete all issue statuses'
-            taigaClient.deleteAllIssuePriorities(project)
-
-        then: 'the priorities have been deleted in Taiga'
-            def projectUpdated = taigaClient.getProjectById(project.id)
-            projectUpdated.issuePriorities.isEmpty()
-
-        and: 'the original project is also updated'
-            project.issuePriorities.isEmpty()
     }
 
     void 'add a new issue priority'() {
