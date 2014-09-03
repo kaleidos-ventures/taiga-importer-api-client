@@ -1,5 +1,6 @@
 package net.kaleidos.taiga
 
+import groovy.text.SimpleTemplateEngine
 import groovy.util.logging.Log4j
 import wslite.rest.RESTClient
 import wslite.rest.RESTClientException
@@ -51,5 +52,12 @@ class BaseClient {
             log.error "Server response ===> " + e.response.contentAsString
             throw e
         }
+    }
+
+    protected String merge(String url, Map values) {
+        def engine = new SimpleTemplateEngine()
+        def template = engine.createTemplate(url).make(values)
+
+        template.toString()
     }
 }
