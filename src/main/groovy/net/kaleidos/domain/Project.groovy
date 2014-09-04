@@ -19,13 +19,5 @@ class Project {
     List<String> issueSeverities
 
     List<String> roles
-//    List<Membership> memberships
-
-    Membership findMembershipByEmail(String email) {
-        memberships.find { it.email == email }
-    }
-
-    Membership findMembershipById(Long id) {
-        memberships.find { it.id == id }
-    }
+    List<Membership> memberships
 }

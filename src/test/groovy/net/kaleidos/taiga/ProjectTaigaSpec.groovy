@@ -1,5 +1,6 @@
 package net.kaleidos.taiga
 
+import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 
 class ProjectTaigaSpec extends TaigaSpecBase {
@@ -135,5 +136,34 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             name = "My project ${new Date().time}"
             description = 'The description of the project'
             roles = ['UX', 'Design', 'Front', 'Back']
+    }
+
+    void 'save a project with memberships'() {
+        given: 'some memberships to add to a project'
+            def m1 = new Membership().setEmail('user1@example.com').setRole('UX')
+            def m2 = new Membership().setEmail('user2@example.com').setRole('Back')
+            def memberships = [m1, m2]
+
+        and: 'a project to create'
+            def project = new Project()
+                .setName(name)
+                .setDescription(description)
+                .setMemberships(memberships)
+                .setRoles(roles)
+
+        when: 'saving the project'
+            project = taigaClient.createProject(project)
+
+        then: 'the project is saved with all the fields'
+            project.memberships.size() == memberships.size()
+            project.memberships*.email.sort() == memberships*.email.sort()
+
+        cleanup:
+            taigaClient.deleteProject(project)
+
+        where:
+            name = "My project ${new Date().time}"
+            description = 'The description of the project'
+            roles = ['UX', 'Back']
     }
 }
