@@ -19,7 +19,13 @@ class TaigaSpecBase extends Specification {
     }
 
     Project createProject() {
-        def project = new Project().setName("name ${new Date().time}").setDescription("description")
+        def project = new Project()
+            .setName("name ${new Date().time}")
+            .setDescription("description")
+            .setIssueTypes(['Bug', 'Question', 'Enhancement'])
+            .setIssueStatuses(['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed'])
+            .setIssuePriorities(['Low', 'Normal', 'High'])
+            .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
 
         taigaClient.createProject(project)
     }

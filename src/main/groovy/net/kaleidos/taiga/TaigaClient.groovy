@@ -2,10 +2,6 @@ package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
-import net.kaleidos.domain.IssuePriority
-import net.kaleidos.domain.IssueSeverity
-import net.kaleidos.domain.IssueStatus
-import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
@@ -13,10 +9,6 @@ import net.kaleidos.domain.User
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
-import net.kaleidos.taiga.builder.IssuePriorityBuilder
-import net.kaleidos.taiga.builder.IssueSeverityBuilder
-import net.kaleidos.taiga.builder.IssueStatusBuilder
-import net.kaleidos.taiga.builder.IssueTypeBuilder
 import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
@@ -30,6 +22,7 @@ class TaigaClient extends BaseClient {
 
     private static final Map URLS_IMPORTER = [
         projects: '/api/v1/importer',
+        issues  : '/api/v1/importer/${projectId}/issue',
     ]
 
     private static final Map URLS = [
@@ -85,8 +78,6 @@ class TaigaClient extends BaseClient {
         this.doDelete("${URLS.projects}/${project.id}")
     }
 
-
-
     // ROLES
     Role addRole(String name, Project project) {
         def params = [
@@ -117,64 +108,13 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUES
-    Issue createIssue(Project project, String type, String status, String priority, String subject, String description, String userEmail = "") {
-        def params = [
-            type       : project.findIssueTypeByName(type).id,
-            status     : project.findIssueStatusByName(status).id,
-            priority   : project.findIssuePriorityByName(priority).id,
-            subject    : subject,
-            description: description,
-            project    : project.id,
-            severity   : project.defaultSeverity
-        ]
+    Issue createIssue(Issue issue) {
+        def url = this.merge(URLS_IMPORTER.issues, [projectId: issue.project.id])
 
-        def json = this.doPost(URLS.issues, params)
+        def params = Mappers.map(issue)
+        def json = this.doPost(url, params)
 
-        new IssueBuilder().build(json, project)
-    }
-
-    // ISSUE TYPES
-    IssueType addIssueType(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def json = this.doPost(URLS.issueTypes, params)
-
-        def issueType = new IssueTypeBuilder().build(json)
-        project.issueTypes << issueType
-
-        issueType
-    }
-
-    // ISSUE STATUSES
-    IssueStatus addIssueStatus(String name, Boolean isClosed, Project project) {
-        def params = [project: project.id, name: name, is_closed: isClosed]
-        def json = this.doPost(URLS.issueStatuses, params)
-
-        def issueStatus = new IssueStatusBuilder().build(json)
-        project.issueStatuses << issueStatus
-
-        issueStatus
-    }
-
-    // ISSUE PRIORITIES
-    IssuePriority addIssuePriority(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def json = this.doPost(URLS.issuePriorities, params)
-
-        def issuePriority = new IssuePriorityBuilder().build(json)
-        project.issuePriorities << issuePriority
-
-        issuePriority
-    }
-
-    // ISSUE SEVERITIES
-    IssueSeverity addIssueSeverity(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def json = this.doPost(URLS.issueSeverities, params)
-
-        def issueSeverity = new IssueSeverityBuilder().build(json)
-        project.issueSeverities << issueSeverity
-
-        issueSeverity
+        new IssueBuilder().build(json, issue.project)
     }
 
     // USERS

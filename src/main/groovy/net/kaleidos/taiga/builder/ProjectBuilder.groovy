@@ -20,10 +20,10 @@ class ProjectBuilder implements SafeJson {
             defaultSeverity = nullSafe(json.default_severity)
             defaultIssueStatus = nullSafe(json.default_issue_status)
             defaultIssueType = nullSafe(json.default_issue_type)
-            issueStatuses = json.issue_statuses.collect { new IssueStatusBuilder().build(it) }
-            issueTypes = json.issue_types.collect { new IssueTypeBuilder().build(it) }
-            issuePriorities = json.priorities.collect { new IssuePriorityBuilder().build(it) }
-            issueSeverities = json.severities.collect { new IssueSeverityBuilder().build(it) }
+            issueStatuses = json.issue_statuses.collect { it.name }
+            issueTypes = json.issue_types.collect { it.name }
+            issuePriorities = json.priorities.collect { it.name }
+            issueSeverities = json.severities.collect { it.name }
             roles = json.roles.collect { new RoleBuilder().build(it) }
             //memberships = json.memberships.collect { new MembershipBuilder().build(it, project) }
         }

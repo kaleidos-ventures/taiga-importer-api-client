@@ -8,4 +8,8 @@ class Mappers {
     static map(Project project) {
         new ProjectMapper().map(project)
     }
+
+    static map(Issue issue) {
+        new IssueMapper().map(issue)
+    }
 }
