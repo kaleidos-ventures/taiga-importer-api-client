@@ -9,10 +9,8 @@ class MembershipBuilder implements SafeJson {
         def membership = new Membership()
 
         membership.with {
-            id = json.id
             email = json.email
-            userId = nullSafe(json.user)
-            token = json.token
+            role = json.role
         }
 
         membership

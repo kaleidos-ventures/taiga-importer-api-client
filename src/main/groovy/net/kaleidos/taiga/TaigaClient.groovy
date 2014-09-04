@@ -2,9 +2,6 @@ package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
-import net.kaleidos.domain.IssuePriority
-import net.kaleidos.domain.IssueStatus
-import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Role
@@ -12,31 +9,35 @@ import net.kaleidos.domain.User
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
-import net.kaleidos.taiga.builder.IssuePriorityBuilder
-import net.kaleidos.taiga.builder.IssueStatusBuilder
-import net.kaleidos.taiga.builder.IssueTypeBuilder
 import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.RoleBuilder
 import net.kaleidos.taiga.builder.UserBuilder
 import net.kaleidos.taiga.builder.WikilinkBuilder
 import net.kaleidos.taiga.builder.WikipageBuilder
+import net.kaleidos.taiga.mapper.Mappers
 
 @Log4j
 class TaigaClient extends BaseClient {
 
-    private final Map URLS = [
-        auth           : "/api/v1/auth",
-        projects       : "/api/v1/projects",
-        issueTypes     : "/api/v1/issue-types",
-        issueStatuses  : "/api/v1/issue-statuses",
-        issuePriorities: "/api/v1/priorities",
-        issues         : "/api/v1/issues",
-        roles          : "/api/v1/roles",
-        memberships    : "/api/v1/memberships",
-        registerUsers  : "/api/v1/auth/register",
-        wikis          : "/api/v1/wiki",
-        wikiLinks      : "/api/v1/wiki-links",
+    private static final Map URLS_IMPORTER = [
+        projects: '/api/v1/importer',
+        issues  : '/api/v1/importer/${projectId}/issue',
+    ]
+
+    private static final Map URLS = [
+        auth           : '/api/v1/auth',
+        projects       : '/api/v1/projects',
+        issueTypes     : '/api/v1/issue-types',
+        issueStatuses  : '/api/v1/issue-statuses',
+        issuePriorities: '/api/v1/priorities',
+        issueSeverities: '/api/v1/severities',
+        issues         : '/api/v1/issues',
+        roles          : '/api/v1/roles',
+        memberships    : '/api/v1/memberships',
+        registerUsers  : '/api/v1/auth/register',
+        wikis          : '/api/v1/wiki',
+        wikiLinks      : '/api/v1/wiki-links',
     ]
 
     TaigaClient(String serverUrl) {
@@ -53,35 +54,28 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECT
-    Project createProject(String name, String description) {
-        log.debug "Saving project ==> ${name}"
-
-        def params = [name: name, description: description]
-        def json = this.doPost(URLS.projects, params)
-
-        new ProjectBuilder().build(json)
-    }
-
-    TaigaClient deleteProjectById(String id) {
-        log.debug "Deleting ==> ${id}"
-        this.doDelete("${URLS.projects}/$id")
-        this
-    }
-
     List<Map> getProjects() {
-        // TODO this has to be paginated
-        return this.doGet("${URLS.projects}?page_size=500")
-    }
-
-    void deleteProject(Project project) {
-        log.debug "Deleting project ==> ${project.id} - ${project.name}"
-        this.doDelete("${URLS.projects}/${project.id}")
+        this.doGet(URLS.projects)
     }
 
     Project getProjectById(Long projectId) {
         def json = this.doGet("${URLS.projects}/${projectId}")
 
         new ProjectBuilder().build(json)
+    }
+
+    Project createProject(Project project) {
+        log.debug "Saving project ==> ${project.name}"
+
+        def params = Mappers.map(project)
+        def json = this.doPost(URLS_IMPORTER.projects, params)
+
+        new ProjectBuilder().build(json)
+    }
+
+    void deleteProject(Project project) {
+        log.debug "Deleting project ==> ${project.id} - ${project.name}"
+        this.doDelete("${URLS.projects}/${project.id}")
     }
 
     // ROLES
@@ -96,16 +90,6 @@ class TaigaClient extends BaseClient {
         project.roles << role
 
         role
-    }
-
-    TaigaClient deleteAllRoles(Project project) {
-        def roles = project.roles
-        roles.each { Role r ->
-            this.doDelete("${URLS.roles}/${r.id}")
-        }
-        project.roles = []
-
-        this
     }
 
     // MEMBERSHIPS
@@ -124,83 +108,13 @@ class TaigaClient extends BaseClient {
     }
 
     // ISSUES
-    Issue createIssue(Project project, String type, String status, String priority, String subject, String description, String userEmail = "") {
-        def params = [
-            type       : project.findIssueTypeByName(type).id,
-            status     : project.findIssueStatusByName(status).id,
-            priority   : project.findIssuePriorityByName(priority).id,
-            subject    : subject,
-            description: description,
-            project    : project.id,
-            severity   : project.defaultSeverity
-        ]
+    Issue createIssue(Issue issue) {
+        def url = this.merge(URLS_IMPORTER.issues, [projectId: issue.project.id])
 
-        def json = this.doPost(URLS.issues, params)
+        def params = Mappers.map(issue)
+        def json = this.doPost(url, params)
 
-        new IssueBuilder().build(json, project)
-    }
-
-    // ISSUE TYPES
-    TaigaClient deleteAllIssueTypes(Project project) {
-        def issueTypes = project.issueTypes
-        issueTypes.each { IssueType it ->
-            this.doDelete("${URLS.issueTypes}/${it.id}")
-        }
-        project.issueTypes = []
-
-        this
-    }
-
-    IssueType addIssueType(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def json = this.doPost(URLS.issueTypes, params)
-
-        def issueType = new IssueTypeBuilder().build(json)
-        project.issueTypes << issueType
-
-        issueType
-    }
-
-    // ISSUE STATUSES
-    TaigaClient deleteAllIssueStatuses(Project project) {
-        def issueStatuses = project.issueStatuses
-        issueStatuses.each { IssueStatus is ->
-            this.doDelete("${URLS.issueStatuses}/${is.id}")
-        }
-        project.issueStatuses = []
-
-        this
-    }
-
-    IssueStatus addIssueStatus(String name, Boolean isClosed, Project project) {
-        def params = [project: project.id, name: name, is_closed: isClosed]
-        def json = this.doPost(URLS.issueStatuses, params)
-
-        def issueStatus = new IssueStatusBuilder().build(json)
-        project.issueStatuses << issueStatus
-
-        issueStatus
-    }
-
-    // ISSUE PRIORITIES
-    TaigaClient deleteAllIssuePriorities(Project project) {
-        def issuePriorities = project.issuePriorities
-        issuePriorities.each { IssuePriority ip ->
-            this.doDelete("${URLS.issuePriorities}/${ip.id}")
-        }
-        project.issuePriorities = []
-
-        this
-    }
-
-    IssuePriority addIssuePriority(String name, Project project) {
-        def params = [project: project.id, name: name]
-        def json = this.doPost(URLS.issuePriorities, params)
-
-        def issuePriority = new IssuePriorityBuilder().build(json)
-        project.issuePriorities << issuePriority
-
-        issuePriority
+        new IssueBuilder().build(json, issue.project)
     }
 
     // USERS
