@@ -18,16 +18,8 @@ class Project {
     List<String> issuePriorities
     List<String> issueSeverities
 
-    List<Role> roles
+    List<String> roles
 //    List<Membership> memberships
-
-    Role findRoleByName(String name) {
-        roles.find { it.name == name }
-    }
-
-    Role findRoleById(Long id) {
-        roles.find { it.id == id }
-    }
 
     Membership findMembershipByEmail(String email) {
         memberships.find { it.email == email }

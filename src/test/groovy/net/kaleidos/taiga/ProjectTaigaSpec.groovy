@@ -23,6 +23,9 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
         then: 'the projects are the same'
             project.id == sameProject.id
+
+        cleanup:
+            taigaClient.deleteProject(project)
     }
 
     void 'save a simple project'() {
@@ -105,10 +108,32 @@ class ProjectTaigaSpec extends TaigaSpecBase {
         where:
             name = "My project ${new Date().time}"
             description = 'The description of the project'
-            createdDate = "01/01/2010"
             types = ['Bug', 'Question', 'Enhancement']
             statuses = ['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed']
             priorities = ['Low', 'Normal', 'High']
             severities = ['Minor', 'Normal', 'Important', 'Critical']
+    }
+
+    void 'save a project with roles'() {
+        given: 'a project to create'
+            def project = new Project()
+                .setName(name)
+                .setDescription(description)
+                .setRoles(roles)
+
+        when: 'saving the project'
+            project = taigaClient.createProject(project)
+
+        then: 'the project is saved with all the fields'
+            project.roles.size() == roles.size()
+            project.roles.sort() == roles.sort()
+
+        cleanup:
+            taigaClient.deleteProject(project)
+
+        where:
+            name = "My project ${new Date().time}"
+            description = 'The description of the project'
+            roles = ['UX', 'Design', 'Front', 'Back']
     }
 }

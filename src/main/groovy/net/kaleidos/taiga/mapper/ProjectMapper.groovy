@@ -21,6 +21,7 @@ class ProjectMapper implements Mapper<Project> {
         map.issue_statuses = project.issueStatuses.collect { [name: it] }
         map.priorities = project.issuePriorities.collect { [name: it] }
         map.severities = project.issueSeverities.collect { [name: it] }
+        map.roles = project.roles.collect { [name: it] }
 
         map
     }
