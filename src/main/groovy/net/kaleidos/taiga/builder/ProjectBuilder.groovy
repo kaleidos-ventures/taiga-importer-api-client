@@ -14,12 +14,6 @@ class ProjectBuilder implements SafeJson {
             name = json.name
             createdDate = Date.parse(TAIGA_DATE_FORMAT, json.created_date)
             description = json.description
-            defaultUsStatus = nullSafe(json.default_us_status)
-            defaultTaskStatus = nullSafe(json.default_task_status)
-            defaultPriority = nullSafe(json.default_priority)
-            defaultSeverity = nullSafe(json.default_severity)
-            defaultIssueStatus = nullSafe(json.default_issue_status)
-            defaultIssueType = nullSafe(json.default_issue_type)
             issueStatuses = json.issue_statuses.collect { it.name }
             issueTypes = json.issue_types.collect { it.name }
             issuePriorities = json.priorities.collect { it.name }

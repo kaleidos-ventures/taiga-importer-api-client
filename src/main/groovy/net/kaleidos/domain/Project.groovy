@@ -12,12 +12,6 @@ class Project {
     Date createdDate
 
     Long id
-    String defaultUsStatus
-    String defaultTaskStatus
-    String defaultPriority
-    String defaultSeverity
-    String defaultIssueStatus
-    String defaultIssueType
 
     List<String> issueStatuses
     List<String> issueTypes
