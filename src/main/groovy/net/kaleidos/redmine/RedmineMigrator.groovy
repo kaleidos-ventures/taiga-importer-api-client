@@ -18,12 +18,15 @@ import net.kaleidos.domain.Project as TaigaProject
 import net.kaleidos.taiga.TaigaClient
 
 import groovy.util.logging.Log4j
+import org.apache.http.message.BasicNameValuePair
+import com.github.slugify.Slugify
 
 @Log4j
 class RedmineMigrator {
 
     final RedmineManager redmineClient
     final TaigaClient taigaClient
+    final Object NOTHING = null
 
     RedmineMigrator(final RedmineManager redmineClient, final TaigaClient taigaClient) {
         this.redmineClient = redmineClient
@@ -142,7 +145,7 @@ class RedmineMigrator {
 
     Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
         return { Map partial ->
-            log.debug("TRACKER/TYPE: ${partial.tracker}")
+            log.debug("Creating issue of type: ${partial.tracker}")
             taigaClient.createIssue(
                 ref.taigaProject,
                 partial.tracker,
@@ -159,7 +162,53 @@ class RedmineMigrator {
         List<RedmineWikiPageSummary> wikiPageSummaryList =
             redmineClient.getWikiPagesByProject(ref.redmineProject)
 
-        return map(wikiPageSummaryList, summaryToReal(ref) >> saveWikiPage(ref))
+        Wikipage home = saveHomeIfNeccessary(wikiPageSummaryList, ref)
+
+        return map(wikiPageSummaryList, summaryToReal(ref) >> saveWikiPage(ref)) + home
+    }
+
+    Wikipage saveHomeIfNeccessary(final List<RedmineWikiPageSummary> pages, final RedmineTaigaRef ref) {
+       log.debug('Resolving which page will become the home page')
+
+        RedmineWikiPageSummary home =
+            filterHomePage << // If home present then it will be save normally afterwards
+            applySearchIfNoResult(searchByOldest(pages)) <<
+            applySearchIfNoResult(searchByTitleWiki(pages)) <<
+            applySearchIfNoResult(searchByTitleHome(pages)) << NOTHING
+
+
+        if (home) {
+            return saveWikiPage(ref) << changeToHome << summaryToReal(ref) << home
+        }
+
+        return null
+    }
+
+    Closure<RedmineWikiPage> changeToHome = { RedmineWikiPage page ->
+        log.debug("Preparing ${page.title} to be HOME")
+        return new RedmineWikiPage(title: 'home', text: page.text)
+    }
+
+    Closure<?> filterHomePage = { RedmineWikiPageSummary summary ->
+        if (summary && summary.title.toLowerCase()!= 'home') {
+            log.debug("Page eligible to be home is ${summary.title}")
+            return summary
+        } else {
+            log.debug("NO home available ${summary?.title}")
+            return NOTHING
+        }
+    }
+
+    Closure<?> searchByTitleHome = { List pages ->
+        return { pages.find(filteringByTitleToLowerCase('home')) }
+    }
+
+    Closure<?> searchByTitleWiki = { List pages ->
+        return { pages.find(filteringByTitleToLowerCase('wiki')) }
+    }
+
+    Closure<?> searchByOldest = { List pages ->
+        return { pages.sort(inAscendingOrderBy('createdOn')).first() }
     }
 
     Closure<RedmineWikiPage> summaryToReal(final RedmineTaigaRef ref) {
@@ -168,13 +217,33 @@ class RedmineMigrator {
         }
     }
 
+    Closure<Boolean> filteringByTitleToLowerCase(String title) {
+        return { it.title.toLowerCase() == title }
+    }
+
+    Closure<Boolean> inAscendingOrderBy(String field) {
+        return { it."$field" }
+    }
+
+    Closure<?> applySearchIfNoResult(Closure<?> search) {
+        return { Object result ->
+            result ? result : search()
+        }
+    }
+
     Closure<Wikipage> saveWikiPage(final RedmineTaigaRef ref) {
         return { RedmineWikiPage wp ->
+            log.debug("Trying to save wiki page: ${wp.title}")
             Wikipage taigaWikiPage =
-                taigaClient.createWiki(wp.title, wp.text, ref.taigaProject)
+                taigaClient.createWiki(slugify(wp.title), wp.text, ref.taigaProject)
+            log.debug("Wikipage saved successfully ? ${taigaWikiPage ? 'TRUE' : 'FALSE' }")
 
             return taigaWikiPage
         }
+    }
+
+    private slugify(String possible) {
+        return new Slugify().slugify(possible)
     }
 
     private RedmineUser getUserInfoById(Integer id) {

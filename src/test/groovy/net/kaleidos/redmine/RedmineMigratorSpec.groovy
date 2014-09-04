@@ -143,7 +143,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('type'))
     }
 
-    @IgnoreRest
     void 'Migrate wiki pages from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()
@@ -162,6 +161,8 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             wikiPages.size() > 0
             wikiPages.every(has('slug'))
             wikiPages.every(has('content'))
+            wikiPages.any { it.slug.toLowerCase() == 'wiki' }
+            wikiPages.any { it.slug.toLowerCase() == 'home' }
     }
 
     Closure<Boolean> has = { String field ->
@@ -169,7 +170,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
     }
 
     Closure<Boolean> valueIsOne = { it.value == 1 }
-
     Closure<Boolean> hasId = has('id')
     Closure<Boolean> hasName = has('name')
     Closure<Boolean> hasDescription = { Project p -> p.description }
