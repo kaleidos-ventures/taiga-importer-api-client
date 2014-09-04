@@ -2,17 +2,11 @@ package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
-import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
-import net.kaleidos.domain.Role
-import net.kaleidos.domain.User
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
-import net.kaleidos.taiga.builder.MembershipBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
-import net.kaleidos.taiga.builder.RoleBuilder
-import net.kaleidos.taiga.builder.UserBuilder
 import net.kaleidos.taiga.builder.WikilinkBuilder
 import net.kaleidos.taiga.builder.WikipageBuilder
 import net.kaleidos.taiga.mapper.Mappers
@@ -28,14 +22,6 @@ class TaigaClient extends BaseClient {
     private static final Map URLS = [
         auth           : '/api/v1/auth',
         projects       : '/api/v1/projects',
-        issueTypes     : '/api/v1/issue-types',
-        issueStatuses  : '/api/v1/issue-statuses',
-        issuePriorities: '/api/v1/priorities',
-        issueSeverities: '/api/v1/severities',
-        issues         : '/api/v1/issues',
-        roles          : '/api/v1/roles',
-        memberships    : '/api/v1/memberships',
-        registerUsers  : '/api/v1/auth/register',
         wikis          : '/api/v1/wiki',
         wikiLinks      : '/api/v1/wiki-links',
     ]
@@ -53,7 +39,7 @@ class TaigaClient extends BaseClient {
         this
     }
 
-    // PROJECT
+    // PROJECTS
     List<Map> getProjects() {
         this.doGet(URLS.projects)
     }
@@ -78,35 +64,6 @@ class TaigaClient extends BaseClient {
         this.doDelete("${URLS.projects}/${project.id}")
     }
 
-    // ROLES
-    Role addRole(String name, Project project) {
-        def params = [
-            project: project.id,
-            name   : name
-        ]
-        def json = this.doPost(URLS.roles, params)
-
-        def role = new RoleBuilder().build(json)
-        project.roles << role
-
-        role
-    }
-
-    // MEMBERSHIPS
-    Membership createMembership(String email, String role, Project project) {
-        def params = [
-            project: project.id,
-            role   : project.findRoleByName(role).id,
-            email  : email
-        ]
-        def json = this.doPost(URLS.memberships, params)
-
-        def membership = new MembershipBuilder().build(json, project)
-        project.memberships << membership
-
-        membership
-    }
-
     // ISSUES
     Issue createIssue(Issue issue) {
         def url = this.merge(URLS_IMPORTER.issues, [projectId: issue.project.id])
@@ -115,22 +72,6 @@ class TaigaClient extends BaseClient {
         def json = this.doPost(url, params)
 
         new IssueBuilder().build(json, issue.project)
-    }
-
-    // USERS
-    User registerUser(String email, String password, String token) {
-        def params = [
-            email    : email,
-            token    : token,
-            username : email,
-            existing : false,
-            full_name: email,
-            password : password,
-            type     : 'private',
-        ]
-        def json = this.doPost(URLS.registerUsers, params)
-
-        new UserBuilder().build(json)
     }
 
     // WIKIS
