@@ -16,8 +16,10 @@ class Issue {
 
     String subject
     String description
-    String author
     Project project
+
+    String owner
+    Date createdDate
 
     List<Attachment> attachments
 }

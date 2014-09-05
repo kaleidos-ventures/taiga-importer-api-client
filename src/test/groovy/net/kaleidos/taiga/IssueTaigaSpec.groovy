@@ -1,7 +1,6 @@
 package net.kaleidos.taiga
 
 import net.kaleidos.domain.Attachment
-import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import spock.lang.Unroll
 
@@ -20,15 +19,8 @@ class IssueTaigaSpec extends TaigaSpecBase {
     @Unroll
     void 'create an issue with the basic fields and ref = #ref'() {
         given: 'a new issue'
-            def issue = new Issue()
+            def issue = buildBasicIssue(project)
                 .setRef(ref)
-                .setType(type)
-                .setStatus(status)
-                .setPriority(priority)
-                .setSeverity(severity)
-                .setSubject(subject)
-                .setDescription(description)
-                .setProject(project)
 
         when: 'creating a new issue'
             issue = taigaClient.createIssue(issue)
@@ -63,20 +55,13 @@ class IssueTaigaSpec extends TaigaSpecBase {
             def attachment2 = new Attachment(name: filename2, data: file2Base64, owner: owner)
 
         and: 'a new issue'
-            def issue = new Issue()
-                .setType('Bug')
-                .setStatus('New')
-                .setPriority('Normal')
-                .setSeverity('Normal')
-                .setSubject('Subject')
-                .setDescription('Description')
-                .setProject(project)
+            def issue = buildBasicIssue(project)
                 .setAttachments([attachment1, attachment2])
 
         when: 'creating a new issue'
             issue = taigaClient.createIssue(issue)
 
-        then: 'the issue is created in Taiga'
+        then: 'the issue is created in Taiga with the attachements'
             issue != null
             issue.attachments.size() == 2
             issue.attachments[0].name == filename1
@@ -87,6 +72,25 @@ class IssueTaigaSpec extends TaigaSpecBase {
         where:
             filename1 = 'tux.png'
             filename2 = 'debian.jpg'
+            owner = 'admin@admin.com'
+    }
+
+    void 'create an issue with optional fields'() {
+        given: 'a new issue with optional fields'
+            def issue = buildBasicIssue(project)
+                .setCreatedDate(Date.parse("dd/MM/yyyy", createdDate))
+                .setOwner(owner)
+
+        when: 'creating a new issue'
+            issue = taigaClient.createIssue(issue)
+
+        then: 'the issue is created in Taiga'
+            issue != null
+            issue.owner == owner
+            issue.createdDate.format("dd/MM/yyyy") == createdDate
+
+        where:
+            createdDate = '01/01/2010'
             owner = 'admin@admin.com'
     }
 }

@@ -1,10 +1,9 @@
 package net.kaleidos.taiga.mapper
 
 import net.kaleidos.domain.Project
+import net.kaleidos.taiga.common.DateConversions
 
-class ProjectMapper implements Mapper<Project> {
-
-    private static final String TAIGA_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+class ProjectMapper implements Mapper<Project>, DateConversions {
 
     private static final List<String> defaultPermissions = [
         "add_issue",
@@ -41,7 +40,7 @@ class ProjectMapper implements Mapper<Project> {
         ]
 
         if (project.createdDate) {
-            map.created_date = project.createdDate?.format(TAIGA_DATE_FORMAT)
+            map.created_date = format(project.createdDate)
         }
 
         map.issue_types = project.issueTypes.collect { [name: it] }
