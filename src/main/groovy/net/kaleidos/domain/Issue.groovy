@@ -7,7 +7,7 @@ import groovy.transform.builder.SimpleStrategy
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
 class Issue {
-    Long id
+    Long ref
 
     String type
     String status

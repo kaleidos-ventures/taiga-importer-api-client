@@ -14,6 +14,7 @@ class IssueMapper implements Mapper<Issue> {
             subject    : issue.subject,
             description: issue.description,
             project    : issue.project.id,
+            ref        : issue.ref,
             attachments : issue.attachments.collect { Mappers.map(it) },
         ]
     }

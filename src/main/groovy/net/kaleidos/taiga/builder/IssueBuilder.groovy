@@ -9,7 +9,7 @@ class IssueBuilder {
         def issue = new Issue()
 
         issue.with {
-            id = json.id
+            ref = json.ref
             type = json.type
             status = json.status
             priority = json.priority

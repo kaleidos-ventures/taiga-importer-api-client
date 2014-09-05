@@ -3,6 +3,7 @@ package net.kaleidos.taiga
 import net.kaleidos.domain.Attachment
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
+import spock.lang.Unroll
 
 class IssueTaigaSpec extends TaigaSpecBase {
 
@@ -16,22 +17,25 @@ class IssueTaigaSpec extends TaigaSpecBase {
         deleteProject(project)
     }
 
-    void 'create an issue with the basic fields'() {
+    @Unroll
+    void 'create an issue with the basic fields and ref = #ref'() {
         given: 'a new issue'
             def issue = new Issue()
-                            .setType(type)
-                            .setStatus(status)
-                            .setPriority(priority)
-                            .setSeverity(severity)
-                            .setSubject(subject)
-                            .setDescription(description)
-                            .setProject(project)
+                .setRef(ref)
+                .setType(type)
+                .setStatus(status)
+                .setPriority(priority)
+                .setSeverity(severity)
+                .setSubject(subject)
+                .setDescription(description)
+                .setProject(project)
 
         when: 'creating a new issue'
             issue = taigaClient.createIssue(issue)
 
         then: 'the issue is created in Taiga'
             issue != null
+            issue.ref == (ref ?: 1)
             issue.project.id == project.id
             issue.subject == subject
             issue.description == description
@@ -41,6 +45,7 @@ class IssueTaigaSpec extends TaigaSpecBase {
             issue.severity == severity
 
         where:
+            ref << [123, null]
             subject = 'The subject'
             description = 'The description'
             type = 'Bug'
