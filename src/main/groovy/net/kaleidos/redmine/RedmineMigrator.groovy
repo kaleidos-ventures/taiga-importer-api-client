@@ -71,7 +71,7 @@ class RedmineMigrator {
 
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
         return [
-            taigaProject  : taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
+            taigaProject: taigaClient.createProject(ref.taigaProject),
             redmineProject: ref.redmineProject
         ] as RedmineTaigaRef
 
