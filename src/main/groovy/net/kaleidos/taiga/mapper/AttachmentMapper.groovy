@@ -13,6 +13,8 @@ class AttachmentMapper implements Mapper<Attachment>, DateConversions {
                 data: attachment.data,
             ],
             owner: attachment.owner,
+            created_date: format(attachment.createdDate),
+            description: attachment.description,
         ]
     }
 }

@@ -77,6 +77,29 @@ class IssueTaigaSpec extends TaigaSpecBase {
             owner = 'admin@admin.com'
     }
 
+    void 'create an attachment with optional data'() {
+        given: 'one file to attach to an issue'
+            def fileBase64 = new File("src/test/resources/tux.png").bytes.encodeBase64().toString()
+            def attachment = new Attachment(name: 'tux.png', data: fileBase64, owner: 'admin@admin.com')
+                .setDescription(description)
+                .setCreatedDate(Date.parse("dd/MM/yyyy", createdDate))
+
+        and: 'a new issue'
+            def issue = buildBasicIssue(project)
+                .setAttachments([attachment])
+
+        when: 'creating a new issue'
+            issue = taigaClient.createIssue(issue)
+
+        then:
+            issue.attachments[0].description == description
+            issue.attachments[0].createdDate.format("dd/MM/yyyy") == createdDate
+
+        where:
+            createdDate = '01/01/2010'
+            description = 'description'
+    }
+
     void 'create an issue with optional fields'() {
         given: 'a new issue with optional fields'
             def issue = buildBasicIssue(project)
