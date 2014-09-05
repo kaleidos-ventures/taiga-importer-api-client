@@ -6,14 +6,15 @@ class IssueMapper implements Mapper<Issue> {
 
     @Override
     Map map(Issue issue) {
-        def map = [
+        [
             type       : issue.type,
             status     : issue.status,
             priority   : issue.priority,
             severity   : issue.severity,
             subject    : issue.subject,
             description: issue.description,
-            project    : issue.project.id
+            project    : issue.project.id,
+            attachments : issue.attachments.collect { Mappers.map(it) },
         ]
     }
 }

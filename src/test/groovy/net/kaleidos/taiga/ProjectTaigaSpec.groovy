@@ -154,9 +154,12 @@ class ProjectTaigaSpec extends TaigaSpecBase {
         when: 'saving the project'
             project = taigaClient.createProject(project)
 
-        then: 'the project is saved with all the fields'
-            project.memberships.size() == memberships.size()
-            project.memberships*.email.sort() == memberships*.email.sort()
+        then: 'the project is saved with the members and the creator of the proyect (owner)'
+            project.memberships.size() == memberships.size() + 1
+            project.memberships*.email.with {
+                contains(memberships*.email[0])
+                contains(memberships*.email[1])
+            }
 
         cleanup:
             taigaClient.deleteProject(project)

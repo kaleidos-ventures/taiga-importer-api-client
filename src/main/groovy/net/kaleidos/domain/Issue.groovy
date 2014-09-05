@@ -18,4 +18,6 @@ class Issue {
     String description
     String author
     Project project
+
+    List<Attachment> attachments
 }

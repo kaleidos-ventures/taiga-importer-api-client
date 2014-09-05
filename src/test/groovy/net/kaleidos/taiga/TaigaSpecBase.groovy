@@ -1,5 +1,6 @@
 package net.kaleidos.taiga
 
+import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import spock.lang.Specification
 
@@ -26,6 +27,8 @@ class TaigaSpecBase extends Specification {
             .setIssueStatuses(['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed'])
             .setIssuePriorities(['Low', 'Normal', 'High'])
             .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
+            .setRoles(['UX', 'Back'])
+            .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
 
         taigaClient.createProject(project)
     }

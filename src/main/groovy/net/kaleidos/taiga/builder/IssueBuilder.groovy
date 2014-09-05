@@ -17,6 +17,7 @@ class IssueBuilder {
             subject = json.subject
             description = json.description
             delegate.project = project
+            attachments = json.attachments.collect { new AttachmentBuilder().build(it, project) }
         }
 
         issue
