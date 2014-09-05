@@ -2,6 +2,7 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
+import net.kaleidos.taiga.common.SafeJson
 
 class ProjectBuilder implements SafeJson, DateConversions {
 

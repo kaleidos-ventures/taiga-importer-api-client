@@ -1,4 +1,4 @@
-package net.kaleidos.taiga.builder
+package net.kaleidos.taiga.common
 
 trait SafeJson {
 
