@@ -4,9 +4,12 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
-@ToString
+@ToString(excludes = 'data')
 @Builder(builderStrategy = SimpleStrategy)
-class User {
+class Attachment {
+    String data
     String name
-    String email
+    String owner
+    String description
+    Date createdDate
 }

@@ -7,7 +7,7 @@ import groovy.transform.builder.SimpleStrategy
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
 class Issue {
-    Long id
+    Long ref
 
     String type
     String status
@@ -16,6 +16,12 @@ class Issue {
 
     String subject
     String description
-    String author
     Project project
+
+    String owner
+    Date createdDate
+
+    List<Attachment> attachments
+
+    List<History> history
 }
