@@ -21,6 +21,7 @@ class IssueBuilder implements DateConversions {
             owner = json.owner
             createdDate = parse(json.created_date)
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, project) }
+            history = json.history.collect { new HistoryBuilder().build(it, project) }
         }
 
         issue

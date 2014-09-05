@@ -22,4 +22,6 @@ class Issue {
     Date createdDate
 
     List<Attachment> attachments
+
+    List<History> history
 }

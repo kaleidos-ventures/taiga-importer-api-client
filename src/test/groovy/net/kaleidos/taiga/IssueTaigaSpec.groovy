@@ -1,7 +1,9 @@
 package net.kaleidos.taiga
 
 import net.kaleidos.domain.Attachment
+import net.kaleidos.domain.History
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.User
 import spock.lang.Unroll
 
 class IssueTaigaSpec extends TaigaSpecBase {
@@ -61,7 +63,7 @@ class IssueTaigaSpec extends TaigaSpecBase {
         when: 'creating a new issue'
             issue = taigaClient.createIssue(issue)
 
-        then: 'the issue is created in Taiga with the attachements'
+        then: 'the issue is created in Taiga with the attachments'
             issue != null
             issue.attachments.size() == 2
             issue.attachments[0].name == filename1
@@ -84,7 +86,7 @@ class IssueTaigaSpec extends TaigaSpecBase {
         when: 'creating a new issue'
             issue = taigaClient.createIssue(issue)
 
-        then: 'the issue is created in Taiga'
+        then: 'the issue is created in Taiga with the optional fields'
             issue != null
             issue.owner == owner
             issue.createdDate.format("dd/MM/yyyy") == createdDate
@@ -93,4 +95,31 @@ class IssueTaigaSpec extends TaigaSpecBase {
             createdDate = '01/01/2010'
             owner = 'admin@admin.com'
     }
+
+    void 'create an issue with comments'() {
+        given: 'a new issue with comments'
+            def user = new User().setEmail('admin@admin.com').setName('The fullname')
+            def history = new History()
+                .setUser(user)
+                .setCreatedAt(Date.parse("dd/MM/yyyy HH:mm", createdAt))
+                .setComment(comment)
+
+            def issue = buildBasicIssue(project)
+                .setHistory([history])
+
+        when: 'creating a new issue'
+            issue = taigaClient.createIssue(issue)
+
+        then: 'the issue is created in Taiga'
+            issue != null
+            issue.history.size() == 1
+            issue.history[0].user.email == user.email
+            issue.history[0].user.name == user.name
+            issue.history[0].createdAt.format('dd/MM/yyyy HH:mm') == createdAt
+
+        where:
+            createdAt = '01/01/2010 13:45'
+            comment = 'The comment'
+    }
+
 }

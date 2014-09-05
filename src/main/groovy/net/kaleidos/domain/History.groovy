@@ -6,7 +6,8 @@ import groovy.transform.builder.SimpleStrategy
 
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
-class User {
-    String name
-    String email
+class History {
+    User user
+    Date createdAt
+    String comment
 }

@@ -19,6 +19,7 @@ class IssueMapper implements Mapper<Issue>, DateConversions {
             owner       : issue.owner,
             created_date: format(issue.createdDate),
             attachments : issue.attachments.collect { Mappers.map(it) },
+            history     : issue.history.collect { Mappers.map(it) },
         ]
     }
 }
