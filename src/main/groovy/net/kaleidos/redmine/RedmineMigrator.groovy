@@ -1,26 +1,17 @@
 package net.kaleidos.redmine
 
-import static groovyx.gpars.GParsPool.withPool
-
-import groovy.util.logging.Log4j
-
-import net.kaleidos.taiga.TaigaClient
 import com.taskadapter.redmineapi.RedmineManager
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
-import com.taskadapter.redmineapi.bean.Tracker
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
-import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
-
-import net.kaleidos.domain.User as TaigaUser
+import com.taskadapter.redmineapi.bean.Tracker
+import com.taskadapter.redmineapi.bean.User as RedmineUser
+import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue as TaigaIssue
-import net.kaleidos.domain.IssueType
 import net.kaleidos.domain.IssueStatus
-import net.kaleidos.domain.IssuePriority
 import net.kaleidos.domain.Project as TaigaProject
+import net.kaleidos.taiga.TaigaClient
 
-import org.apache.http.message.BasicNameValuePair
+import static groovyx.gpars.GParsPool.withPool
 
 @Log4j
 class RedmineMigrator {
@@ -49,29 +40,29 @@ class RedmineMigrator {
     Closure<RedmineTaigaRef> addIdentifierJustInCase = { final List<String> allNames ->
         return { RedmineProject source ->
 
-            def addIdentifier = allNames.count { it.trim() == source.name.trim()} > 1 ? true : false
+            def addIdentifier = allNames.count { it.trim() == source.name.trim() } > 1 ? true : false
 
             if (addIdentifier) {
                 log.warn "Project '${source.name}' is repeated. Modifying name..."
             }
 
             return [
-                taigaProject: [
-                    name: addIdentifier ? "${source.name} [${source.identifier}]" : source.name,
-                    description: source.description ] as TaigaProject,
+                taigaProject  : [
+                    name       : addIdentifier ? "${source.name} [${source.identifier}]" : source.name,
+                    description: source.description] as TaigaProject,
                 redmineProject: source
             ] as RedmineTaigaRef
 
         }
     }
 
-    Closure<IssueType> trackerToIssueType = { Tracker tracker ->
-        return new IssueType(name: tracker.name)
+    Closure<String> trackerToIssueType = { Tracker tracker ->
+        return tracker.name
     }
 
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
         return [
-            taigaProject: taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
+            taigaProject  : taigaClient.createProject(ref.taigaProject.name, ref.taigaProject.description),
             redmineProject: ref.redmineProject
         ] as RedmineTaigaRef
 
@@ -85,11 +76,11 @@ class RedmineMigrator {
         }
     }
 
-    List<IssueType> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
+    List<String> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
         return map(ref.redmineProject.trackers, addedIssueType(ref))
     }
 
-    Closure<IssueType> addedIssueType(final RedmineTaigaRef ref) {
+    Closure<String> addedIssueType(final RedmineTaigaRef ref) {
         return {
             taigaClient.addIssueType(it.name, ref.taigaProject)
         }
@@ -105,11 +96,11 @@ class RedmineMigrator {
         }
     }
 
-    List<IssuePriority> migrateIssuePriorities(final RedmineTaigaRef ref) {
+    List<String> migrateIssuePriorities(final RedmineTaigaRef ref) {
         return map(redmineClient.issuePriorities, addedIssuePriority(ref))
     }
 
-    Closure<IssuePriority> addedIssuePriority(final RedmineTaigaRef ref) {
+    Closure<String> addedIssuePriority(final RedmineTaigaRef ref) {
         return {
             taigaClient.addIssuePriority(it.name, ref.taigaProject)
         }
@@ -134,12 +125,12 @@ class RedmineMigrator {
 
     Closure<TaigaIssue> fullfillUserMail = { RedmineIssue source ->
         return [
-            tracker: source.tracker.name,
-            status: source.statusName,
-            priority: source.priorityText,
-            subject: source.subject,
+            tracker    : source.tracker.name,
+            status     : source.statusName,
+            priority   : source.priorityText,
+            subject    : source.subject,
             description: source.description,
-            userMail: getUserInfoById(source.author.id).mail
+            userMail   : getUserInfoById(source.author.id).mail
         ]
     }
 
@@ -163,15 +154,14 @@ class RedmineMigrator {
     }
 
     Closure<RedmineUser> extractUserFromIssue = { RedmineIssue issue ->
-       return redmineClient.getUserById(issue.author.id)
+        return redmineClient.getUserById(issue.author.id)
     }
 
-    static <T,U> List<U> map(List<T> collection, Closure<U> collector) {
+    static <T, U> List<U> map(List<T> collection, Closure<U> collector) {
         return collection.collect(collector)
     }
 
-    static <T,U> List<U> mapParallel(List<T> collection, Closure<U> collector) {
+    static <T, U> List<U> mapParallel(List<T> collection, Closure<U> collector) {
         return withPool { collection.collectParallel(collector) }
     }
-
 }

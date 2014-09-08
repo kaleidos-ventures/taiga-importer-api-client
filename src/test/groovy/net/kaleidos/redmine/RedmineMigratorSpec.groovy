@@ -1,17 +1,10 @@
 package net.kaleidos.redmine
 
-import spock.lang.IgnoreRest
-
-import net.kaleidos.domain.User
-import net.kaleidos.domain.Issue
-import net.kaleidos.domain.Project
-import net.kaleidos.domain.IssueType
-import net.kaleidos.domain.IssueStatus
-import net.kaleidos.domain.IssuePriority
-
-import net.kaleidos.taiga.TaigaClient
-
 import com.taskadapter.redmineapi.RedmineManager
+import net.kaleidos.domain.Issue
+import net.kaleidos.domain.IssueStatus
+import net.kaleidos.domain.Project
+import net.kaleidos.taiga.TaigaClient
 
 class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
 
@@ -53,7 +46,8 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .deleteAllIssueStatuses(project.taigaProject)
                 .deleteAllIssuePriorities(project.taigaProject)
         and: 'migrating issue types of the current project'
-            List<IssueType> projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
+//            List<IssueType> projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
+            def projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
         then: 'there should be some types'
             projectIssueTypeList.size() > 0
         and: 'cant be repeated'
@@ -91,7 +85,8 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .deleteAllIssueStatuses(project.taigaProject)
                 .deleteAllIssuePriorities(project.taigaProject)
         and: 'migrating issue priorities of the current project'
-            List<IssuePriority> priorities = migrator.migrateIssuePriorities(project)
+//            List<IssuePriority> priorities = migrator.migrateIssuePriorities(project)
+            def priorities = migrator.migrateIssuePriorities(project)
         then: 'there should be some priorities'
             priorities.size() > 0
         and: 'all of them should have name'
@@ -163,5 +158,4 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
 
         return manager
     }
-
 }
