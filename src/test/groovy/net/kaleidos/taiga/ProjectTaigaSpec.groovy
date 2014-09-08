@@ -97,7 +97,8 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             project.issueTypes.size() == types.size()
             project.issueTypes.sort() == types.sort()
             project.issueStatuses.size() == statuses.size()
-            project.issueStatuses.sort() == statuses.sort()
+            project.issueStatuses*.name.sort() == statuses*.name.sort()
+            project.issueStatuses*.isClosed.sort() == statuses*.isClosed.sort()
             project.issuePriorities.size() == priorities.size()
             project.issuePriorities.sort() == priorities.sort()
             project.issueSeverities.size() == severities.size()
@@ -110,7 +111,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             name = "My project ${new Date().time}"
             description = 'The description of the project'
             types = ['Bug', 'Question', 'Enhancement']
-            statuses = ['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed']
+            statuses = buildIssueStatuses()
             priorities = ['Low', 'Normal', 'High']
             severities = ['Minor', 'Normal', 'Important', 'Critical']
     }
@@ -156,10 +157,8 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
         then: 'the project is saved with the members and the creator of the proyect (owner)'
             project.memberships.size() == memberships.size() + 1
-            project.memberships*.email.with {
-                contains(memberships*.email[0])
-                contains(memberships*.email[1])
-            }
+            project.memberships*.email.contains(memberships[0].email)
+            project.memberships*.email.contains(memberships[1].email)
 
         cleanup:
             taigaClient.deleteProject(project)

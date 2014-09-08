@@ -1,6 +1,7 @@
 package net.kaleidos.taiga
 
 import net.kaleidos.domain.Issue
+import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
 import spock.lang.Specification
@@ -25,7 +26,7 @@ class TaigaSpecBase extends Specification {
             .setName("name ${new Date().time}")
             .setDescription("description")
             .setIssueTypes(['Bug', 'Question', 'Enhancement'])
-            .setIssueStatuses(['New', 'In progress', 'Ready for test', 'Closed', 'Needs Info', 'Rejected', 'Postponed'])
+            .setIssueStatuses(buildIssueStatuses())
             .setIssuePriorities(['Low', 'Normal', 'High'])
             .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
             .setRoles(['UX', 'Back'])
@@ -47,5 +48,22 @@ class TaigaSpecBase extends Specification {
             .setSubject('The subject')
             .setDescription('The description')
             .setProject(project)
+    }
+
+    List<IssueStatus> buildIssueStatuses() {
+        [
+            [name: 'New', isClosed: false],
+            [name: 'In progress', isClosed: false],
+            [name: 'Ready for test', isClosed: true],
+            [name: 'Closed', isClosed: true],
+            [name: 'Needs Info', isClosed: false],
+            [name: 'Rejected', isClosed: false]
+        ].collect {
+            buildIssueStatus(it.name, it.isClosed)
+        }
+    }
+
+    IssueStatus buildIssueStatus(String name, Boolean isClosed) {
+        new IssueStatus().setName(name).setIsClosed(isClosed)
     }
 }
