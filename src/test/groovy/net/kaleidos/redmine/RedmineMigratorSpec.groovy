@@ -1,6 +1,9 @@
 package net.kaleidos.redmine
 
-import com.taskadapter.redmineapi.RedmineManager
+import spock.lang.Ignore
+import spock.lang.IgnoreRest
+
+import net.kaleidos.domain.User
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.domain.IssueStatus
@@ -54,100 +57,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .div(projectList.size()) > HALF_PERCENTAGE
     }
 
-<<<<<<< HEAD
-    String loadResourceAsString(String resource) {
-        return RedmineMigratorSpec
-            .classLoader
-            .getResourceAsStream(resource)
-            .text
-    }
-
-    HttpResponse buildResponseWithJson(String jsonResource) {
-        def response =
-            new BasicHttpResponse(HttpVersion.HTTP_1_1,HttpStatus.SC_OK,"OK")
-
-        def entity =
-            new StringEntity(
-                loadResourceAsString(jsonResource),
-                ContentType.APPLICATION_JSON
-            )
-
-        response.setEntity(entity)
-        return response
-    }
-
-    RedmineManager buildRedmineClient(HttpClient httpClient) {
-        return new RedmineManager(
-            new Transport(
-                new URIConfigurator("http://a", "0983hr0ih23roubk"),
-                httpClient
-            ),
-            RedmineManagerFactory.createDefaultTransportConfig().shutdownListener
-        )
-    }
-
-    void 'Migrate issue trackers from a given project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
-        when: 'creating a new project and cleaning up its issue structure'
-            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
-        and: 'migrating issue types of the current project'
-//            List<IssueType> projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
-            def projectIssueTypeList = migrator.migrateIssueTrackersByProject(project)
-        then: 'there should be some types'
-            projectIssueTypeList.size() > 0
-        and: 'cant be repeated'
-            projectIssueTypeList.unique {it.name}.size() == projectIssueTypeList.size()
-    }
-
-    void 'Migrate issue status from a given project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
-        when: 'creating a new project and cleaning up its issue structure'
-            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
-        and: 'migrating issue statuses of the current project'
-            List<IssueStatus> projectIssueStatusList = migrator.migrateIssueStatusesByProject(project)
-        then: 'there should be some types'
-            projectIssueStatusList.size() > 0
-        and: 'cant be repeated'
-            projectIssueStatusList.unique {it.name}.size() == projectIssueStatusList.size()
-    }
-
-    void 'Migrate issue priorities from a given project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
-        when: 'creating a new project and cleaning up its issue structure'
-            RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
-        and: 'migrating issue priorities of the current project'
-//            List<IssuePriority> priorities = migrator.migrateIssuePriorities(project)
-            def priorities = migrator.migrateIssuePriorities(project)
-        then: 'there should be some priorities'
-            priorities.size() > 0
-        and: 'all of them should have name'
-            priorities.every(hasId)
-            priorities.every(hasName)
-    }
-
-=======
->>>>>>> Merging hell: part I
     void 'Generating taiga issues with user email'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
@@ -183,7 +92,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('userMail'))
     }
 
-    @IgnoreRest
     void 'Migrate issues from a given project'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
@@ -209,7 +117,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             List<Issue> issues = migrator.migrateIssuesByProject(project)
         then: 'there should be issues'
             issues.size() > 0
-            issues.every(has('id'))
+            issues.every(has('ref'))
             issues.every(has('project'))
             issues.every(has('subject'))
             issues.every(has('status'))
@@ -217,6 +125,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('type'))
     }
 
+    @Ignore
     void 'Migrate wiki pages from a given project'() {
         setup: 'redmine and taiga clients'
             RedmineManager redmineClient = createRedmineClient()

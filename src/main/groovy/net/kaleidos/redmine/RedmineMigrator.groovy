@@ -27,6 +27,7 @@ class RedmineMigrator {
     final RedmineManager redmineClient
     final TaigaClient taigaClient
     final Object NOTHING = null
+    final String SEVERITY_NORMAL = 'Normal'
 
     RedmineMigrator(final RedmineManager redmineClient, final TaigaClient taigaClient) {
         this.redmineClient = redmineClient
@@ -47,7 +48,7 @@ class RedmineMigrator {
             issueTypes: issueTypes,
             issueStatuses: issueStatuses,
             issuePriorities: issuePriorities,
-            issueSeverities: ['Normal']
+            issueSeverities: [SEVERITY_NORMAL]
         ]
 
         return map(
@@ -119,12 +120,13 @@ class RedmineMigrator {
         return redmineClient.getIssues(project_id: ref.redmineProject.id.toString())
     }
 
-    Closure<TaigaIssue> fullfillUserMail = { RedmineIssue source ->
+    Closure<Map> fullfillUserMail = { RedmineIssue source ->
         return [
-            tracker    : source.tracker.name,
-            status     : source.statusName,
-            priority   : source.priorityText,
-            subject    : source.subject,
+            tracker: source.tracker.name,
+            status: source.statusName,
+            ref: source.id,
+            priority: source.priorityText,
+            subject: source.subject,
             description: source.description,
             userMail   : getUserInfoById(source.author.id).mail
         ]
@@ -136,13 +138,14 @@ class RedmineMigrator {
             taigaClient.createIssue(
                 new TaigaIssue(
                     project: ref.taigaProject,
+                    ref: partial.ref,
                     type: partial.tracker,
                     status: partial.status,
                     priority: partial.priority,
-                    severity: 'Normal',
+                    severity: SEVERITY_NORMAL,
                     subject: partial.subject,
                     description: partial.description,
-                    author: partial.userMail
+                    owner: partial.userMail
                 )
             )
         }
