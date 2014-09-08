@@ -5,20 +5,12 @@ import net.kaleidos.domain.Project
 
 class ProjectTaigaSpec extends TaigaSpecBase {
 
-    void 'get the list of projects'() {
-        when: 'we get the list of projects'
-            def projects = taigaClient.getProjects()
-
-        then: 'there are projects'
-            notThrown Exception
-            projects.size() > 0
-    }
-
     void 'get a project'() {
         given: 'an existing project'
             def project = new Project().setName("name ${new Date().time}").setDescription("description")
             project = taigaClient.createProject(project)
 
+            assert taigaClient.getProjects().size() > 0
         when: 'tying to get the project'
             def sameProject = taigaClient.getProjectById(project.id)
 

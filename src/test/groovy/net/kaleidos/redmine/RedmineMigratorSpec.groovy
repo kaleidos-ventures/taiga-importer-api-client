@@ -19,6 +19,7 @@ import groovy.util.logging.Log4j
 class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
 
     static final Double HALF_PERCENTAGE = 0.5
+    static final String PATH = "net/kaleidos/redmine"
 
     void setup() {
         deleteTaigaProjects()
@@ -28,12 +29,12 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
                 execute(_) >>> [
-                    buildResponseWithJson("net/kaleidos/redmine/projects.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/projectdetail2.json")
+                    buildResponseWithJson("${PATH}/projects.json"),
+                    buildResponseWithJson("${PATH}/trackers.json"),
+                    buildResponseWithJson("${PATH}/issue_statuses.json"),
+                    buildResponseWithJson("${PATH}/issue_priorities.json"),
+                    buildResponseWithJson("${PATH}/projectdetail1.json"),
+                    buildResponseWithJson("${PATH}/projectdetail2.json")
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -61,14 +62,14 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
                 execute(_) >>> [
-                    buildResponseWithJson("net/kaleidos/redmine/projects_only_one.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issues.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/user1.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/user1.json")
+                    buildResponseWithJson("${PATH}/projects_only_one.json"),
+                    buildResponseWithJson("${PATH}/trackers.json"),
+                    buildResponseWithJson("${PATH}/issue_statuses.json"),
+                    buildResponseWithJson("${PATH}/issue_priorities.json"),
+                    buildResponseWithJson("${PATH}/projectdetail1.json"),
+                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/user1.json")
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -96,14 +97,14 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
                 execute(_) >>> [
-                    buildResponseWithJson("net/kaleidos/redmine/projects_only_one.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/issues.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/user1.json"),
-                    buildResponseWithJson("net/kaleidos/redmine/user1.json")
+                    buildResponseWithJson("${PATH}/projects_only_one.json"),
+                    buildResponseWithJson("${PATH}/trackers.json"),
+                    buildResponseWithJson("${PATH}/issue_statuses.json"),
+                    buildResponseWithJson("${PATH}/issue_priorities.json"),
+                    buildResponseWithJson("${PATH}/projectdetail1.json"),
+                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/user1.json")
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -125,18 +126,33 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('type'))
     }
 
-    @Ignore
     void 'Migrate wiki pages from a given project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        setup: 'Mocking redmine communication'
+            HttpClient http = Stub(HttpClient) {
+                execute(_) >>> [
+                    buildResponseWithJson("${PATH}/projects_only_one.json"),
+                    buildResponseWithJson("${PATH}/trackers.json"),
+                    buildResponseWithJson("${PATH}/issue_statuses.json"),
+                    buildResponseWithJson("${PATH}/issue_priorities.json"),
+                    buildResponseWithJson("${PATH}/projectdetail1.json"),
+                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/wiki_index.json"),
+                    buildResponseWithJson("${PATH}/wiki_page3_wiki.json"),
+                    buildResponseWithJson("${PATH}/wiki_page1.json"),
+                    buildResponseWithJson("${PATH}/wiki_page2.json"),
+                    buildResponseWithJson("${PATH}/wiki_page3_wiki.json")
+                ]
+            }
+        and: 'building a redmine migrator mocking redmine integration'
+            RedmineMigrator migrator =
+                new RedmineMigrator(
+                    buildRedmineClient(http),
+                    createTaigaClient())
+
         when: 'creating a new project and cleaning up its issue structure'
             RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
         and: 'migrating redmine current issues'
             List<Issue> issues = migrator.migrateIssuesByProject(project)
             List<Wikipage> wikiPages= migrator.migrateWikiPagesByProject(project)
