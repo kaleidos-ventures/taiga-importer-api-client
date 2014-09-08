@@ -3,6 +3,7 @@ package net.kaleidos.redmine
 import static groovyx.gpars.GParsPool.withPool
 import com.taskadapter.redmineapi.RedmineManager
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
+import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.Tracker
 import com.taskadapter.redmineapi.bean.User as RedmineUser
@@ -41,7 +42,10 @@ class RedmineMigrator {
     List<RedmineTaigaRef> migrateProjectList(List<RedmineProject> projects) {
         Closure<String> extractName = { it.name }
         List<String> issueTypes = map(redmineClient.trackers, extractName)
-        List<String> issueStatuses = map(redmineClient.statuses, extractName)
+        List<IssueStatus> issueStatuses =
+            map(redmineClient.statuses) { RedmineIssueStatus status ->
+                new IssueStatus(name: status.name, isClosed: status.isClosed())
+            }
         List<String> issuePriorities = map(redmineClient.issuePriorities, extractName)
 
         Map<String,List<String>> relationships = [
