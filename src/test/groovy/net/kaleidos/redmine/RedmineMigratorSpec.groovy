@@ -7,23 +7,8 @@ import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.TaigaClient
 
-import com.taskadapter.redmineapi.RedmineManager
-
-// TODO to base spec
-import com.taskadapter.redmineapi.RedmineManager
-import com.taskadapter.redmineapi.RedmineManagerFactory
-import com.taskadapter.redmineapi.internal.Transport
-import com.taskadapter.redmineapi.internal.URIConfigurator
-
-import org.apache.http.HttpStatus
-import org.apache.http.HttpVersion
-import org.apache.http.HttpResponse
 import org.apache.http.client.HttpClient
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.StringEntity
-import org.apache.http.message.BasicHeader
-import org.apache.http.message.BasicHttpResponse
-import org.apache.http.client.methods.HttpUriRequest
+import com.taskadapter.redmineapi.RedmineManager
 
 import groovy.util.logging.Log4j
 
@@ -36,12 +21,14 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         deleteTaigaProjects()
     }
 
-    @IgnoreRest
     void 'Migrate all active projects basic structure'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
                 execute(_) >>> [
                     buildResponseWithJson("net/kaleidos/redmine/projects.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
                     buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
                     buildResponseWithJson("net/kaleidos/redmine/projectdetail2.json")
                 ]
@@ -52,13 +39,14 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildRedmineClient(http),
                     createTaigaClient())
         when: 'invoking all names'
-            List<RedmineTaigaRef> projectList = migrator.migrateAllProjectBasicStructure()
+            List<RedmineTaigaRef> projectList = migrator.migrateAllProjects()
         then: 'there should be at least one project'
             projectList.taigaProject.size() > 0
         and: 'all of them have id and name'
             projectList.taigaProject.every(hasId)
             projectList.taigaProject.every(hasName)
             projectList.taigaProject.every(has('issueTypes'))
+            projectList.taigaProject.every(has('issueSeverities'))
         and: 'usually most projects have description'
             projectList
                 .taigaProject
@@ -66,6 +54,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                 .div(projectList.size()) > HALF_PERCENTAGE
     }
 
+<<<<<<< HEAD
     String loadResourceAsString(String resource) {
         return RedmineMigratorSpec
             .classLoader
@@ -157,17 +146,29 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             priorities.every(hasName)
     }
 
+=======
+>>>>>>> Merging hell: part I
     void 'Generating taiga issues with user email'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        setup: 'Mocking redmine communication'
+            HttpClient http = Stub(HttpClient) {
+                execute(_) >>> [
+                    buildResponseWithJson("net/kaleidos/redmine/projects_only_one.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issues.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/user1.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/user1.json")
+                ]
+            }
+        and: 'building a redmine migrator mocking redmine integration'
+            RedmineMigrator migrator =
+                new RedmineMigrator(
+                    buildRedmineClient(http),
+                    createTaigaClient())
         when: 'creating a new project and cleaning up its issue structure'
             RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
         and: 'migrating redmine current issues'
             List<Issue> issues =
                 migrator
@@ -182,17 +183,28 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('userMail'))
     }
 
+    @IgnoreRest
     void 'Migrate issues from a given project'() {
-        setup: 'redmine and taiga clients'
-            RedmineManager redmineClient = createRedmineClient()
-            TaigaClient taigaClient = createTaigaClient()
-            RedmineMigrator migrator = new RedmineMigrator(redmineClient, taigaClient)
+        setup: 'Mocking redmine communication'
+            HttpClient http = Stub(HttpClient) {
+                execute(_) >>> [
+                    buildResponseWithJson("net/kaleidos/redmine/projects_only_one.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/trackers.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_statuses.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issue_priorities.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/projectdetail1.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/issues.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/user1.json"),
+                    buildResponseWithJson("net/kaleidos/redmine/user1.json")
+                ]
+            }
+        and: 'building a redmine migrator mocking redmine integration'
+            RedmineMigrator migrator =
+                new RedmineMigrator(
+                    buildRedmineClient(http),
+                    createTaigaClient())
         when: 'creating a new project and cleaning up its issue structure'
             RedmineTaigaRef project = migrator.migrateFirstProjectBasicStructure()
-            taigaClient
-                .deleteAllIssueTypes(project.taigaProject)
-                .deleteAllIssueStatuses(project.taigaProject)
-                .deleteAllIssuePriorities(project.taigaProject)
         and: 'migrating redmine current issues'
             List<Issue> issues = migrator.migrateIssuesByProject(project)
         then: 'there should be issues'

@@ -33,10 +33,42 @@ class RedmineMigrator {
         this.taigaClient = taigaClient
     }
 
-    List<RedmineTaigaRef> migrateAllProjectBasicStructure() {
-        List<RedmineProject> projects = redmineClient.projects
+    List<RedmineTaigaRef> migrateAllProjects() {
+        return migrateProjectList(redmineClient.projects)
+    }
 
-        return map(projects, addBasicFields >> addIdentifierJustInCase(projects.name) >> saveProject)
+    List<RedmineTaigaRef> migrateProjectList(List<RedmineProject> projects) {
+        Closure<String> extractName = { it.name }
+        List<String> issueTypes = map(redmineClient.trackers, extractName)
+        List<String> issueStatuses = map(redmineClient.statuses, extractName)
+        List<String> issuePriorities = map(redmineClient.issuePriorities, extractName)
+
+        Map<String,List<String>> relationships = [
+            issueTypes: issueTypes,
+            issueStatuses: issueStatuses,
+            issuePriorities: issuePriorities,
+            issueSeverities: ['Normal']
+        ]
+
+        return map(
+            projects,
+            addBasicFields >>
+            addIdentifierJustInCase(projects.name) >>
+            addIssueRelationShips(relationships) >>
+            saveProject
+        )
+    }
+
+    Closure<RedmineTaigaRef> addIssueRelationShips = { Map relationships ->
+        return { RedmineTaigaRef ref ->
+            ref.taigaProject.with {
+                issueTypes = relationships.issueTypes
+                issueStatuses = relationships.issueStatuses
+                issuePriorities = relationships.issuePriorities
+                issueSeverities = relationships.issueSeverities
+            }
+            ref
+        }
     }
 
     Closure<RedmineProject> addBasicFields = { RedmineProject rp ->
@@ -65,10 +97,6 @@ class RedmineMigrator {
         }
     }
 
-    Closure<String> trackerToIssueType = { Tracker tracker ->
-        return tracker.name
-    }
-
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
         return [
             taigaProject: taigaClient.createProject(ref.taigaProject),
@@ -78,51 +106,10 @@ class RedmineMigrator {
     }
 
     RedmineTaigaRef migrateFirstProjectBasicStructure() {
-        List<RedmineProject> projects = redmineClient.projects
-
-        saveProject << addIdentifierJustInCase(projects.name) << addBasicFields << projects.find {
-            it.name.toLowerCase().contains('decathlon')
-        }
-    }
-
-    List<String> migrateIssueTrackersByProject(final RedmineTaigaRef ref) {
-        return map(ref.redmineProject.trackers, addedIssueType(ref))
-    }
-
-    Closure<String> addedIssueType(final RedmineTaigaRef ref) {
-        return {
-            taigaClient.addIssueType(it.name, ref.taigaProject)
-        }
-    }
-
-    List<IssueStatus> migrateIssueStatusesByProject(final RedmineTaigaRef ref) {
-        return map(redmineClient.statuses, addedIssueStatus(ref))
-    }
-
-    Closure<IssueStatus> addedIssueStatus(final RedmineTaigaRef ref) {
-        return {
-            taigaClient.addIssueStatus(it.name, it.isClosed(), ref.taigaProject)
-        }
-    }
-
-    List<String> migrateIssuePriorities(final RedmineTaigaRef ref) {
-        return map(redmineClient.issuePriorities, addedIssuePriority(ref))
-    }
-
-    Closure<String> addedIssuePriority(final RedmineTaigaRef ref) {
-        return {
-            taigaClient.addIssuePriority(it.name, ref.taigaProject)
-        }
+        return migrateProjectList(Arrays.asList(redmineClient.projects.first()))?.findResult{it}
     }
 
     List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef ref) {
-
-        ref.taigaProject.with {
-            issueStatuses = migrateIssueStatusesByProject(ref)
-            issueTypes = migrateIssueTrackersByProject(ref)
-            issuePriorities = migrateIssuePriorities(ref)
-        }
-
         // Per each redmine issue first we need to add the user mail
         // and then create a new taiga issue
         return map(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
@@ -147,13 +134,16 @@ class RedmineMigrator {
         return { Map partial ->
             log.debug("Creating issue of type: ${partial.tracker}")
             taigaClient.createIssue(
-                ref.taigaProject,
-                partial.tracker,
-                partial.status,
-                partial.priority,
-                partial.subject,
-                partial.description,
-                partial.userMail
+                new TaigaIssue(
+                    project: ref.taigaProject,
+                    type: partial.tracker,
+                    status: partial.status,
+                    priority: partial.priority,
+                    severity: 'Normal',
+                    subject: partial.subject,
+                    description: partial.description,
+                    author: partial.userMail
+                )
             )
         }
     }
