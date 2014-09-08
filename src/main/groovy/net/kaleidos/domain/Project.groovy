@@ -13,7 +13,7 @@ class Project {
 
     Long id
 
-    List<String> issueStatuses
+    List<IssueStatus> issueStatuses
     List<String> issueTypes
     List<String> issuePriorities
     List<String> issueSeverities

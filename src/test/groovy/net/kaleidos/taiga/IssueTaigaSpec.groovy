@@ -144,5 +144,4 @@ class IssueTaigaSpec extends TaigaSpecBase {
             createdAt = '01/01/2010 13:45'
             comment = 'The comment'
     }
-
 }

@@ -44,7 +44,7 @@ class ProjectMapper implements Mapper<Project>, DateConversions {
         }
 
         map.issue_types = project.issueTypes.collect { [name: it] }
-        map.issue_statuses = project.issueStatuses.collect { [name: it] }
+        map.issue_statuses = project.issueStatuses.collect { [name: it.name, is_closed: it.isClosed] }
         map.priorities = project.issuePriorities.collect { [name: it] }
         map.severities = project.issueSeverities.collect { [name: it] }
         map.roles = project.roles.collect { [name: it, permissions: defaultPermissions] }

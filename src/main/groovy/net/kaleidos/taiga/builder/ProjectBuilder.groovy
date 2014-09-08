@@ -14,7 +14,7 @@ class ProjectBuilder implements SafeJson, DateConversions {
             name = json.name
             createdDate = parse(json.created_date)
             description = json.description
-            issueStatuses = json.issue_statuses.collect { it.name }
+            issueStatuses = json.issue_statuses.collect { new IssueStatusBuilder().build(it, project) }
             issueTypes = json.issue_types.collect { it.name }
             issuePriorities = json.priorities.collect { it.name }
             issueSeverities = json.severities.collect { it.name }
