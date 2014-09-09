@@ -91,6 +91,8 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('status'))
             issues.every(has('priority'))
             issues.every(has('userMail'))
+        and: 'Making sure types are present'
+            issues.tracker == ['Task','User story']
     }
 
     void 'Migrate issues from a given project'() {
