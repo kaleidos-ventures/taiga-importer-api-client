@@ -7,10 +7,12 @@ import groovy.transform.builder.SimpleStrategy
 @ToString(includeNames = true)
 @Builder(builderStrategy = SimpleStrategy)
 class Wikipage {
+    Project project
+
     String slug
     String content
     String owner
     Date createdDate
 
-    Project project
+    List<Attachment> attachments
 }

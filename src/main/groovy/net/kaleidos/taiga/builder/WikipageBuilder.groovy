@@ -15,6 +15,7 @@ class WikipageBuilder implements DateConversions {
             content = json.content
             createdDate = parse(json.created_date)
             owner = json.owner
+            attachments = json.attachments.collect { new AttachmentBuilder().build(it, project) }
         }
 
         wikipage
