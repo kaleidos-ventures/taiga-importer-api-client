@@ -9,27 +9,27 @@ import net.kaleidos.domain.Wikipage
 
 class Mappers {
 
-    static map(Project project) {
+    static Map map(Project project) {
         new ProjectMapper().map(project)
     }
 
-    static map(Issue issue) {
+    static Map map(Issue issue) {
         new IssueMapper().map(issue)
     }
 
-    static map(Attachment attachment) {
+    static Map map(Attachment attachment) {
         new AttachmentMapper().map(attachment)
     }
 
-    static map(History history) {
+    static Map map(History history) {
         new HistoryMapper().map(history)
     }
 
-    static map(Wikipage wikipage) {
+    static Map map(Wikipage wikipage) {
         new WikipageMapper().map(wikipage)
     }
 
-    static map(Wikilink wikilink) {
+    static Map map(Wikilink wikilink) {
         new WikilinkMapper().map(wikilink)
     }
 }
