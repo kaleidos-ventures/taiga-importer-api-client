@@ -4,6 +4,7 @@ import net.kaleidos.domain.Attachment
 import net.kaleidos.domain.History
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.Wikipage
 
 class Mappers {
 
@@ -21,5 +22,9 @@ class Mappers {
 
     static map(History history) {
         new HistoryMapper().map(history)
+    }
+
+    static map(Wikipage wikipage) {
+        new WikipageMapper().map(wikipage)
     }
 }

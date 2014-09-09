@@ -17,13 +17,13 @@ class TaigaClient extends BaseClient {
     private static final Map URLS_IMPORTER = [
         projects: '/api/v1/importer',
         issues  : '/api/v1/importer/${projectId}/issue',
+        wikiPage: '/api/v1/importer/${projectId}/wiki_page',
     ]
 
     private static final Map URLS = [
-        auth           : '/api/v1/auth',
-        projects       : '/api/v1/projects',
-        wikis          : '/api/v1/wiki',
-        wikiLinks      : '/api/v1/wiki-links',
+        auth     : '/api/v1/auth',
+        projects : '/api/v1/projects',
+        wikiLinks: '/api/v1/wiki-links',
     ]
 
     TaigaClient(String serverUrl) {
@@ -75,15 +75,13 @@ class TaigaClient extends BaseClient {
     }
 
     // WIKIS
-    Wikipage createWiki(String slug, String content, Project project) {
-        def params = [
-            slug   : slug,
-            content: content,
-            project: project.id,
-        ]
-        def json = this.doPost(URLS.wikis, params)
+    Wikipage createWiki(Wikipage wikipage) {
+        def url = this.merge(URLS_IMPORTER.wikiPage, [projectId: wikipage.project.id])
 
-        new WikipageBuilder().build(json, project)
+        def params = Mappers.map(wikipage)
+        def json = this.doPost(url, params)
+
+        new WikipageBuilder().build(json, wikipage.project)
     }
 
     Wikilink createWikiLink(String title, String href, Project project) {

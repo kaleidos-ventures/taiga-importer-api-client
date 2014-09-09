@@ -2,8 +2,9 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Wikipage
+import net.kaleidos.taiga.common.DateConversions
 
-class WikipageBuilder {
+class WikipageBuilder implements DateConversions {
 
     Wikipage build(Map json, Project project) {
         def wikipage = new Wikipage()
@@ -12,6 +13,8 @@ class WikipageBuilder {
             delegate.project = project
             slug = json.slug
             content = json.content
+            createdDate = parse(json.created_date)
+            owner = json.owner
         }
 
         wikipage
