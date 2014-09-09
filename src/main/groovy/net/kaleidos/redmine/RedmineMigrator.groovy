@@ -40,29 +40,39 @@ class RedmineMigrator {
     }
 
     List<RedmineTaigaRef> migrateProjectList(List<RedmineProject> projects) {
-        Closure<String> extractName = { it.name }
-        List<String> issueTypes = map(redmineClient.trackers, extractName)
-        List<IssueStatus> issueStatuses =
-            map(redmineClient.statuses) { RedmineIssueStatus status ->
-                new IssueStatus(name: status.name, isClosed: status.isClosed())
-            }
-        List<String> issuePriorities = map(redmineClient.issuePriorities, extractName)
+        return map(
+            projects,
+            addBasicFields >>
+            addIdentifierJustInCase(projects.name) >>
+            addIssueRelationShips(projectRelationships) >>
+            saveProject
+        )
+    }
 
-        Map<String,List<String>> relationships = [
+    Map getProjectRelationships() {
+        return [
             issueTypes: issueTypes,
             issueStatuses: issueStatuses,
             issuePriorities: issuePriorities,
             issueSeverities: [SEVERITY_NORMAL]
         ]
-
-        return map(
-            projects,
-            addBasicFields >>
-            addIdentifierJustInCase(projects.name) >>
-            addIssueRelationShips(relationships) >>
-            saveProject
-        )
     }
+
+    List<String> getIssueTypes() {
+        return map(redmineClient.trackers, extractName)
+    }
+
+    List<IssueStatus> getIssueStatuses() {
+        return map(redmineClient.statuses) { RedmineIssueStatus status ->
+            new IssueStatus(name: status.name, isClosed: status.isClosed())
+        }
+    }
+
+    List<String> getIssuePriorities() {
+        return map(redmineClient.issuePriorities, extractName)
+    }
+
+    Closure<String> extractName = { it.name }
 
     Closure<RedmineTaigaRef> addIssueRelationShips = { Map relationships ->
         return { RedmineTaigaRef ref ->
@@ -87,15 +97,14 @@ class RedmineMigrator {
         return { RedmineProject source ->
 
             def addIdentifier = allNames.count { it.trim() == source.name.trim() } > 1 ? true : false
+            def finalName = addIdentifier ? "${source.name} [${source.identifier}]" : source.name
 
             if (addIdentifier) {
                 log.warn "Project '${source.name}' is repeated. Modifying name..."
             }
 
             return [
-                taigaProject  : [
-                    name       : addIdentifier ? "${source.name} [${source.identifier}]" : source.name,
-                    description: source.description] as TaigaProject,
+                taigaProject  : [ name: finalName, description: source.description] as TaigaProject,
                 redmineProject: source
             ] as RedmineTaigaRef
 
@@ -115,8 +124,6 @@ class RedmineMigrator {
     }
 
     List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef ref) {
-        // Per each redmine issue first we need to add the user mail
-        // and then create a new taiga issue
         return map(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
     }
 
@@ -156,6 +163,7 @@ class RedmineMigrator {
     }
 
     List<Wikipage> migrateWikiPagesByProject(final RedmineTaigaRef ref)  {
+
         List<RedmineWikiPageSummary> wikiPageSummaryList =
             redmineClient.getWikiPagesByProject(ref.redmineProject)
 
@@ -210,7 +218,11 @@ class RedmineMigrator {
 
     Closure<RedmineWikiPage> summaryToReal(final RedmineTaigaRef ref) {
         return { RedmineWikiPageSummary summary ->
-            redmineClient.getWikiPageDetailByProjectAndTitle(ref.redmineProject, summary.title)
+            redmineClient
+                .getWikiPageDetailByProjectAndTitle(
+                    ref.redmineProject,
+                    summary.title
+                )
         }
     }
 
@@ -239,7 +251,7 @@ class RedmineMigrator {
         }
     }
 
-    private slugify(String possible) {
+    private String slugify(String possible) {
         return new Slugify().slugify(possible)
     }
 
@@ -255,7 +267,4 @@ class RedmineMigrator {
         return collection.collect(collector)
     }
 
-    static <T, U> List<U> mapParallel(List<T> collection, Closure<U> collector) {
-        return withPool { collection.collectParallel(collector) }
-    }
 }
