@@ -2,6 +2,7 @@ package net.kaleidos.taiga
 
 import net.kaleidos.domain.Attachment
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 
 class WikiTaigaSpec extends TaigaSpecBase {
@@ -78,8 +79,14 @@ class WikiTaigaSpec extends TaigaSpecBase {
     }
 
     void 'create a wiki link'() {
-        when: 'saving a wiki link'
-            def wikilink = taigaClient.createWikiLink(title, href, project)
+        given: 'a wiki link to save'
+            def wikilink = new Wikilink()
+                .setProject(project)
+                .setTitle(title)
+                .setHref(href)
+
+        when: 'saving the wiki link'
+            wikilink = taigaClient.createWikiLink(wikilink)
 
         then: 'the wiki link is created'
             wikilink != null
