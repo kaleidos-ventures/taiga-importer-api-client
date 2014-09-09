@@ -4,7 +4,7 @@ import net.kaleidos.domain.Project
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.common.DateConversions
 
-class WikipageBuilder implements DateConversions {
+class WikipageBuilder implements TaigaEntityBuilder<Wikipage>, DateConversions {
 
     Wikipage build(Map json, Project project) {
         def wikipage = new Wikipage()

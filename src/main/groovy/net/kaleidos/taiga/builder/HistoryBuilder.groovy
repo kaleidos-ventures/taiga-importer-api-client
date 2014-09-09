@@ -4,7 +4,7 @@ import net.kaleidos.domain.History
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
 
-class HistoryBuilder implements DateConversions {
+class HistoryBuilder implements TaigaEntityBuilder<History>, DateConversions {
 
     History build(Map json, Project project) {
         def history = new History()

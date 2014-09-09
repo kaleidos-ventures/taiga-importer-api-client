@@ -4,7 +4,7 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
 
-class IssueBuilder implements DateConversions {
+class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions {
 
     Issue build(Map json, Project project) {
         def issue = new Issue()
@@ -20,8 +20,8 @@ class IssueBuilder implements DateConversions {
             delegate.project = project
             owner = json.owner
             createdDate = parse(json.created_date)
-            attachments = json.attachments.collect { new AttachmentBuilder().build(it, project) }
-            history = json.history.collect { new HistoryBuilder().build(it, project) }
+            attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
+            history = json.history.collect { new HistoryBuilder().build(it, null) }
         }
 
         issue

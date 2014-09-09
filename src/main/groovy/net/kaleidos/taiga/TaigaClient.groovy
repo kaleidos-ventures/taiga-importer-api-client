@@ -47,7 +47,7 @@ class TaigaClient extends BaseClient {
     Project getProjectById(Long projectId) {
         def json = this.doGet("${URLS.projects}/${projectId}")
 
-        new ProjectBuilder().build(json)
+        new ProjectBuilder().build(json, null)
     }
 
     Project createProject(Project project) {
@@ -56,7 +56,7 @@ class TaigaClient extends BaseClient {
         def params = Mappers.map(project)
         def json = this.doPost(URLS_IMPORTER.projects, params)
 
-        new ProjectBuilder().build(json)
+        new ProjectBuilder().build(json, null)
     }
 
     void deleteProject(Project project) {
