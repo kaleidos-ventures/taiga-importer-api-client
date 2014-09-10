@@ -2,9 +2,8 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.User
-import net.kaleidos.taiga.common.DateConversions
 
-class UserBuilder implements TaigaEntityBuilder<User>, DateConversions {
+class UserBuilder implements TaigaEntityBuilder<User> {
 
     User build(Map json, Project project) {
         def user = new User()

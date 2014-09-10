@@ -2,9 +2,8 @@ package net.kaleidos.taiga.builder
 
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
-import net.kaleidos.taiga.common.SafeJson
 
-class ProjectBuilder implements TaigaEntityBuilder<Project>, SafeJson, DateConversions {
+class ProjectBuilder implements TaigaEntityBuilder<Project>, DateConversions {
 
     Project build(Map json, Project p) {
         Project project = new Project()

@@ -1,10 +1,8 @@
 package net.kaleidos.taiga.builder
-
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project
-import net.kaleidos.taiga.common.SafeJson
 
-class IssueStatusBuilder implements TaigaEntityBuilder<IssueStatus>, SafeJson {
+class IssueStatusBuilder implements TaigaEntityBuilder<IssueStatus> {
 
     IssueStatus build(Map json, Project project) {
         def issueStatus = new IssueStatus()
