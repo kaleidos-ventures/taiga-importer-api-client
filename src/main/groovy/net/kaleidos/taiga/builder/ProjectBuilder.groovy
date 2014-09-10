@@ -20,6 +20,7 @@ class ProjectBuilder implements TaigaEntityBuilder<Project>, DateConversions {
             roles = json.roles.collect { it.name }
             memberships = json.memberships.collect { new MembershipBuilder().build(it, null) }
             userStoryStatuses = json.us_statuses.collect { new UserStoryStatusBuilder().build(it, null) }
+            points = json.points.collect { new EstimationPointBuilder().build(it, null) }
         }
 
         project
