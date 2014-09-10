@@ -1,5 +1,6 @@
 package net.kaleidos.taiga
 
+import groovy.json.JsonBuilder
 import groovy.text.SimpleTemplateEngine
 import groovy.util.logging.Log4j
 import wslite.rest.RESTClient
@@ -19,27 +20,45 @@ class BaseClient {
     }
 
     protected doGet(String url, Map params = [:]) {
+
+        log.trace "Request for GET: ${url} with params ${params}"
+
         withClient { RESTClient client ->
             Response response = client.get(
                 path: url,
                 query: params
             )
 
+            def builder = new JsonBuilder(response.json)
+            log.trace "Response for GET: ${url} with params ${params}"
+            log.trace "\n" + builder.toPrettyString()
+
             response.json
         }
     }
 
     protected doPost(String url, Map params = [:]) {
+
+        log.trace "Request for POST: ${url} with params ${params}"
+        log.trace "\n" + new JsonBuilder(params).toPrettyString()
+
         withClient { RESTClient client ->
             def response = client.post(path: url) {
                 json params
             }
+
+            def builder = new JsonBuilder(response.json)
+            log.trace "Response for POST: ${url} with params ${params}"
+            log.trace "\n" + builder.toPrettyString()
 
             response.json
         }
     }
 
     protected doDelete(String url) {
+
+        log.trace "Request for DELETE: ${url}"
+
         withClient { RESTClient client ->
             client.delete(path: url)
         }

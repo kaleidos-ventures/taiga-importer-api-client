@@ -21,7 +21,7 @@ apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy:2.3.6'
+    compile 'org.codehaus.groovy:groovy-all:2.3.6'
     compile 'org.codehaus.gpars:gpars:1.2.0'
     compile 'log4j:log4j:1.2.17'
     compile 'com.taskadapter:redmine-java-api:1.26-SNAPSHOT'
