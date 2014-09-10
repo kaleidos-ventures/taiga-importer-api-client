@@ -4,11 +4,21 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.UserStoryStatus
 import spock.lang.Specification
 
 class TaigaSpecBase extends Specification {
 
     TaigaClient taigaClient
+
+    private static final List STATUSES = [
+        [name: 'New', isClosed: false],
+        [name: 'In progress', isClosed: false],
+        [name: 'Ready for test', isClosed: true],
+        [name: 'Closed', isClosed: true],
+        [name: 'Needs Info', isClosed: false],
+        [name: 'Rejected', isClosed: false]
+    ]
 
     def setup() {
         taigaClient = createAuthenticatedTaigaClient()
@@ -50,20 +60,15 @@ class TaigaSpecBase extends Specification {
             .setProject(project)
     }
 
-    List<IssueStatus> buildIssueStatuses() {
-        [
-            [name: 'New', isClosed: false],
-            [name: 'In progress', isClosed: false],
-            [name: 'Ready for test', isClosed: true],
-            [name: 'Closed', isClosed: true],
-            [name: 'Needs Info', isClosed: false],
-            [name: 'Rejected', isClosed: false]
-        ].collect {
-            buildIssueStatus(it.name, it.isClosed)
+    List<UserStoryStatus> buildUserStoryStatuses() {
+        STATUSES.collect {
+            new UserStoryStatus().setName(it.name).setIsClosed(it.isClosed)
         }
     }
 
-    IssueStatus buildIssueStatus(String name, Boolean isClosed) {
-        new IssueStatus().setName(name).setIsClosed(isClosed)
+    List<IssueStatus> buildIssueStatuses() {
+        STATUSES.collect {
+            new IssueStatus().setName(it.name).setIsClosed(it.isClosed)
+        }
     }
 }
