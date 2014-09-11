@@ -29,10 +29,18 @@ trait ProjectData {
         [name: '13', value: 13]
     ]
 
-    Project buildProject() {
+    Project buildProject(String name, String description) {
         new Project()
-            .setName("name ${new Date().time}")
-            .setDescription("description")
+            .setName(name)
+            .setDescription(description)
+    }
+
+    Project buildBasicProject() {
+        this.buildProject("name ${new Date().time}", "description")
+    }
+
+    Project buildProject() {
+        this.buildProject("name ${new Date().time}", "description")
             .setIssueTypes(['Bug', 'Question', 'Enhancement'])
             .setIssueStatuses(buildIssueStatuses())
             .setIssuePriorities(['Low', 'Normal', 'High'])

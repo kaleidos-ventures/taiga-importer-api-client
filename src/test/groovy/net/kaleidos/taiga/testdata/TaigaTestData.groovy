@@ -3,7 +3,8 @@ package net.kaleidos.taiga.testdata
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.TaigaClient
 
-trait TaigaTestData implements ProjectData, IssueData, UserStoryData {
+trait TaigaTestData implements ProjectData, IssueData, UserStoryData,
+    AttachmentData, MembershipData, HistoryData, UserData, WikipageData, WikilinkData {
 
     TaigaClient taigaClient
 

@@ -1,9 +1,6 @@
 package net.kaleidos.taiga
 
-import net.kaleidos.domain.Attachment
-import net.kaleidos.domain.History
 import net.kaleidos.domain.Project
-import net.kaleidos.domain.User
 import spock.lang.Unroll
 
 class UserStoryTaigaSpec extends TaigaSpecBase {
@@ -45,7 +42,7 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
     void 'create a user story with owner and created date'() {
         given: 'a new user story'
             def userStory = buildBasicUserStory(project)
-                .setCreatedDate(Date.parse("dd/MM/yyyy", createdDate))
+                .setCreatedDate(createdDate)
                 .setOwner(owner)
 
         when: 'creating the user story'
@@ -54,24 +51,21 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
         then: 'the issue is created in Taiga with the optional fields'
             userStory != null
             userStory.owner == owner
-            userStory.createdDate.format("dd/MM/yyyy") == createdDate
+            userStory.createdDate == createdDate
 
         where:
-            createdDate = '01/01/2010'
+            createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
             owner = 'admin@admin.com'
     }
 
     void 'create a user story with two attachments'() {
         given: 'two files to attach to a user story'
-            def file1Base64 = new File("src/test/resources/${filename1}").bytes.encodeBase64().toString()
-            def attachment1 = new Attachment(name: filename1, data: file1Base64, owner: owner)
-
-            def file2Base64 = new File("src/test/resources/${filename2}").bytes.encodeBase64().toString()
-            def attachment2 = new Attachment(name: filename2, data: file2Base64, owner: owner)
+            def attachment0 = buildBasicAttachment(filename0, owner)
+            def attachment1 = buildBasicAttachment(filename1, owner)
 
         and: 'a new user story'
             def userStory = buildBasicUserStory(project)
-                .setAttachments([attachment1, attachment2])
+                .setAttachments([attachment0, attachment1])
 
         when: 'creating the user story'
             userStory = taigaClient.createUserStory(userStory)
@@ -79,23 +73,24 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
         then: 'the user story is created in Taiga with the attachments'
             userStory != null
             userStory.attachments.size() == 2
-            userStory.attachments[0].name == filename1
-            userStory.attachments[0].data == file1Base64
-            userStory.attachments[1].name == filename2
-            userStory.attachments[1].data == file2Base64
+
+        and: 'the attachments are correct'
+            userStory.attachments[0].name == attachment0.name
+            userStory.attachments[0].data == attachment0.data
+            userStory.attachments[0].owner == attachment0.owner
+            userStory.attachments[1].name == attachment1.name
+            userStory.attachments[1].data == attachment1.data
+            userStory.attachments[1].owner == attachment1.owner
 
         where:
-            filename1 = 'tux.png'
-            filename2 = 'debian.jpg'
+            filename0 = 'tux.png'
+            filename1 = 'debian.jpg'
             owner = 'admin@admin.com'
     }
 
     void 'create an attachment with optional data'() {
         given: 'one file to attach to a user story'
-            def fileBase64 = new File("src/test/resources/tux.png").bytes.encodeBase64().toString()
-            def attachment = new Attachment(name: 'tux.png', data: fileBase64, owner: 'admin@admin.com')
-                .setDescription(description)
-                .setCreatedDate(Date.parse("dd/MM/yyyy", createdDate))
+            def attachment = buildAttachmentWithOptionalData(description, createdDate)
 
         and: 'a new user story'
             def userStory = buildBasicUserStory(project)
@@ -106,21 +101,19 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
 
         then: 'the user story is created in Taiga'
             userStory.attachments[0].description == description
-            userStory.attachments[0].createdDate.format("dd/MM/yyyy") == createdDate
+            userStory.attachments[0].createdDate == createdDate
 
         where:
-            createdDate = '01/01/2010'
+            createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
             description = 'description'
     }
 
-    void 'create a user story with comments'() {
-        given: 'a new user story with comments'
-            def user = new User().setEmail('admin@admin.com').setName('The fullname')
-            def history = new History()
-                .setUser(user)
-                .setCreatedAt(Date.parse("dd/MM/yyyy HH:mm", createdAt))
-                .setComment(comment)
+    void 'create a user story with history'() {
+        given: 'a new user story with history'
+            def user = buildBasicUser()
+            def history = buildBasicHistory(user, createdAt, comment)
 
+        and: 'the user story to create'
             def userStory = buildBasicUserStory(project)
                 .setHistory([history])
 
@@ -132,10 +125,10 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
             userStory.history.size() == 1
             userStory.history[0].user.email == user.email
             userStory.history[0].user.name == user.name
-            userStory.history[0].createdAt.format('dd/MM/yyyy HH:mm') == createdAt
+            userStory.history[0].createdAt == createdAt
 
         where:
-            createdAt = '01/01/2010 13:45'
+            createdAt = Date.parse("dd/MM/yyyy HH:mm", '01/01/2010 13:45')
             comment = 'The comment'
     }
 }
