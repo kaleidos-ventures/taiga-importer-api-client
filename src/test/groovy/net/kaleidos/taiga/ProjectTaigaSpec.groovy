@@ -1,16 +1,12 @@
 package net.kaleidos.taiga
 
-import net.kaleidos.domain.Membership
-import net.kaleidos.domain.Project
-
 class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'get a project'() {
         given: 'an existing project'
-            def project = new Project().setName("name ${new Date().time}").setDescription("description")
-            project = taigaClient.createProject(project)
-
+            def project = taigaClient.createProject(buildBasicProject())
             assert taigaClient.getProjects().size() > 0
+
         when: 'tying to get the project'
             def sameProject = taigaClient.getProjectById(project.id)
 
@@ -23,9 +19,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'save a simple project'() {
         given: 'a project to save'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildProject(name, description)
 
         when: 'saving the project'
             project = taigaClient.createProject(project)
@@ -51,32 +45,26 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'save a project with and old start date'() {
         given: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
-                .setCreatedDate(Date.parse("dd/MM/yyyy", createdDate))
+            def project = buildBasicProject()
+                .setCreatedDate(createdDate)
 
         when: 'saving the project'
             project = taigaClient.createProject(project)
 
         then: 'the project is saved with the old date'
             project.createdDate != null
-            project.createdDate.format("dd/MM/yyyy") == createdDate
+            project.createdDate == createdDate
 
         cleanup:
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
-            createdDate = "01/01/2010"
+            createdDate = Date.parse("dd/MM/yyyy", "01/01/2010")
     }
 
     void 'save a project with issue types, statuses, priorities and severities'() {
         given: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildBasicProject()
                 .setIssueTypes(types)
                 .setIssueStatuses(statuses)
                 .setIssuePriorities(priorities)
@@ -100,8 +88,6 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
             types = ['Bug', 'Question', 'Enhancement']
             statuses = buildIssueStatuses()
             priorities = ['Low', 'Normal', 'High']
@@ -110,9 +96,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'save a project with roles'() {
         given: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildBasicProject()
                 .setRoles(roles)
 
         when: 'saving the project'
@@ -126,21 +110,17 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
             roles = ['UX', 'Design', 'Front', 'Back']
     }
 
     void 'save a project with memberships'() {
         given: 'some memberships to add to a project'
-            def m1 = new Membership().setEmail('user1@example.com').setRole('UX')
-            def m2 = new Membership().setEmail('user2@example.com').setRole('Back')
+            def m1 = buildBasicMembership('user1@example.com', 'UX')
+            def m2 = buildBasicMembership('user2@example.com', 'Back')
             def memberships = [m1, m2]
 
         and: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildBasicProject()
                 .setMemberships(memberships)
                 .setRoles(roles)
 
@@ -156,16 +136,12 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
             roles = ['UX', 'Back']
     }
 
     void 'save a project with user stories statuses'() {
         given: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildBasicProject()
                 .setUserStoryStatuses(usStatuses)
 
         when: 'saving the project'
@@ -181,16 +157,12 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
             usStatuses = buildUserStoryStatuses()
     }
 
     void 'save a project with estimation points'() {
         given: 'a project to create'
-            def project = new Project()
-                .setName(name)
-                .setDescription(description)
+            def project = buildBasicProject()
                 .setPoints(points)
 
         when: 'saving the project'
@@ -206,8 +178,6 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             taigaClient.deleteProject(project)
 
         where:
-            name = "My project ${new Date().time}"
-            description = 'The description of the project'
             points = buildEstimationPoints()
     }
 }

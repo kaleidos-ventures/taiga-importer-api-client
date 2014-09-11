@@ -1,4 +1,5 @@
 package net.kaleidos.taiga
+
 import spock.lang.Specification
 
 class TaigaClientSpec extends Specification {
