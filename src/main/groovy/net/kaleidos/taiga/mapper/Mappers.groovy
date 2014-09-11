@@ -4,6 +4,7 @@ import net.kaleidos.domain.Attachment
 import net.kaleidos.domain.History
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 
@@ -31,5 +32,9 @@ class Mappers {
 
     static Map map(Wikilink wikilink) {
         new WikilinkMapper().map(wikilink)
+    }
+
+    static Map map(UserStory userStory) {
+        new UserStoryMapper().map(userStory)
     }
 }

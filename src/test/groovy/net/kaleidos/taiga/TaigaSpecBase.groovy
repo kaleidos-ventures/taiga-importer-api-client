@@ -54,6 +54,8 @@ class TaigaSpecBase extends Specification {
             .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
             .setRoles(['UX', 'Back'])
             .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
+            .setPoints(buildEstimationPoints())
+            .setUserStoryStatuses(buildUserStoryStatuses())
 
         taigaClient.createProject(project)
     }

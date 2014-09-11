@@ -3,10 +3,12 @@ package net.kaleidos.taiga
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
+import net.kaleidos.taiga.builder.UserStoryBuilder
 import net.kaleidos.taiga.builder.WikilinkBuilder
 import net.kaleidos.taiga.builder.WikipageBuilder
 import net.kaleidos.taiga.mapper.Mappers
@@ -15,15 +17,16 @@ import net.kaleidos.taiga.mapper.Mappers
 class TaigaClient extends BaseClient {
 
     private static final Map URLS_IMPORTER = [
-        projects: '/api/v1/importer',
-        issues  : '/api/v1/importer/${projectId}/issue',
-        wikiPage: '/api/v1/importer/${projectId}/wiki_page',
-        wikiLink: '/api/v1/importer/${projectId}/wiki_link',
+        project  : '/api/v1/importer',
+        issue    : '/api/v1/importer/${projectId}/issue',
+        wikiPage : '/api/v1/importer/${projectId}/wiki_page',
+        wikiLink : '/api/v1/importer/${projectId}/wiki_link',
+        userStory: '/api/v1/importer/${projectId}/us',
     ]
 
     private static final Map URLS = [
-        auth     : '/api/v1/auth',
-        projects : '/api/v1/projects',
+        auth    : '/api/v1/auth',
+        projects: '/api/v1/projects',
     ]
 
     TaigaClient(String serverUrl) {
@@ -54,7 +57,7 @@ class TaigaClient extends BaseClient {
         log.debug "Saving project ==> ${project.name}"
 
         def params = Mappers.map(project)
-        def json = this.doPost(URLS_IMPORTER.projects, params)
+        def json = this.doPost(URLS_IMPORTER.project, params)
 
         new ProjectBuilder().build(json, null)
     }
@@ -66,7 +69,7 @@ class TaigaClient extends BaseClient {
 
     // ISSUES
     Issue createIssue(Issue issue) {
-        def url = this.merge(URLS_IMPORTER.issues, [projectId: issue.project.id])
+        def url = this.merge(URLS_IMPORTER.issue, [projectId: issue.project.id])
 
         def params = Mappers.map(issue)
         def json = this.doPost(url, params)
@@ -91,5 +94,15 @@ class TaigaClient extends BaseClient {
         def json = this.doPost(url, params)
 
         new WikilinkBuilder().build(json, wikilink.project)
+    }
+
+    // USER STORIES
+    UserStory createUserStory(UserStory userStory) {
+        def url = this.merge(URLS_IMPORTER.userStory, [projectId: userStory.project.id])
+
+        def params = Mappers.map(userStory)
+        def json = this.doPost(url, params)
+
+        new UserStoryBuilder().build(json, userStory.project)
     }
 }
