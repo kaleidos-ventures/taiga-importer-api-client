@@ -5,6 +5,7 @@ import net.kaleidos.domain.Issue
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.UserStoryStatus
 import spock.lang.Specification
 
@@ -91,5 +92,13 @@ class TaigaSpecBase extends Specification {
         ESTIMATION_POINTS.collect {
             new EstimationPoint().setName(it.name).setValue(it.value)
         }
+    }
+
+    UserStory buildBasicUserStory(Project project) {
+        new UserStory()
+            .setStatus('New')
+            .setSubject('The subject')
+            .setDescription('The description')
+            .setProject(project)
     }
 }
