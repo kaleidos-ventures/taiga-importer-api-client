@@ -5,7 +5,9 @@ import com.taskadapter.redmineapi.RedmineManager
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
 import com.taskadapter.redmineapi.bean.Project as RedmineProject
+import com.taskadapter.redmineapi.bean.Attachment as RedmineAttachment
 import com.taskadapter.redmineapi.bean.Tracker
+import com.taskadapter.redmineapi.bean.Journal
 import com.taskadapter.redmineapi.bean.User as RedmineUser
 import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
 import com.taskadapter.redmineapi.bean.WikiPage as RedmineWikiPageSummary
@@ -13,7 +15,9 @@ import com.taskadapter.redmineapi.bean.WikiPageDetail as RedmineWikiPage
 
 import net.kaleidos.domain.User as TaigaUser
 import net.kaleidos.domain.Issue as TaigaIssue
+import net.kaleidos.domain.Attachment as TaigaAttachment
 import net.kaleidos.domain.Wikipage
+import net.kaleidos.domain.History
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Project as TaigaProject
 import net.kaleidos.taiga.TaigaClient
@@ -124,7 +128,39 @@ class RedmineMigrator {
     }
 
     List<TaigaIssue> migrateIssuesByProject(final RedmineTaigaRef ref) {
-        return map(getIssuesByProject(ref), fullfillUserMail >> addedTaigaIssue(ref))
+        return map(
+            getIssuesByProject(ref),
+            fullfillUserMail >>
+            addAttachments >>
+            addedTaigaIssue(ref)
+        )
+    }
+
+    Closure<Map> addAttachments = { Map basicFields ->
+        RedmineIssue issue =
+            redmineClient.getIssueById(basicFields.ref)
+
+        return [
+            basicFields: basicFields,
+            attachments: issue
+                    .attachments
+                    .collect { RedmineAttachment att ->
+                        new TaigaAttachment(
+                            data: new URL(att.contentURL).bytes.encodeBase64(),
+                            name: att.fileName,
+                            description: att.description,
+                            owner: getUserInfoById(att.author.id).mail
+                        )
+                    },
+            history: issue
+                    .journals
+                    .collect { Journal journal ->
+                        new History(
+                            user: "trasmallo@lala.com",//getUserInfoById(journal.user.id).mail,
+                            comment: journal.notes
+                        )
+                    }
+        ]
     }
 
     List<RedmineIssue> getIssuesByProject(RedmineTaigaRef ref) {
@@ -149,14 +185,15 @@ class RedmineMigrator {
             taigaClient.createIssue(
                 new TaigaIssue(
                     project: ref.taigaProject,
-                    ref: partial.ref,
-                    type: partial.tracker,
-                    status: partial.status,
-                    priority: partial.priority,
+                    ref: partial.basicFields.ref,
+                    type: partial.basicFields.tracker,
+                    status: partial.basicFields.status,
+                    priority: partial.basicFields.priority,
                     severity: SEVERITY_NORMAL,
-                    subject: partial.subject,
-                    description: partial.description,
-                    owner: partial.userMail
+                    subject: partial.basicFields.subject,
+                    description: partial.basicFields.description,
+                    owner: partial.basicFields.userMail,
+                    attachments: partial.attachments
                 )
             )
         }

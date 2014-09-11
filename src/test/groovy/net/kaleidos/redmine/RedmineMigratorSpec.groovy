@@ -92,7 +92,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.every(has('priority'))
             issues.every(has('userMail'))
         and: 'Making sure types are present'
-            issues.tracker == ['Task','User story']
+            issues.tracker == ['Task']
     }
 
     void 'Migrate issues from a given project'() {
@@ -106,6 +106,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/projectdetail1.json"),
                     buildResponseWithJson("${PATH}/issues.json"),
                     buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/issue_17002.json"),
                     buildResponseWithJson("${PATH}/user1.json")
                 ]
             }
@@ -136,10 +137,13 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/trackers.json"),
                     buildResponseWithJson("${PATH}/issue_statuses.json"),
                     buildResponseWithJson("${PATH}/issue_priorities.json"),
+
                     buildResponseWithJson("${PATH}/projectdetail1.json"),
                     buildResponseWithJson("${PATH}/issues.json"),
                     buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/issue_17002.json"),
                     buildResponseWithJson("${PATH}/user1.json"),
+
                     buildResponseWithJson("${PATH}/wiki_index.json"),
                     buildResponseWithJson("${PATH}/wiki_page3_wiki.json"),
                     buildResponseWithJson("${PATH}/wiki_page1.json"),
