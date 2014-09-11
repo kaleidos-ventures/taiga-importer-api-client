@@ -95,7 +95,8 @@ class RedmineMigrator {
     Closure<RedmineTaigaRef> addMemberships = { RedmineTaigaRef ref ->
         List<RedmineMembership> memberships =
             redmineClient.getMemberships(
-                ref.taigaProject.id.toString())
+                ref.taigaProject.id.toString()
+            )
 
         ref.taigaProject.roles =
             memberships.roles.name.flatten().unique()
@@ -107,6 +108,7 @@ class RedmineMigrator {
                     role: m.roles.first().name
                 )
             }
+        ref.memberships = ref.taigaProject.memberships
 
         return ref
     }
@@ -139,6 +141,7 @@ class RedmineMigrator {
     Closure<RedmineTaigaRef> saveProject = { RedmineTaigaRef ref ->
         return [
             taigaProject: taigaClient.createProject(ref.taigaProject),
+            memberships: ref.memberships,
             redmineProject: ref.redmineProject
         ] as RedmineTaigaRef
 
@@ -158,10 +161,14 @@ class RedmineMigrator {
     }
 
     def findUserByIdInProject(String userId, RedmineTaigaRef ref) {
-       return ref
-            .taigaProject
+        log.debug("Looking for user: ${userId} in ${ref.memberships.userReferenceId}")
+        def found =
+            ref
             .memberships
             .find { it.userReferenceId == userId }
+        log.debug("Found: ${userId} ==> ${found}")
+
+        return found
     }
 
     Closure<Map> addAttachments = {RedmineTaigaRef ref ->
@@ -178,14 +185,24 @@ class RedmineMigrator {
                                 data: new URL(att.contentURL).bytes.encodeBase64(),
                                 name: att.fileName,
                                 description: att.description,
-                                owner: findUserByIdInProject(att.user.id,ref)
+                                owner: findUserByIdInProject(att.author.id.toString(),ref)
                             )
                         },
                 history: issue
                         .journals
                         .collect { Journal journal ->
-                            new History(
-                                user: findUserByIdInProject(journal.user.id, ref),
+                            TaigaMembership m =
+                                findUserByIdInProject(
+                                    journal.user.id.toString(),
+                                    ref
+                                )
+                            TaigaUser user = new TaigaUser(
+                                email: m.email,
+                                name: 'hu'//journal.user.name,
+                            )
+                            return new History(
+                                user:  user,
+                                createdAt: journal.createdOn,
                                 comment: journal.notes
                             )
                         }
@@ -206,7 +223,7 @@ class RedmineMigrator {
                 priority: source.priorityText,
                 subject: source.subject,
                 description: source.description,
-                userMail   : findUserByIdInProject(source.author.id, ref).mail
+                userMail   : findUserByIdInProject(source.author.id.toString(), ref).email
             ]
         }
     }
@@ -225,7 +242,8 @@ class RedmineMigrator {
                     subject: partial.basicFields.subject,
                     description: partial.basicFields.description,
                     owner: partial.basicFields.userMail,
-                    attachments: partial.attachments
+                    attachments: partial.attachments,
+                    history: partial.history
                 )
             )
         }
@@ -313,7 +331,14 @@ class RedmineMigrator {
         return { RedmineWikiPage wp ->
             log.debug("Trying to save wiki page: ${wp.title}")
             Wikipage taigaWikiPage =
-                taigaClient.createWiki(slugify(wp.title), wp.text, ref.taigaProject)
+                taigaClient
+                    .createWiki(
+                        new Wikipage(
+                            slug:slugify(wp.title),
+                            content: wp.text,
+                            project:ref.taigaProject
+                        )
+                    )
             log.debug("Wikipage saved successfully ? ${taigaWikiPage ? 'TRUE' : 'FALSE' }")
 
             return taigaWikiPage

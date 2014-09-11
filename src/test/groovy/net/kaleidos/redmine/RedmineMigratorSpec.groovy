@@ -25,7 +25,6 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         deleteTaigaProjects()
     }
 
-    @IgnoreRest
     void 'Migrate all active projects basic structure'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
@@ -73,10 +72,10 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/trackers.json"),
                     buildResponseWithJson("${PATH}/issue_statuses.json"),
                     buildResponseWithJson("${PATH}/issue_priorities.json"),
-                    buildResponseWithJson("${PATH}/projectdetail1.json"),
-                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/projectdetail2.json"),
+                    buildResponseWithJson("${PATH}/memberships.json"),
                     buildResponseWithJson("${PATH}/user1.json"),
-                    buildResponseWithJson("${PATH}/user1.json")
+                    buildResponseWithJson("${PATH}/issues.json"),
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -90,7 +89,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             List<Issue> issues =
                 migrator
                     .getIssuesByProject(project)
-                    .collect(migrator.fullfillUserMail)
+                    .collect(migrator.fullfillUserMail(project))
         then: 'there should be issues'
             issues.size() > 0
             issues.every(has('tracker'))
@@ -102,6 +101,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             issues.tracker == ['Task']
     }
 
+    @IgnoreRest
     void 'Migrate issues from a given project'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
@@ -111,10 +111,10 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/issue_statuses.json"),
                     buildResponseWithJson("${PATH}/issue_priorities.json"),
                     buildResponseWithJson("${PATH}/projectdetail1.json"),
-                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/memberships.json"),
                     buildResponseWithJson("${PATH}/user1.json"),
-                    buildResponseWithJson("${PATH}/issue_17002.json"),
-                    buildResponseWithJson("${PATH}/user1.json")
+                    buildResponseWithJson("${PATH}/issues.json"),
+                    buildResponseWithJson("${PATH}/issue_17002.json")
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -144,13 +144,11 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/trackers.json"),
                     buildResponseWithJson("${PATH}/issue_statuses.json"),
                     buildResponseWithJson("${PATH}/issue_priorities.json"),
-
                     buildResponseWithJson("${PATH}/projectdetail1.json"),
+                    buildResponseWithJson("${PATH}/memberships.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
                     buildResponseWithJson("${PATH}/issues.json"),
-                    buildResponseWithJson("${PATH}/user1.json"),
                     buildResponseWithJson("${PATH}/issue_17002.json"),
-                    buildResponseWithJson("${PATH}/user1.json"),
-
                     buildResponseWithJson("${PATH}/wiki_index.json"),
                     buildResponseWithJson("${PATH}/wiki_page3_wiki.json"),
                     buildResponseWithJson("${PATH}/wiki_page1.json"),
