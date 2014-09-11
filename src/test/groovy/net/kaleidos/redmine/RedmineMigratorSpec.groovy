@@ -25,6 +25,7 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
         deleteTaigaProjects()
     }
 
+    @IgnoreRest
     void 'Migrate all active projects basic structure'() {
         setup: 'Mocking redmine communication'
             HttpClient http = Stub(HttpClient) {
@@ -34,7 +35,11 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
                     buildResponseWithJson("${PATH}/issue_statuses.json"),
                     buildResponseWithJson("${PATH}/issue_priorities.json"),
                     buildResponseWithJson("${PATH}/projectdetail1.json"),
-                    buildResponseWithJson("${PATH}/projectdetail2.json")
+                    buildResponseWithJson("${PATH}/memberships.json"),
+                    buildResponseWithJson("${PATH}/user1.json"),
+                    buildResponseWithJson("${PATH}/projectdetail2.json"),
+                    buildResponseWithJson("${PATH}/memberships.json"),
+                    buildResponseWithJson("${PATH}/user1.json")
                 ]
             }
         and: 'building a redmine migrator mocking redmine integration'
@@ -50,6 +55,8 @@ class RedmineMigratorSpec extends MigratorToTaigaSpecBase {
             projectList.taigaProject.every(hasId)
             projectList.taigaProject.every(hasName)
             projectList.taigaProject.every(has('issueTypes'))
+            projectList.taigaProject.every(has('roles'))
+            projectList.taigaProject.every(has('memberships'))
             projectList.taigaProject.every(has('issueSeverities'))
         and: 'usually most projects have description'
             projectList

@@ -7,6 +7,7 @@ import groovy.transform.builder.SimpleStrategy
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
 class Membership {
+    String userReferenceId
     String email
     String role
 }
