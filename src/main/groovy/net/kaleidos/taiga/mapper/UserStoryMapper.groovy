@@ -15,6 +15,7 @@ class UserStoryMapper implements Mapper<UserStory>, DateConversions {
             ref         : userStory.ref,
             owner       : userStory.owner,
             created_date: format(userStory.createdDate),
+            attachments : userStory.attachments.collect { Mappers.map(it) },
         ]
     }
 }

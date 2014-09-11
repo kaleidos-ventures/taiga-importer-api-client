@@ -17,6 +17,7 @@ class UserStoryBuilder implements TaigaEntityBuilder<UserStory>, DateConversions
             delegate.project = project
             owner = json.owner
             createdDate = parse(json.created_date)
+            attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
         }
 
         userStory
