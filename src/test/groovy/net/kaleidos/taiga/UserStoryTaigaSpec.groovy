@@ -1,7 +1,9 @@
 package net.kaleidos.taiga
 
 import net.kaleidos.domain.Attachment
+import net.kaleidos.domain.History
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.User
 import spock.lang.Unroll
 
 class UserStoryTaigaSpec extends TaigaSpecBase {
@@ -109,5 +111,31 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
         where:
             createdDate = '01/01/2010'
             description = 'description'
+    }
+
+    void 'create a user story with comments'() {
+        given: 'a new user story with comments'
+            def user = new User().setEmail('admin@admin.com').setName('The fullname')
+            def history = new History()
+                .setUser(user)
+                .setCreatedAt(Date.parse("dd/MM/yyyy HH:mm", createdAt))
+                .setComment(comment)
+
+            def userStory = buildBasicUserStory(project)
+                .setHistory([history])
+
+        when: 'creating the user story'
+            userStory = taigaClient.createUserStory(userStory)
+
+        then: 'the user story is created in Taiga'
+            userStory != null
+            userStory.history.size() == 1
+            userStory.history[0].user.email == user.email
+            userStory.history[0].user.name == user.name
+            userStory.history[0].createdAt.format('dd/MM/yyyy HH:mm') == createdAt
+
+        where:
+            createdAt = '01/01/2010 13:45'
+            comment = 'The comment'
     }
 }

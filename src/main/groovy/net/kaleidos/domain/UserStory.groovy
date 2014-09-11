@@ -19,4 +19,6 @@ class UserStory {
     Date createdDate
 
     List<Attachment> attachments
+
+    List<History> history
 }
