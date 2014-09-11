@@ -104,7 +104,7 @@ class RedmineMigrator {
                 new TaigaMembership(
                     userReferenceId: m.user.id.toString(),
                     email: getUserInfoById(m.user.id).mail,
-                    role: m.roles.first()
+                    role: m.roles.first().name
                 )
             }
 
