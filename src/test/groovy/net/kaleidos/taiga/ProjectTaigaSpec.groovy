@@ -160,4 +160,54 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             description = 'The description of the project'
             roles = ['UX', 'Back']
     }
+
+    void 'save a project with user stories statuses'() {
+        given: 'a project to create'
+            def project = new Project()
+                .setName(name)
+                .setDescription(description)
+                .setUserStoryStatuses(usStatuses)
+
+        when: 'saving the project'
+            project = taigaClient.createProject(project)
+
+        then: 'the project is saved'
+            project != null
+            project.userStoryStatuses.size() == usStatuses.size()
+            project.userStoryStatuses*.name.sort() == usStatuses*.name.sort()
+            project.userStoryStatuses*.isClosed.sort() == usStatuses*.isClosed.sort()
+
+        cleanup:
+            taigaClient.deleteProject(project)
+
+        where:
+            name = "My project ${new Date().time}"
+            description = 'The description of the project'
+            usStatuses = buildUserStoryStatuses()
+    }
+
+    void 'save a project with estimation points'() {
+        given: 'a project to create'
+            def project = new Project()
+                .setName(name)
+                .setDescription(description)
+                .setPoints(points)
+
+        when: 'saving the project'
+            project = taigaClient.createProject(project)
+
+        then: 'the project is saved'
+            project != null
+            project.points.size() == points.size()
+            project.points*.name.sort() == points*.name.sort()
+            project.points*.value.sort() == points*.value.sort()
+
+        cleanup:
+            taigaClient.deleteProject(project)
+
+        where:
+            name = "My project ${new Date().time}"
+            description = 'The description of the project'
+            points = buildEstimationPoints()
+    }
 }

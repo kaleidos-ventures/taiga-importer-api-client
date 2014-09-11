@@ -20,4 +20,7 @@ class Project {
 
     List<String> roles
     List<Membership> memberships
+
+    List<UserStoryStatus> userStoryStatuses
+    List<EstimationPoint> points
 }
