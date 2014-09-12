@@ -5,6 +5,7 @@ import net.kaleidos.domain.History
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.UserStory
+import net.kaleidos.domain.UserStory.RolePoint
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 
@@ -36,5 +37,9 @@ class Mappers {
 
     static Map map(UserStory userStory) {
         new UserStoryMapper().map(userStory)
+    }
+
+    static Map map(RolePoint rolePoint) {
+        new RolePointMapper().map(rolePoint)
     }
 }

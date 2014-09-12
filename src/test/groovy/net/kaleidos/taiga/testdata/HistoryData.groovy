@@ -5,7 +5,7 @@ import net.kaleidos.domain.User
 
 trait HistoryData {
 
-    History buildBasicHistory(User user, Date createdAt, String comment ) {
+    History buildBasicHistory(User user, Date createdAt, String comment) {
         new History()
             .setUser(user)
             .setCreatedAt(createdAt)

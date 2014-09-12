@@ -21,4 +21,12 @@ class UserStory {
     List<Attachment> attachments
 
     List<History> history
+
+    List<RolePoint> rolePoints
+
+    @Builder(builderStrategy = SimpleStrategy)
+    class RolePoint {
+        String role
+        String points
+    }
 }

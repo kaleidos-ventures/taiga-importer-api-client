@@ -1,4 +1,5 @@
 package net.kaleidos.taiga
+
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Wikipage
 

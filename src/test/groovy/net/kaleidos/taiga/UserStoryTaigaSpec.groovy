@@ -131,4 +131,21 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
             createdAt = Date.parse("dd/MM/yyyy HH:mm", '01/01/2010 13:45')
             comment = 'The comment'
     }
+
+    void 'create a user story with estimation points'() {
+        given: 'a new user story with points'
+            def points0 = buildRolePoint('UX', '1/2')
+            def points1 = buildRolePoint('Front', '?')
+            def points2 = buildRolePoint('Back', '5')
+
+            def userStory = buildBasicUserStory(project)
+                .setRolePoints([points0, points1, points2])
+
+        when: 'creating the user story'
+            userStory = taigaClient.createUserStory(userStory)
+
+        then: 'the user story is created in Taiga'
+            userStory != null
+            userStory.rolePoints.size() == 3
+    }
 }

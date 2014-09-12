@@ -1,4 +1,5 @@
 package net.kaleidos.taiga.testdata
+
 import net.kaleidos.domain.Attachment
 
 trait AttachmentData {

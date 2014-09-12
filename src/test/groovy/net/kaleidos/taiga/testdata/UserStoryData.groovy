@@ -12,4 +12,8 @@ trait UserStoryData {
             .setDescription('The description')
             .setProject(project)
     }
+
+    UserStory.RolePoint buildRolePoint(String role, String pointName) {
+        new UserStory.RolePoint().setRole(role).setPoints(pointName)
+    }
 }
