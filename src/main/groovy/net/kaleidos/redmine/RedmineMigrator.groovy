@@ -27,6 +27,8 @@ import groovy.util.logging.Log4j
 import org.apache.http.message.BasicNameValuePair
 import com.github.slugify.Slugify
 
+import groovy.json.JsonOutput
+
 @Log4j
 class RedmineMigrator {
 
@@ -185,6 +187,7 @@ class RedmineMigrator {
                                 data: new URL(att.contentURL).bytes.encodeBase64(),
                                 name: att.fileName,
                                 description: att.description,
+                                createdDate: issue.createdOn,
                                 owner: findUserByIdInProject(att.author.id.toString(),ref)
                             )
                         },
@@ -198,7 +201,7 @@ class RedmineMigrator {
                                 )
                             TaigaUser user = new TaigaUser(
                                 email: m.email,
-                                name: 'hu'//journal.user.name,
+                                name: findUserByIdInProject(journal.user.id.toString(),ref).email,
                             )
                             return new History(
                                 user:  user,
@@ -222,30 +225,32 @@ class RedmineMigrator {
                 ref: source.id,
                 priority: source.priorityText,
                 subject: source.subject,
-                description: source.description,
-                userMail   : findUserByIdInProject(source.author.id.toString(), ref).email
+                description: source.description ?: source.subject,
+                userMail   : findUserByIdInProject(source.author.id.toString(), ref).email,
+                createdDate: source.createdOn ?: source.updatedOn ?: source.startDate ?: new Date()
             ]
         }
     }
 
     Closure<TaigaIssue> addedTaigaIssue(final RedmineTaigaRef ref) {
         return { Map partial ->
-            log.debug("Creating issue of type: ${partial.tracker}")
-            taigaClient.createIssue(
-                new TaigaIssue(
-                    project: ref.taigaProject,
-                    ref: partial.basicFields.ref,
-                    type: partial.basicFields.tracker,
-                    status: partial.basicFields.status,
-                    priority: partial.basicFields.priority,
-                    severity: SEVERITY_NORMAL,
-                    subject: partial.basicFields.subject,
-                    description: partial.basicFields.description,
-                    owner: partial.basicFields.userMail,
-                    attachments: partial.attachments,
-                    history: partial.history
-                )
-            )
+            log.debug("Creating issue of type: ${partial.basicFields.tracker}")
+            Map issueMap = [
+                project: ref.taigaProject,
+                ref: partial.basicFields.ref,
+                type: partial.basicFields.tracker,
+                status: partial.basicFields.status,
+                priority: partial.basicFields.priority,
+                createdDate: partial.basicFields.createdDate,
+                severity: SEVERITY_NORMAL,
+                subject: partial.basicFields.subject,
+                description: partial.basicFields.description,
+                owner: partial.basicFields.userMail,
+                attachments: partial.attachments,
+                history: partial.history
+            ]
+
+            return taigaClient.createIssue(new TaigaIssue(issueMap))
         }
     }
 
