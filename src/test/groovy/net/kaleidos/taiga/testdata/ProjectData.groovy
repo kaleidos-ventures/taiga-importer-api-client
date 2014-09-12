@@ -45,7 +45,7 @@ trait ProjectData {
             .setIssueStatuses(buildIssueStatuses())
             .setIssuePriorities(['Low', 'Normal', 'High'])
             .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
-            .setRoles(['UX', 'Back'])
+            .setRoles(['UX', 'Front', 'Back'])
             .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
             .setPoints(buildEstimationPoints())
             .setUserStoryStatuses(buildUserStoryStatuses())
