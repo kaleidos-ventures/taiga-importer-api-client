@@ -64,12 +64,12 @@ class RedmineClientImpl implements RedmineClient {
 
     @Override
     Issue findIssueById(Integer issueId){
-        return null
+        return redmineManager.getIssueById(issueId)
     }
 
     @Override
     User findUserFullById(Integer userId){
-        return null
+        return redmineManager.getUserById(userId)
     }
 
 }

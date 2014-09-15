@@ -137,12 +137,50 @@ class RedmineClientImplSpec extends Specification {
                 client.findAllProject()
         when: 'getting a project from the list'
             Project project =
-                client.findProjectById(allAvailableProjects.first().id)
+                client.findProjectById(allAvailableProjects.first().identifier)
         then: 'I should be able to retrieve it again successfully'
             with(project) {
                 id
                 name
                 description
+            }
+    }
+
+    void 'Getting a specific redmine issue by id'() {
+        given: 'a list of available projects'
+            List<Project> allAvailableProjects = client.findAllProject()
+        when: 'getting all issues'
+            List<Issue> issueList =
+                client.findAllIssueByProjectId(
+                    allAvailableProjects
+                        .first()
+                        .id.toString())
+        and: 'getting specific info of one of them'
+            Issue issue =
+                client.findIssueById(issueList.first().id)
+        then: 'we should be able to access extended fields'
+            with(issue) {
+                id
+                subject
+                author
+                tracker
+                priorityId
+                priorityText
+                statusId
+                createdOn
+                updatedOn
+            }
+    }
+
+    void 'Getting full information about a given user'() {
+        given: 'a list of memberships of a given project'
+            List<Membership> projectMembershipList =
+                client.findAllMembershipByProjectId(client.findAllProject().first().identifier)
+        when: 'getting the first available user'
+            User user = client.findUserFullById(projectMembershipList.first().user.id)
+        then: 'we should be able to get his/her email'
+            with(user) {
+                user.mail
             }
     }
 
