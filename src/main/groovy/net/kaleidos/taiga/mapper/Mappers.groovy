@@ -3,6 +3,7 @@ package net.kaleidos.taiga.mapper
 import net.kaleidos.domain.Attachment
 import net.kaleidos.domain.History
 import net.kaleidos.domain.Issue
+import net.kaleidos.domain.Milestone
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.UserStory.RolePoint
@@ -41,5 +42,9 @@ class Mappers {
 
     static Map map(RolePoint rolePoint) {
         new RolePointMapper().map(rolePoint)
+    }
+
+    static Map map(Milestone milestone) {
+        new MilestoneMapper().map(milestone)
     }
 }

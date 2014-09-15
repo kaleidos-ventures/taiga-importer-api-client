@@ -2,11 +2,13 @@ package net.kaleidos.taiga
 
 import groovy.util.logging.Log4j
 import net.kaleidos.domain.Issue
+import net.kaleidos.domain.Milestone
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.Wikilink
 import net.kaleidos.domain.Wikipage
 import net.kaleidos.taiga.builder.IssueBuilder
+import net.kaleidos.taiga.builder.MilestoneBuilder
 import net.kaleidos.taiga.builder.ProjectBuilder
 import net.kaleidos.taiga.builder.UserStoryBuilder
 import net.kaleidos.taiga.builder.WikilinkBuilder
@@ -22,6 +24,7 @@ class TaigaClient extends BaseClient {
         wikiPage : '/api/v1/importer/${projectId}/wiki_page',
         wikiLink : '/api/v1/importer/${projectId}/wiki_link',
         userStory: '/api/v1/importer/${projectId}/us',
+        milestone: '/api/v1/importer/${projectId}/milestone',
     ]
 
     private static final Map URLS = [
@@ -104,5 +107,15 @@ class TaigaClient extends BaseClient {
         def json = this.doPost(url, params)
 
         new UserStoryBuilder().build(json, userStory.project)
+    }
+
+    // MILESTONES
+    Milestone createMilestone(Milestone milestone) {
+        def url = this.merge(URLS_IMPORTER.milestone, [projectId: milestone.project.id])
+
+        def params = Mappers.map(milestone)
+        def json = this.doPost(url, params)
+
+        new MilestoneBuilder().build(json, milestone.project)
     }
 }
