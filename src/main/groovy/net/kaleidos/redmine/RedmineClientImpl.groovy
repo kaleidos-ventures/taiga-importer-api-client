@@ -37,7 +37,7 @@ class RedmineClientImpl implements RedmineClient {
 
     @Override
     List<IssueStatus> findAllIssueStatus(){
-        return null
+        return redmineManager.getStatuses()
     }
 
     @Override

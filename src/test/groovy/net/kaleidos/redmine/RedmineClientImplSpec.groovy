@@ -71,6 +71,19 @@ class RedmineClientImplSpec extends Specification {
             }
     }
 
+    void 'Getting all issue statuses from a redmine instance'() {
+        when: 'trying to get all issue statuses'
+            List<IssueStatus> issueStatusList =
+                client.findAllIssueStatus()
+        then: 'the list shouldnt be empty'
+            issueStatusList.size() > 0
+        and: 'checking mandatory firstl from a random object'
+            with(issueStatusList.first()) {
+                id
+                name
+            }
+    }
+
 
 }
 
