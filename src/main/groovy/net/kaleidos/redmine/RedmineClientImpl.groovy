@@ -41,23 +41,25 @@ class RedmineClientImpl implements RedmineClient {
     }
 
     @Override
-    List<IssuePriority> findAllPriority(){
-        return null
+    List<IssuePriority> findAllIssuePriority(){
+        return redmineManager.issuePriorities
     }
 
     @Override
     List<Membership> findAllMembershipByProjectId(String projectId){
-        return null
+        return redmineManager.getMemberships(projectId)
     }
 
     @Override
     List<WikiPage> findAllWikiPageByProjectId(String projectId){
-        return null
+        return redmineManager.getWikiPagesByProject(
+           new Project(identifier: projectId)
+        )
     }
 
     @Override
     Project findProjectById(String projectId){
-        return null
+        return redmineManager.getProjectByKey(projectId)
     }
 
     @Override

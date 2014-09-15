@@ -5,6 +5,7 @@ import spock.lang.Specification
 import com.taskadapter.redmineapi.RedmineManager
 import com.taskadapter.redmineapi.bean.Issue
 import com.taskadapter.redmineapi.bean.IssueStatus
+import com.taskadapter.redmineapi.bean.IssuePriority
 import com.taskadapter.redmineapi.bean.Project
 import com.taskadapter.redmineapi.bean.Attachment
 import com.taskadapter.redmineapi.bean.Tracker
@@ -81,6 +82,67 @@ class RedmineClientImplSpec extends Specification {
             with(issueStatusList.first()) {
                 id
                 name
+            }
+    }
+
+    void 'Getting all issue priorities from a redmine instance'() {
+        when: 'trying to get all issue priorities'
+            List<IssuePriority> issuePriorityList =
+                client.findAllIssuePriority()
+        then: 'the list should be empty'
+            issuePriorityList.size() > 0
+        and: 'checking first object'
+            with(issuePriorityList.first()) {
+                id
+                name
+            }
+    }
+
+    void 'Getting all memberships from a given project'() {
+        given: 'a redmine project'
+            Project project = client.findAllProject().first()
+        when: 'trying to get all memberships from a given project'
+            List<Membership> membershipList =
+                client.findAllMembershipByProjectId(project.identifier)
+        then: 'the list shouldnt be empty'
+            membershipList.size() > 0
+        and: 'object should have some mandatory data'
+            with(membershipList.first()) {
+                id
+                user
+                roles
+            }
+    }
+
+    void 'Getting all basic wiki page info from a given project'() {
+        given: 'a redmine project'
+            Project project = client.findAllProject().first()
+        when: 'trying to get all wiki pages from it'
+            List<WikiPage> wikiPageList =
+                client.findAllWikiPageByProjectId(project.identifier)
+        then: 'we should get a list of wiki pages'
+            wikiPageList.size() > 0
+        and: 'basic fields are present'
+            with(wikiPageList.first()) {
+                title
+                version
+                createdOn
+                updatedOn
+            }
+    }
+
+    void 'Getting a specific redmine project by its id'() {
+        given: 'a list of projects'
+            List<Project> allAvailableProjects =
+                client.findAllProject()
+        when: 'getting a project from the list'
+            Project project =
+                client.findProjectById(allAvailableProjects.first().id)
+        then: 'I should be able to retrieve it again successfully'
+            with(project) {
+                id
+                name
+                description
             }
     }
 

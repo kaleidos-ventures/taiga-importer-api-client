@@ -47,7 +47,7 @@ interface RedmineClient {
     /**
      * find all possible issue priorities from the redmine instance
      **/
-    List<IssuePriority> findAllPriority()
+    List<IssuePriority> findAllIssuePriority()
 
     /**
      * find all membership from a given project
