@@ -37,7 +37,7 @@ interface RedmineClient {
     /**
      * find all basic issues info from the project passed as parameter
      **/
-    List<Issue> findAllIssueByProjectId(String id)
+    List<Issue> findAllIssueByProjectIdentifier(String identifier)
 
     /**
      * find all possible issue statuses info from the configured redmine instance
@@ -52,17 +52,17 @@ interface RedmineClient {
     /**
      * find all membership from a given project
      **/
-    List<Membership> findAllMembershipByProjectId(String projectId)
+    List<Membership> findAllMembershipByProjectIdentifier(String projectIdentifier)
 
     /**
      * Find all basic information of wiki pages found in a project
      */
-    List<WikiPage> findAllWikiPageByProjectId(String projectId)
+    List<WikiPage> findAllWikiPageByProjectIdentifier(String projectIdentifier)
 
     /**
      * Find full information of a given project
      */
-    Project findProjectById(String projectId)
+    Project findProjectByIdentifier(String projectIdentifier)
 
     /**
      * Find full information of a given issue

@@ -63,7 +63,7 @@ class RedmineClientImplSpec extends Specification {
             Project project = client.findAllProject().first()
         when: 'trying to get all basic issue info from a given project'
             List<Issue> issueList =
-                client.findAllIssueByProjectId(project.identifier)
+                client.findAllIssueByProjectIdentifier(project.identifier)
         then: 'the list shouldnt be empty'
             issueList.size() > 0
         and: 'the content should be the expected'
@@ -103,7 +103,7 @@ class RedmineClientImplSpec extends Specification {
             Project project = client.findAllProject().first()
         when: 'trying to get all memberships from a given project'
             List<Membership> membershipList =
-                client.findAllMembershipByProjectId(project.identifier)
+                client.findAllMembershipByProjectIdentifier(project.identifier)
         then: 'the list shouldnt be empty'
             membershipList.size() > 0
         and: 'object should have some mandatory data'
@@ -119,7 +119,7 @@ class RedmineClientImplSpec extends Specification {
             Project project = client.findAllProject().first()
         when: 'trying to get all wiki pages from it'
             List<WikiPage> wikiPageList =
-                client.findAllWikiPageByProjectId(project.identifier)
+                client.findAllWikiPageByProjectIdentifier(project.identifier)
         then: 'we should get a list of wiki pages'
             wikiPageList.size() > 0
         and: 'basic fields are present'
@@ -137,7 +137,7 @@ class RedmineClientImplSpec extends Specification {
                 client.findAllProject()
         when: 'getting a project from the list'
             Project project =
-                client.findProjectById(allAvailableProjects.first().identifier)
+                client.findProjectByIdentifier(allAvailableProjects.first().identifier)
         then: 'I should be able to retrieve it again successfully'
             with(project) {
                 id
@@ -151,10 +151,10 @@ class RedmineClientImplSpec extends Specification {
             List<Project> allAvailableProjects = client.findAllProject()
         when: 'getting all issues'
             List<Issue> issueList =
-                client.findAllIssueByProjectId(
+                client.findAllIssueByProjectIdentifier(
                     allAvailableProjects
                         .first()
-                        .id.toString())
+                        .identifier)
         and: 'getting specific info of one of them'
             Issue issue =
                 client.findIssueById(issueList.first().id)
@@ -175,7 +175,9 @@ class RedmineClientImplSpec extends Specification {
     void 'Getting full information about a given user'() {
         given: 'a list of memberships of a given project'
             List<Membership> projectMembershipList =
-                client.findAllMembershipByProjectId(client.findAllProject().first().identifier)
+                client.findAllMembershipByProjectIdentifier(
+                    client.findAllProject().first().identifier
+                )
         when: 'getting the first available user'
             User user = client.findUserFullById(projectMembershipList.first().user.id)
         then: 'we should be able to get his/her email'

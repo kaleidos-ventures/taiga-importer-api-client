@@ -31,8 +31,8 @@ class RedmineClientImpl implements RedmineClient {
     }
 
     @Override
-    List<Issue> findAllIssueByProjectId(String id){
-        return redmineManager.getIssues(project_id: id)
+    List<Issue> findAllIssueByProjectIdentifier(String identifier){
+        return redmineManager.getIssues(project_id: identifier)
     }
 
     @Override
@@ -46,20 +46,20 @@ class RedmineClientImpl implements RedmineClient {
     }
 
     @Override
-    List<Membership> findAllMembershipByProjectId(String projectId){
-        return redmineManager.getMemberships(projectId)
+    List<Membership> findAllMembershipByProjectIdentifier(String projectIdentifier){
+        return redmineManager.getMemberships(projectIdentifier)
     }
 
     @Override
-    List<WikiPage> findAllWikiPageByProjectId(String projectId){
+    List<WikiPage> findAllWikiPageByProjectIdentifier(String projectIdentifier){
         return redmineManager.getWikiPagesByProject(
-           new Project(identifier: projectId)
+           new Project(identifier: projectIdentifier)
         )
     }
 
     @Override
-    Project findProjectById(String projectId){
-        return redmineManager.getProjectByKey(projectId)
+    Project findProjectByIdentifier(String projectIdentifier){
+        return redmineManager.getProjectByKey(projectIdentifier)
     }
 
     @Override
