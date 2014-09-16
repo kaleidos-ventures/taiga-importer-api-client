@@ -23,4 +23,6 @@ class Project {
 
     List<UserStoryStatus> userStoryStatuses
     List<EstimationPoint> points
+
+    List<TaskStatus> taskStatuses
 }

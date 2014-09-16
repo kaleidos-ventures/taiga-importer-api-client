@@ -180,4 +180,25 @@ class ProjectTaigaSpec extends TaigaSpecBase {
         where:
             points = buildEstimationPoints()
     }
+
+    void 'save a project with task statuses'() {
+        given: 'a project to create'
+            def project = buildBasicProject()
+                .setTaskStatuses(taskStatuses)
+
+        when: 'saving the project'
+            project = taigaClient.createProject(project)
+
+        then: 'the project is saved'
+            project != null
+            project.taskStatuses.size() == taskStatuses.size()
+            project.taskStatuses*.name.sort() == taskStatuses*.name.sort()
+            project.taskStatuses*.isClosed.sort() == taskStatuses*.isClosed.sort()
+
+        cleanup:
+            taigaClient.deleteProject(project)
+
+        where:
+            taskStatuses = buildTaskStatuses()
+    }
 }
