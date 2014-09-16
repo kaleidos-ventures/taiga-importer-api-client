@@ -50,6 +50,7 @@ trait ProjectData {
             .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
             .setPoints(buildEstimationPoints())
             .setUserStoryStatuses(buildUserStoryStatuses())
+            .setTaskStatuses(buildTaskStatuses())
     }
 
     List<UserStoryStatus> buildUserStoryStatuses() {
