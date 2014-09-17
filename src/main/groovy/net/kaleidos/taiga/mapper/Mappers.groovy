@@ -5,6 +5,7 @@ import net.kaleidos.domain.History
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Milestone
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.Task
 import net.kaleidos.domain.UserStory
 import net.kaleidos.domain.UserStory.RolePoint
 import net.kaleidos.domain.Wikilink
@@ -46,5 +47,9 @@ class Mappers {
 
     static Map map(Milestone milestone) {
         new MilestoneMapper().map(milestone)
+    }
+
+    static Map map(Task task) {
+        new TaskMapper().map(task)
     }
 }

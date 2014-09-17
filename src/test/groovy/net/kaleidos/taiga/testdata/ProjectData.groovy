@@ -4,6 +4,7 @@ import net.kaleidos.domain.EstimationPoint
 import net.kaleidos.domain.IssueStatus
 import net.kaleidos.domain.Membership
 import net.kaleidos.domain.Project
+import net.kaleidos.domain.TaskStatus
 import net.kaleidos.domain.UserStoryStatus
 
 trait ProjectData {
@@ -49,6 +50,7 @@ trait ProjectData {
             .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
             .setPoints(buildEstimationPoints())
             .setUserStoryStatuses(buildUserStoryStatuses())
+            .setTaskStatuses(buildTaskStatuses())
     }
 
     List<UserStoryStatus> buildUserStoryStatuses() {
@@ -60,6 +62,12 @@ trait ProjectData {
     List<IssueStatus> buildIssueStatuses() {
         STATUSES.collect {
             new IssueStatus().setName(it.name).setIsClosed(it.isClosed)
+        }
+    }
+
+    List<TaskStatus> buildTaskStatuses() {
+        STATUSES.collect {
+            new TaskStatus().setName(it.name).setIsClosed(it.isClosed)
         }
     }
 

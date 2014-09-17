@@ -4,7 +4,8 @@ import net.kaleidos.domain.Project
 import net.kaleidos.taiga.TaigaClient
 
 trait TaigaTestData implements ProjectData, IssueData, UserStoryData,
-    AttachmentData, MembershipData, HistoryData, UserData, WikipageData, WikilinkData {
+    AttachmentData, MembershipData, HistoryData, UserData, WikipageData,
+    WikilinkData, TaskData, MilestoneData {
 
     TaigaClient taigaClient
 
