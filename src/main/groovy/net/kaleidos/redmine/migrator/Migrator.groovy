@@ -1,3 +1,5 @@
 package net.kaleidos.redmine.migrator
 
-interface Migrator { }
+interface Migrator<A>  {
+    A save(A instance)
+}

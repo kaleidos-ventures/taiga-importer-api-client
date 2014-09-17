@@ -12,7 +12,7 @@ import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
 import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
 
-class ProjectMigrator implements Migrator {
+class ProjectMigrator implements Migrator<TaigaProject> {
 
     static final String SEVERITY_NORMAL = 'Normal'
 
@@ -29,14 +29,12 @@ class ProjectMigrator implements Migrator {
     }
 
     TaigaProject migrateProject(final RedmineProject redmineProject) {
-        return saveProject(buildProjectFromRedmineProject(redmineProject))
+        return save(buildProjectFromRedmineProject(redmineProject))
     }
 
     TaigaProject buildProjectFromRedmineProject(final RedmineProject redmineProject) {
         List<TaigaMembership> memberships =
-            redmineClient
-                .findAllMembershipByProjectIdentifier(redmineProject.identifier)
-                .collect(this.&transformToTaigaMembership)
+            getMembershipsByProjectIdentifier(redmineProject.identifier)
 
         return new TaigaProject(
             name: "${redmineProject.name} - [${redmineProject.identifier}]" ,
@@ -50,8 +48,15 @@ class ProjectMigrator implements Migrator {
         )
     }
 
+    List<TaigaMembership> getMembershipsByProjectIdentifier(String identifier) {
+        return redmineClient
+                .findAllMembershipByProjectIdentifier(identifier)
+                .collect(this.&transformToTaigaMembership)
+    }
+
     TaigaMembership transformToTaigaMembership(final RedmineMembership redmineMembership) {
-        RedmineUser user = redmineClient.findUserFullById(redmineMembership.user.id)
+        RedmineUser user =
+            redmineClient.findUserFullById(redmineMembership.user.id)
 
         return new TaigaMembership(
             email: user.mail,
@@ -81,7 +86,8 @@ class ProjectMigrator implements Migrator {
 
     Closure<String> extractName = { it.name }
 
-    TaigaProject saveProject(final TaigaProject taigaProject) {
+    @Override
+    TaigaProject save(final TaigaProject taigaProject) {
         return taigaClient.createProject(taigaProject)
     }
 
