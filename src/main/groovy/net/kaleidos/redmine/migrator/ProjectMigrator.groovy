@@ -24,7 +24,7 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
 
     RedmineTaigaRef migrateProject(final RedmineProject redmineProject) {
         return new RedmineTaigaRef(
-            redmineProject.id,
+            redmineProject.identifier,
             save(buildProjectFromRedmineProject(redmineProject))
         )
     }
@@ -56,8 +56,6 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
             redmineClient.findUserFullById(redmineMembership.user.id)
 
         return new TaigaMembership(
-            userName: user.fullName,
-            userMigrationRef: user.id.toString(),
             email: user.mail,
             role: redmineMembership.roles.name.first()
         )

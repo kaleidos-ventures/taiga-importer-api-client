@@ -38,20 +38,15 @@ class ProjectMigratorSpec extends MigratorToTaigaSpecBase {
                 description
                 roles.size() == 3
                 memberships.size() == 4 // 3 + admin
-                issueTypes.size() == 5
-                issueStatuses.size() == 5
-                issuePriorities.size() == 5
-                issueSeverities.size() == 1
+                issueTypes.unique().size() == 5
+                issueStatuses.unique().size() == 5
+                issuePriorities.unique().size() == 5
+                issueSeverities.unique().size() == 1
             }
         and: 'checking all membership user data (admin included)'
             with(migratedProjectInfo.project) {
                 memberships.every { m -> m.email }
                 memberships.every { m -> m.role }
-            }
-        and: 'checking only migrated memberships (admin excluded)'
-            with(migratedProjectInfo.project) {
-                memberships.count { m -> m.userMigrationRef } == memberships.size() - 1
-                memberships.count { m -> m.userName } == memberships.size() - 1
             }
     }
 
