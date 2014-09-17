@@ -17,6 +17,7 @@ class TaskMapper implements Mapper<Task>, DateConversions {
             created_date: format(task.createdDate),
             user_story  : task.userStory?.ref,
             milestone   : task.milestone?.name,
+            attachments : task.attachments.collect { Mappers.map(it) },
         ]
     }
 }

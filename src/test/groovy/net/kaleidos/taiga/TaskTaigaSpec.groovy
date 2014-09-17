@@ -91,4 +91,52 @@ class TaskTaigaSpec extends TaigaSpecBase {
             createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
             owner = 'admin@admin.com'
     }
+
+    void 'create a task with two attachments'() {
+        given: 'two files to attach to a task'
+            def attachment0 = buildBasicAttachment(filename0, owner)
+            def attachment1 = buildBasicAttachment(filename1, owner)
+
+        and: 'a new task'
+            def task = buildBasicTask(project)
+                .setAttachments([attachment0, attachment1])
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then: 'the task is created in Taiga with the attachments'
+            task != null
+            task.attachments.size() == 2
+
+        and: 'the attachments are correct'
+            task.attachments[0].name == attachment0.name
+            task.attachments[0].data == attachment0.data
+            task.attachments[1].name == attachment1.name
+            task.attachments[1].data == attachment1.data
+
+        where:
+            filename0 = 'tux.png'
+            filename1 = 'debian.jpg'
+            owner = 'admin@admin.com'
+    }
+
+    void 'create a task with an attachment with optional data'() {
+        given: 'one file to attach to a task'
+            def attachment = buildAttachmentWithOptionalData(description, createdDate)
+
+        and: 'a new task'
+            def task = buildBasicTask(project)
+                .setAttachments([attachment])
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then:
+            task.attachments[0].description == description
+            task.attachments[0].createdDate == createdDate
+
+        where:
+            createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
+            description = 'description'
+    }
 }

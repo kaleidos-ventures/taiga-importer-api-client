@@ -20,4 +20,6 @@ class Task {
 
     UserStory userStory
     Milestone milestone
+
+    List<Attachment> attachments
 }
