@@ -45,35 +45,4 @@ class MigratorToTaigaSpecBase extends Specification {
         }
     }
 
-    String loadResourceAsString(String resource) {
-        return RedmineMigratorSpec
-            .classLoader
-            .getResourceAsStream(resource)
-            .text
-    }
-
-    HttpResponse buildResponseWithJson(String jsonResource) {
-        def response =
-            new BasicHttpResponse(HttpVersion.HTTP_1_1,HttpStatus.SC_OK,"OK")
-
-        def entity =
-            new StringEntity(
-                loadResourceAsString(jsonResource),
-                ContentType.APPLICATION_JSON
-            )
-
-        response.setEntity(entity)
-        return response
-    }
-
-    RedmineManager buildRedmineClient(HttpClient httpClient) {
-        return new RedmineManager(
-            new Transport(
-                new URIConfigurator("http://a", "0983hr0ih23roubk"),
-                httpClient
-            ),
-            RedmineManagerFactory.createDefaultTransportConfig().shutdownListener
-        )
-    }
-
 }
