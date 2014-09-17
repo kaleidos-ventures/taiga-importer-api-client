@@ -22,4 +22,6 @@ class Task {
     Milestone milestone
 
     List<Attachment> attachments
+
+    List<History> history
 }

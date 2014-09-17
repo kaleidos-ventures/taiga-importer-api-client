@@ -139,4 +139,29 @@ class TaskTaigaSpec extends TaigaSpecBase {
             createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
             description = 'description'
     }
+
+    void 'create a task with history'() {
+        given: 'a new task with history'
+            def user = buildBasicUser()
+            def history = buildBasicHistory(user, createdAt, comment)
+
+        and: 'the task to create'
+            def task = buildBasicTask(project)
+                .setHistory([history])
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then: 'the task is created in Taiga'
+            task != null
+            task.history.size() == 1
+            task.history[0].user.email == user.email
+            task.history[0].user.name == user.name
+            task.history[0].createdAt == createdAt
+            task.history[0].comment == comment
+
+        where:
+            createdAt = Date.parse("dd/MM/yyyy HH:mm", '01/01/2010 13:45')
+            comment = 'The comment'
+    }
 }
