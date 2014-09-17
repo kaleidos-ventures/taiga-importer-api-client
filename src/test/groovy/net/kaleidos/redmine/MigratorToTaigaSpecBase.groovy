@@ -28,14 +28,24 @@ import org.apache.http.client.methods.HttpUriRequest
 class MigratorToTaigaSpecBase extends Specification {
 
     TaigaClient createTaigaClient() {
-        def config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').text)
+        return createTaigaClientBase()
+    }
+
+    TaigaClient createTaigaAdminClient() {
+        return createTaigaClientBase("admin")
+    }
+
+    TaigaClient createTaigaClientBase(String specialUser = "") {
+        def config =
+            new ConfigSlurper()
+                .parse(new File("src/test/resources/taiga${specialUser ? '_' + specialUser : ''}.groovy").text)
         def client = new TaigaClient(config.host)
 
         return client.authenticate(config.user, config.passwd)
     }
 
     void deleteTaigaProjects() {
-        TaigaClient taigaClient = createTaigaClient()
+        TaigaClient taigaClient = createTaigaAdminClient()
 
         taigaClient.with {
             projects.each { p ->
