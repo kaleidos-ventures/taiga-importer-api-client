@@ -60,6 +60,11 @@ interface RedmineClient {
     List<WikiPage> findAllWikiPageByProjectIdentifier(String projectIdentifier)
 
     /**
+     * Get wiki pages full information
+     */
+    WikiPageDetail findCompleteWikiPageByProjectIdentifierAndTitle(String projectIdentifier, String wikiTitle)
+
+    /**
      * Find full information of a given project
      */
     Project findProjectByIdentifier(String projectIdentifier)

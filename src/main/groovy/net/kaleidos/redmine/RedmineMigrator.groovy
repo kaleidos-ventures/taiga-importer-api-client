@@ -308,16 +308,6 @@ class RedmineMigrator {
         return { pages.sort(inAscendingOrderBy('createdOn')).first() }
     }
 
-    Closure<RedmineWikiPage> summaryToReal(final RedmineTaigaRef ref) {
-        return { RedmineWikiPageSummary summary ->
-            redmineClient
-                .getWikiPageDetailByProjectAndTitle(
-                    ref.redmineProject,
-                    summary.title
-                )
-        }
-    }
-
     Closure<Boolean> filteringByTitleToLowerCase(String title) {
         return { it.title.toLowerCase() == title }
     }

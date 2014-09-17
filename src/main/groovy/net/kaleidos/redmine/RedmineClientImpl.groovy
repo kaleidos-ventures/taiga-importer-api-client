@@ -58,6 +58,15 @@ class RedmineClientImpl implements RedmineClient {
     }
 
     @Override
+    WikiPageDetail findCompleteWikiPageByProjectIdentifierAndTitle(String projectIdentifier, String wikiTitle) {
+        return redmineManager
+            .getWikiPageDetailByProjectAndTitle(
+                new Project(identifier:projectIdentifier),
+                wikiTitle
+            )
+    }
+
+    @Override
     Project findProjectByIdentifier(String projectIdentifier){
         return redmineManager.getProjectByKey(projectIdentifier)
     }

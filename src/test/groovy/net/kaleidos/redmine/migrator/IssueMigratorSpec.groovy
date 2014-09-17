@@ -25,7 +25,7 @@ class IssueMigratorSpec extends MigratorToTaigaSpecBase {
         deleteTaigaProjects()
     }
 
-    void 'migrating one project'() {
+    void 'migrating project issues'() {
         given: 'a mocked redmine client'
             RedmineClient redmineClient = buildRedmineClientToCreateProject()
             TaigaClient taigaClient = createTaigaClient()
