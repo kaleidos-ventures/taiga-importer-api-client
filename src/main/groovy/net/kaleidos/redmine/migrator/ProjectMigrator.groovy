@@ -1,7 +1,8 @@
 package net.kaleidos.redmine.migrator
 
-import net.kaleidos.taiga.TaigaClient
-import net.kaleidos.redmine.RedmineClient
+import groovy.transform.InheritConstructors
+
+import net.kaleidos.redmine.RedmineTaigaRef
 
 import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
 import net.kaleidos.domain.Project as TaigaProject
@@ -12,24 +13,20 @@ import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
 import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
 
-class ProjectMigrator implements Migrator<TaigaProject> {
+@InheritConstructors
+class ProjectMigrator extends AbstractMigrator<TaigaProject> {
 
     static final String SEVERITY_NORMAL = 'Normal'
-
-    final TaigaClient taigaClient
-    final RedmineClient redmineClient
-
-    ProjectMigrator(final RedmineClient redmineClient, final TaigaClient taigaClient) {
-        this.redmineClient = redmineClient
-        this.taigaClient = taigaClient
-    }
 
     List<TaigaProject> migrateAllProjects() {
         return redmineClient.findAllProject().collect(this.&migrateProject)
     }
 
-    TaigaProject migrateProject(final RedmineProject redmineProject) {
-        return save(buildProjectFromRedmineProject(redmineProject))
+    RedmineTaigaRef migrateProject(final RedmineProject redmineProject) {
+        return new RedmineTaigaRef(
+            redmineProject.id,
+            save(buildProjectFromRedmineProject(redmineProject))
+        )
     }
 
     TaigaProject buildProjectFromRedmineProject(final RedmineProject redmineProject) {
@@ -59,6 +56,8 @@ class ProjectMigrator implements Migrator<TaigaProject> {
             redmineClient.findUserFullById(redmineMembership.user.id)
 
         return new TaigaMembership(
+            userName: user.fullName,
+            userMigrationRef: user.id.toString(),
             email: user.mail,
             role: redmineMembership.roles.name.first()
         )

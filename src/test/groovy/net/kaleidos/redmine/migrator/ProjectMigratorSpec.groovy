@@ -2,6 +2,7 @@ package net.kaleidos.redmine.migrator
 
 import spock.lang.Specification
 
+import net.kaleidos.redmine.RedmineTaigaRef
 import net.kaleidos.redmine.MigratorToTaigaSpecBase
 
 import net.kaleidos.taiga.TaigaClient
@@ -38,9 +39,9 @@ class ProjectMigratorSpec extends MigratorToTaigaSpecBase {
             ProjectMigrator migrator =
                 new ProjectMigrator(mockedClient, createTaigaClient())
         when: 'trying to migrate basic estructure of a redmine project'
-            TaigaProject migratedProject = migrator.migrateProject(buildRedmineProject())
+            RedmineTaigaRef migratedProjectInfo = migrator.migrateProject(buildRedmineProject())
         then: 'checking the object'
-            with(migratedProject) {
+            with(migratedProjectInfo.project) {
                 name
                 description
                 roles.size() == 3
@@ -50,10 +51,15 @@ class ProjectMigratorSpec extends MigratorToTaigaSpecBase {
                 issuePriorities.size() == 5
                 issueSeverities.size() == 1
             }
-        and: 'checking membership user data'
-            with(migratedProject) {
+        and: 'checking all membership user data (admin included)'
+            with(migratedProjectInfo.project) {
                 memberships.every { m -> m.email }
                 memberships.every { m -> m.role }
+            }
+        and: 'checking only migrated memberships (admin excluded)'
+            with(migratedProjectInfo.project) {
+                memberships.count { m -> m.userMigrationRef } == memberships.size() - 1
+                memberships.count { m -> m.userName } == memberships.size() - 1
             }
     }
 
