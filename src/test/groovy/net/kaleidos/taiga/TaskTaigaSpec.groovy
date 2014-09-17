@@ -72,4 +72,23 @@ class TaskTaigaSpec extends TaigaSpecBase {
             task != null
             task.milestone.name == milestone.name
     }
+
+    void 'create a task with owner and created date'() {
+        given: 'a new task'
+            def task = buildBasicTask(project)
+                .setCreatedDate(createdDate)
+                .setOwner(owner)
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then: 'the task is created in Taiga with the optional fields'
+            task != null
+            task.owner == owner
+            task.createdDate == createdDate
+
+        where:
+            createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
+            owner = 'admin@admin.com'
+    }
 }
