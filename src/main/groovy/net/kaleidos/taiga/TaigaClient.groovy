@@ -50,7 +50,7 @@ class TaigaClient extends BaseClient {
 
     // PROJECTS
     List<Map> getProjects() {
-        this.doGet(URLS.projects)
+        this.doGet("${URLS.projects}?page_size=500")
     }
 
     Project getProjectById(Long projectId) {

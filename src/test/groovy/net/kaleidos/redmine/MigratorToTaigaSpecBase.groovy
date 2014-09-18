@@ -28,14 +28,24 @@ import org.apache.http.client.methods.HttpUriRequest
 class MigratorToTaigaSpecBase extends Specification {
 
     TaigaClient createTaigaClient() {
-        def config = new ConfigSlurper().parse(new File('src/test/resources/taiga.groovy').text)
+        return createTaigaClientBase()
+    }
+
+    TaigaClient createTaigaAdminClient() {
+        return createTaigaClientBase("admin")
+    }
+
+    TaigaClient createTaigaClientBase(String specialUser = "") {
+        def config =
+            new ConfigSlurper()
+                .parse(new File("src/test/resources/taiga${specialUser ? '_' + specialUser : ''}.groovy").text)
         def client = new TaigaClient(config.host)
 
         return client.authenticate(config.user, config.passwd)
     }
 
     void deleteTaigaProjects() {
-        TaigaClient taigaClient = createTaigaClient()
+        TaigaClient taigaClient = createTaigaAdminClient()
 
         taigaClient.with {
             projects.each { p ->
@@ -43,37 +53,6 @@ class MigratorToTaigaSpecBase extends Specification {
                 deleteProject(new Project(id:p.id))
             }
         }
-    }
-
-    String loadResourceAsString(String resource) {
-        return RedmineMigratorSpec
-            .classLoader
-            .getResourceAsStream(resource)
-            .text
-    }
-
-    HttpResponse buildResponseWithJson(String jsonResource) {
-        def response =
-            new BasicHttpResponse(HttpVersion.HTTP_1_1,HttpStatus.SC_OK,"OK")
-
-        def entity =
-            new StringEntity(
-                loadResourceAsString(jsonResource),
-                ContentType.APPLICATION_JSON
-            )
-
-        response.setEntity(entity)
-        return response
-    }
-
-    RedmineManager buildRedmineClient(HttpClient httpClient) {
-        return new RedmineManager(
-            new Transport(
-                new URIConfigurator("http://a", "0983hr0ih23roubk"),
-                httpClient
-            ),
-            RedmineManagerFactory.createDefaultTransportConfig().shutdownListener
-        )
     }
 
 }

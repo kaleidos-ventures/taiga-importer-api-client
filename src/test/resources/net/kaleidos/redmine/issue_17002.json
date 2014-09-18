@@ -1,0 +1,77 @@
+{
+	"issue": {
+		"id": 17002,
+		"project": {
+			"id": 145,
+			"name": "Yump"
+		},
+		"tracker": {
+			"id": 10,
+			"name": "User story"
+		},
+		"status": {
+			"id": 1,
+			"name": "New"
+		},
+		"priority": {
+			"id": 4,
+			"name": "Normal"
+		},
+		"author": {
+			"id": 245,
+			"name": "Miguel de la Cruz"
+		},
+		"subject": "[NEW] Endpoint de video por nombre #back",
+		"description": "description",
+		"done_ratio": 0,
+		"spent_hours": 0.0,
+		"custom_fields": [{
+				"id": 11,
+				"name": "Story Points UX",
+				"value": ""
+			}],
+		"created_on": "2014-02-12T09:50:00Z",
+		"updated_on": "2014-09-12T07:42:54Z",
+		"attachments": [{
+				"id": 4857,
+				"filename": "logo.png",
+				"filesize": 5819,
+				"description": "",
+				"content_url": "http://www.kaleidos.net/static/img/logo.png",
+				"author": {
+					"id": 1,
+					"name": "Stephen Hawking"
+				},
+				"created_on": "2014-09-12T07:42:52Z"
+			}],
+		"journals": [{
+				"id": 76784,
+				"user": {
+					"id": 245,
+					"name": "Stephen Hawking"
+				},
+				"notes": "Comentario 1",
+				"created_on": "2014-09-12T07:42:36Z",
+				"details": []
+			}, {
+				"id": 76785,
+				"user": {
+					"id": 245,
+					"name": "Stephen Hawking"
+				},
+				"notes": "Comentario 2",
+				"created_on": "2014-09-12T07:42:43Z",
+				"details": []
+			}, {
+				"id": 76786,
+				"user": {
+					"id": 245,
+					"name": "Stephen Hawking"
+				},
+				"notes": "",
+				"created_on": "2014-09-12T07:42:54Z",
+				"details": []
+			}],
+		"story_points": null
+	}
+}
