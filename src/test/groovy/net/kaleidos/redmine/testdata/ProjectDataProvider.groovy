@@ -17,6 +17,7 @@ class ProjectDataProvider {
     RedmineProject buildRedmineProject(String projectName = "prueba"){
         return new RedmineProject(
             name: projectName,
+            id: 123,
             identifier: projectName.toLowerCase(),
             description: "Project $projectName description"
         )
