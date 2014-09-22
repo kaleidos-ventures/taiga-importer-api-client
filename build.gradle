@@ -33,7 +33,7 @@ dependencies {
 
 }
 
-String mainClass = 'net.kaleidos.RedmineToTaiga'
+String mainClass = 'net.kaleidos.redmine.migrator.RedmineMigrator'
 
 task run(type: JavaExec) {
     main = mainClass

@@ -48,7 +48,7 @@ class ProjectMapper implements Mapper<Project>, DateConversions {
         map.priorities = project.issuePriorities.collect { [name: it] }
         map.severities = project.issueSeverities.collect { [name: it] }
         map.roles = project.roles.collect { [name: it, permissions: defaultPermissions] }
-        map.memberships = project.memberships.collect { [email: it.email, role: it.role] }
+        map.memberships = project.memberships.findAll{it}.collect { [email: it.email, role: it.role] }
         map.us_statuses = project.userStoryStatuses.collect { [name: it.name, is_closed: it.isClosed] }
         map.points = project.points.collect { [name: it.name, value: it.value] }
         map.task_statuses = project.taskStatuses.collect { [name: it.name, is_closed: it.isClosed] }

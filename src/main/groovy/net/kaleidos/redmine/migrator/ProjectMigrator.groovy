@@ -15,7 +15,7 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
 
     static final String SEVERITY_NORMAL = 'Normal'
 
-    List<TaigaProject> migrateAllProjects() {
+    List<RedmineTaigaRef> migrateAllProjects() {
         return redmineClient.findAllProject().collect(this.&migrateProject)
     }
 
@@ -34,7 +34,7 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
         return new TaigaProject(
             name: "${redmineProject.name} - [${redmineProject.identifier}]",
             description: redmineProject.with { description ?: name },
-            roles: memberships.role.unique(),
+            roles: memberships?.role?.unique(),
             memberships: memberships,
             issueTypes: issueTypes,
             issueStatuses: issueStatuses,
@@ -50,6 +50,11 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
     }
 
     TaigaMembership transformToTaigaMembership(final RedmineMembership redmineMembership) {
+
+        if (!redmineMembership?.user?.id) {
+            return
+        }
+
         RedmineUser user =
             redmineClient.findUserFullById(redmineMembership.user.id)
 

@@ -72,8 +72,8 @@ class RedmineClientImpl implements RedmineClient {
         return redmineManager.getIssueById(issueId)
     }
 
-    @Override
-    User findUserFullById(Integer userId) {
+    @groovy.transform.Memoized
+    User findUserFullById(Integer userId){
         return redmineManager.getUserById(userId)
     }
 
