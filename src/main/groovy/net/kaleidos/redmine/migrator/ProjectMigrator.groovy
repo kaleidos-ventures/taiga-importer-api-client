@@ -24,6 +24,7 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
 
     RedmineTaigaRef migrateProject(final RedmineProject redmineProject) {
         return new RedmineTaigaRef(
+            redmineProject.id,
             redmineProject.identifier,
             save(buildProjectFromRedmineProject(redmineProject))
         )

@@ -33,6 +33,8 @@ class ProjectMigratorSpec extends MigratorToTaigaSpecBase {
         when: 'trying to migrate basic estructure of a redmine project'
             RedmineTaigaRef migratedProjectInfo = migrator.migrateProject(buildRedmineProject())
         then: 'checking the object'
+            migratedProjectInfo.redmineId
+            migratedProjectInfo.redmineIdentifier
             with(migratedProjectInfo.project) {
                 name
                 description
