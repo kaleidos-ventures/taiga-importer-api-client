@@ -1,9 +1,8 @@
 package net.kaleidos.redmine.migrator
 
 import com.github.slugify.Slugify
-
-import net.kaleidos.taiga.TaigaClient
 import net.kaleidos.redmine.RedmineClient
+import net.kaleidos.taiga.TaigaClient
 
 abstract class AbstractMigrator<A> implements Migrator<A> {
 

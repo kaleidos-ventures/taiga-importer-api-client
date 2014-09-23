@@ -1,19 +1,11 @@
 package net.kaleidos.redmine.migrator
 
-import groovy.util.logging.Log4j
-import groovy.transform.InheritConstructors
-
-import net.kaleidos.redmine.RedmineTaigaRef
-
-import net.kaleidos.domain.Project as TaigaProject
-import net.kaleidos.domain.Wikipage as TaigaWikiPage
-import net.kaleidos.domain.Membership as TaigaMembership
-import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
-import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.WikiPage as RedmineWikiPage
 import com.taskadapter.redmineapi.bean.WikiPageDetail as RedmineWikiPageDetail
+import groovy.transform.InheritConstructors
+import groovy.util.logging.Log4j
+import net.kaleidos.domain.Wikipage as TaigaWikiPage
+import net.kaleidos.redmine.RedmineTaigaRef
 
 @Log4j
 @InheritConstructors
@@ -28,7 +20,7 @@ class WikiMigrator extends AbstractMigrator<TaigaWikiPage> {
             .collect(this.&save)
     }
 
-    List<RedmineWikiPage> findAllWikiPagesFromProject(String identifier)  {
+    List<RedmineWikiPage> findAllWikiPagesFromProject(String identifier) {
         return redmineClient.findAllWikiPageByProjectIdentifier(identifier)
     }
 
@@ -51,9 +43,9 @@ class WikiMigrator extends AbstractMigrator<TaigaWikiPage> {
 
         return redmineClient
             .findCompleteWikiPageByProjectIdentifierAndTitle(
-                redmineTaigaRef.redmineIdentifier,
-                redmineWikiPage.title
-            )
+            redmineTaigaRef.redmineIdentifier,
+            redmineWikiPage.title
+        )
     }
 
     @Override
@@ -67,8 +59,8 @@ class WikiMigrator extends AbstractMigrator<TaigaWikiPage> {
         log.debug("Looking for wiki home")
 
         TaigaWikiPage home =
-            alreadySavedWikiPages.find(wikiPageWithHomeName)  ?:
-            saveAlternativeWikiHome(alreadySavedWikiPages)
+            alreadySavedWikiPages.find(wikiPageWithHomeName) ?:
+                saveAlternativeWikiHome(alreadySavedWikiPages)
 
         return home
     }
@@ -80,7 +72,7 @@ class WikiMigrator extends AbstractMigrator<TaigaWikiPage> {
 
         TaigaWikiPage alternative =
             alreadySavedWikiPages.find(byWikiTitle) ?:
-            alreadySavedWikiPages.sort(byOldest).first()
+                alreadySavedWikiPages.sort(byOldest).first()
 
         log.debug("Wiki alternative home found: ['${alternative.slug}']")
 
@@ -108,5 +100,3 @@ class WikiMigrator extends AbstractMigrator<TaigaWikiPage> {
     }
 
 }
-
-

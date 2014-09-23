@@ -1,20 +1,16 @@
 package net.kaleidos.redmine.testdata
 
-import net.kaleidos.domain.Project as TaigaProject
-import net.kaleidos.domain.Membership as TaigaMembership
-import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
+import com.taskadapter.redmineapi.bean.IssuePriority as RedmineIssuePriority
+import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
+import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
+import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.Role as RedmineRole
 import com.taskadapter.redmineapi.bean.Tracker as RedmineTracker
-import com.taskadapter.redmineapi.bean.Project as RedmineProject
-import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
-import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
-import com.taskadapter.redmineapi.bean.IssuePriority as RedmineIssuePriority
+import com.taskadapter.redmineapi.bean.User as RedmineUser
 
 class ProjectDataProvider {
 
-    RedmineProject buildRedmineProject(String projectName = "prueba"){
+    RedmineProject buildRedmineProject(String projectName = "prueba") {
         return new RedmineProject(
             name: projectName,
             id: 123,
@@ -66,7 +62,7 @@ class ProjectDataProvider {
     }
 
     List<RedmineIssueStatus> buildRedmineStatusList() {
-        return (1..5).collect { new RedmineIssueStatus(id: it, name: "status-$it")}
+        return (1..5).collect { new RedmineIssueStatus(id: it, name: "status-$it") }
     }
 
     List<RedmineIssuePriority> buildRedmineIssuePriorityList() {

@@ -1,23 +1,16 @@
 package net.kaleidos.redmine
 
+import com.taskadapter.redmineapi.bean.Issue
+import com.taskadapter.redmineapi.bean.IssuePriority
+import com.taskadapter.redmineapi.bean.IssueStatus
+import com.taskadapter.redmineapi.bean.Membership
+import com.taskadapter.redmineapi.bean.Project
+import com.taskadapter.redmineapi.bean.Tracker
+import com.taskadapter.redmineapi.bean.User
+import com.taskadapter.redmineapi.bean.Version
+import com.taskadapter.redmineapi.bean.WikiPage
 import spock.lang.Specification
 
-import com.taskadapter.redmineapi.RedmineManager
-import com.taskadapter.redmineapi.bean.Issue
-import com.taskadapter.redmineapi.bean.IssueStatus
-import com.taskadapter.redmineapi.bean.IssuePriority
-import com.taskadapter.redmineapi.bean.Project
-import com.taskadapter.redmineapi.bean.Attachment
-import com.taskadapter.redmineapi.bean.Tracker
-import com.taskadapter.redmineapi.bean.Journal
-import com.taskadapter.redmineapi.bean.User
-import com.taskadapter.redmineapi.bean.Membership
-import com.taskadapter.redmineapi.bean.WikiPage
-import com.taskadapter.redmineapi.bean.WikiPageDetail
-
-/**
- *
- **/
 class RedmineClientImplSpec extends Specification {
 
     RedmineClient client
@@ -186,6 +179,14 @@ class RedmineClientImplSpec extends Specification {
             }
     }
 
+    void 'Getting all versions of a project'() {
+        given: 'a project'
+            Project project = client.findAllProject().first()
 
+        when: 'getting the versions'
+            List<Version> versions = client.findAllVersionByProjectId(project.id)
+
+        then: 'we get all the versions'
+            versions.size() > 0
+    }
 }
-
