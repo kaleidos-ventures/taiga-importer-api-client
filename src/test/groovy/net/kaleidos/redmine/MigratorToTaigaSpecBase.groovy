@@ -1,28 +1,9 @@
 package net.kaleidos.redmine
 
-import static groovyx.gpars.GParsPool.withPool
-
-import spock.lang.Specification
 import groovy.util.logging.Log4j
-import net.kaleidos.taiga.TaigaClient
 import net.kaleidos.domain.Project
-
-import com.taskadapter.redmineapi.RedmineManager
-import com.taskadapter.redmineapi.RedmineManagerFactory
-import com.taskadapter.redmineapi.internal.Transport
-import com.taskadapter.redmineapi.internal.URIConfigurator
-
-
-import org.apache.http.HttpStatus
-import org.apache.http.HttpVersion
-import org.apache.http.HttpResponse
-import org.apache.http.client.HttpClient
-import org.apache.http.entity.ContentType
-import org.apache.http.entity.StringEntity
-import org.apache.http.message.BasicHeader
-import org.apache.http.message.BasicHttpResponse
-import org.apache.http.client.methods.HttpUriRequest
-
+import net.kaleidos.taiga.TaigaClient
+import spock.lang.Specification
 
 @Log4j
 class MigratorToTaigaSpecBase extends Specification {
@@ -50,9 +31,8 @@ class MigratorToTaigaSpecBase extends Specification {
         taigaClient.with {
             projects.each { p ->
                 log.debug "Deleting project '${p.name}' with id ${p.id}"
-                deleteProject(new Project(id:p.id))
+                deleteProject(new Project(id: p.id))
             }
         }
     }
-
 }

@@ -1,16 +1,5 @@
 package net.kaleidos.redmine.testdata
 
-import groovy.transform.InheritConstructors
-
-import net.kaleidos.redmine.RedmineTaigaRef
-
-import net.kaleidos.domain.Project as TaigaProject
-import net.kaleidos.domain.Wikipage as TaigaWikiPage
-import net.kaleidos.domain.Membership as TaigaMembership
-import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
-import com.taskadapter.redmineapi.bean.Project as RedmineProject
 import com.taskadapter.redmineapi.bean.WikiPage as RedmineWikiPage
 import com.taskadapter.redmineapi.bean.WikiPageDetail as RedmineWikiPageDetail
 
@@ -36,5 +25,3 @@ class WikiDataProvider {
     }
 
 }
-
-

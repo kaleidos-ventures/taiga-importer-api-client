@@ -12,9 +12,6 @@ import com.taskadapter.redmineapi.bean.Version
 import com.taskadapter.redmineapi.bean.WikiPage
 import com.taskadapter.redmineapi.bean.WikiPageDetail
 
-/**
- *
- **/
 class RedmineClientImpl implements RedmineClient {
 
     private RedmineManager redmineManager
@@ -84,5 +81,4 @@ class RedmineClientImpl implements RedmineClient {
     List<Version> findAllVersionByProjectId(Integer projectId) {
         return redmineManager.getVersions(projectId)
     }
-
 }

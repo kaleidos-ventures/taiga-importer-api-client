@@ -1,17 +1,14 @@
 package net.kaleidos.redmine.migrator
 
-import groovy.transform.InheritConstructors
-
-import net.kaleidos.redmine.RedmineTaigaRef
-
-import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
-import net.kaleidos.domain.Project as TaigaProject
-import net.kaleidos.domain.Membership as TaigaMembership
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
-import com.taskadapter.redmineapi.bean.Project as RedmineProject
-import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
 import com.taskadapter.redmineapi.bean.IssueStatus as RedmineIssueStatus
+import com.taskadapter.redmineapi.bean.Membership as RedmineMembership
+import com.taskadapter.redmineapi.bean.Project as RedmineProject
+import com.taskadapter.redmineapi.bean.User as RedmineUser
+import groovy.transform.InheritConstructors
+import net.kaleidos.domain.IssueStatus as TaigaIssueStatus
+import net.kaleidos.domain.Membership as TaigaMembership
+import net.kaleidos.domain.Project as TaigaProject
+import net.kaleidos.redmine.RedmineTaigaRef
 
 @InheritConstructors
 class ProjectMigrator extends AbstractMigrator<TaigaProject> {
@@ -35,7 +32,7 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
             getMembershipsByProjectIdentifier(redmineProject.identifier)
 
         return new TaigaProject(
-            name: "${redmineProject.name} - [${redmineProject.identifier}]" ,
+            name: "${redmineProject.name} - [${redmineProject.identifier}]",
             description: redmineProject.with { description ?: name },
             roles: memberships.role.unique(),
             memberships: memberships,
@@ -48,8 +45,8 @@ class ProjectMigrator extends AbstractMigrator<TaigaProject> {
 
     List<TaigaMembership> getMembershipsByProjectIdentifier(String identifier) {
         return redmineClient
-                .findAllMembershipByProjectIdentifier(identifier)
-                .collect(this.&transformToTaigaMembership)
+            .findAllMembershipByProjectIdentifier(identifier)
+            .collect(this.&transformToTaigaMembership)
     }
 
     TaigaMembership transformToTaigaMembership(final RedmineMembership redmineMembership) {

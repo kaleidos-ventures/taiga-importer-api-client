@@ -1,23 +1,17 @@
 package net.kaleidos.redmine.migrator
 
-import groovy.transform.InheritConstructors
-
-import groovy.util.logging.Log4j
-import com.github.slugify.Slugify
-
-import net.kaleidos.redmine.RedmineTaigaRef
-
-import net.kaleidos.domain.User as TaigaUser
-import net.kaleidos.domain.Issue as TaigaIssue
-import net.kaleidos.domain.History as TaigaHistory
-import net.kaleidos.domain.Project as TaigaProject
-import net.kaleidos.domain.Membership as TaigaMembership
-import net.kaleidos.domain.Attachment as TaigaAttachment
-
-import com.taskadapter.redmineapi.bean.User as RedmineUser
+import com.taskadapter.redmineapi.bean.Attachment as RedmineAttachment
 import com.taskadapter.redmineapi.bean.Issue as RedmineIssue
 import com.taskadapter.redmineapi.bean.Journal as RedmineHistory
-import com.taskadapter.redmineapi.bean.Attachment as RedmineAttachment
+import com.taskadapter.redmineapi.bean.User as RedmineUser
+import groovy.transform.InheritConstructors
+import groovy.util.logging.Log4j
+import net.kaleidos.domain.Attachment as TaigaAttachment
+import net.kaleidos.domain.History as TaigaHistory
+import net.kaleidos.domain.Issue as TaigaIssue
+import net.kaleidos.domain.Project as TaigaProject
+import net.kaleidos.domain.User as TaigaUser
+import net.kaleidos.redmine.RedmineTaigaRef
 
 @Log4j
 @InheritConstructors
