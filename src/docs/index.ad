@@ -6,3 +6,5 @@ by Kaleidos
 :sourceDir: ../main/groovy
 
 include::01_intro.ad[]
+
+include::02_authentication.ad[]
