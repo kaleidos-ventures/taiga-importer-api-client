@@ -1,0 +1,38 @@
+== Project migration
+
+To import a new project in Taiga first you have to create a `Project` object.
+
+[source, groovy]
+.Project.groovy
+----
+include::{sourceDir}/net/kaleidos/domain/Project.groovy[tags=project,indent=0]
+----
+
+
+The only mandatory fields are `name` and `description`:
+
+[source, groovy]
+.Basic project creation
+----
+include::{testDir}/net/kaleidos/taiga/testdata/ProjectData.groovy[tags=createProject,indent=0]
+----
+
+
+After creating the `Project` object you only have to use the client to import the project in Taiga:
+
+[source, groovy]
+----
+project = taigaClient.createProject(project)
+----
+
+The `project` instance is populated with all the information returned from Taiga after the project creation.
+
+
+You can set all the fields you want:
+
+[source, groovy]
+----
+include::{testDir}/net/kaleidos/taiga/testdata/ProjectData.groovy[tags=createProject2,indent=0]
+----
+
+Please, check all https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/ProjectTaigaSpec.groovy[the tests^] to see other examples:
