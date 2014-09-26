@@ -1,0 +1,8 @@
+= Taiga migrator API client
+:linkcss:
+by Kaleidos
+:numbered:
+:testDir: ../test/groovy
+:sourceDir: ../main/groovy
+
+include::01_intro.ad[]
