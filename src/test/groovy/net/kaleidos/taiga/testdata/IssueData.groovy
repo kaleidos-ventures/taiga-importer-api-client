@@ -6,6 +6,7 @@ import net.kaleidos.domain.Project
 trait IssueData {
 
     Issue buildBasicIssue(Project project) {
+        // tag::createIssue[]
         new Issue()
             .setType('Bug')
             .setStatus('New')
@@ -14,5 +15,6 @@ trait IssueData {
             .setSubject('The subject')
             .setDescription('The description')
             .setProject(project)
+        // end::createIssue[]
     }
 }
