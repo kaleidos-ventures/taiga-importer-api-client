@@ -1,0 +1,28 @@
+== Wiki migration
+
+Once you have created a project, you can now import wiki pages related with this project:
+
+[source, groovy]
+.Wikipage.groovy
+----
+include::{sourceDir}/net/kaleidos/domain/Wikipage.groovy[tags=wikipage,indent=0]
+----
+
+
+[source, groovy]
+.Basic wikipage creation
+----
+include::{testDir}/net/kaleidos/taiga/testdata/WikipageData.groovy[tags=createWikipage,indent=0]
+----
+
+Now you can import the wiki page in Taiga:
+
+[source, groovy]
+----
+wikipage = taigaClient.createWiki(wikipage)
+----
+
+The `wikipage` instance is populated with all the information returned from Taiga after the wiki creation.
+
+You can also include attachments, set the owner and the creation date.
+Please, check https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/WikiTaigaSpec.groovy[the tests^] to see other examples.

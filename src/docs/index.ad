@@ -12,3 +12,5 @@ include::02_authentication.ad[]
 include::03_projects.ad[]
 
 include::04_issues.ad[]
+
+include::05_wiki.ad[]
