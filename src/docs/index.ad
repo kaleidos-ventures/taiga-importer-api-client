@@ -1,6 +1,6 @@
 = Taiga migrator API client
 :linkcss:
-by Kaleidos
+by Taiga
 :numbered:
 :testDir: ../test/groovy
 :sourceDir: ../main/groovy
