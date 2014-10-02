@@ -1,3 +1,11 @@
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'signing'
+
 repositories {
     jcenter()
     mavenCentral()
@@ -9,11 +17,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
     }
 }
-
-apply plugin: 'groovy'
-apply plugin: 'idea'
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.7'
@@ -21,6 +27,35 @@ dependencies {
     compile 'com.github.groovy-wslite:groovy-wslite:1.1.0'
 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+}
+
+publishing {
+    publications {
+        mavenCustom(MavenPublication) {
+            groupId 'net.kaleidos'
+            artifactId 'taiga-importer-api-client'
+            version '1.0.1'
+
+            from components.java
+        }
+    }
+}
+
+bintray {
+    user = bintrayUser
+    key = bintrayKey
+    publish = true
+    publications = ['mavenCustom']
+    pkg {
+        repo = 'maven'
+        version {
+            name = '1.0.1'
+        }
+        name = 'taiga-importer-api-client'
+        desc = 'Taiga Importer API client'
+        licenses = ['AGPL-V3']
+        labels = ['groovy', 'taigaio', 'rest', 'api']
+    }
 }
 
 task wrapper(type: Wrapper) {
