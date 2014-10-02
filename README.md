@@ -39,3 +39,7 @@ Or if you are using Maven:
 
 Please note that although the client library is developed with Groovy, you can use it from Java. Please check this [example project](https://github.com/taigaio/taiga-java-importer-example).
 )
+
+## Documentation
+
+A more detailed documentation of how to use the API client is available [here](http://taigaio.github.io/taiga-importer-api-client/)
