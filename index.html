@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.0">
+<meta name="author" content="by Kaleidos">
+<title>Taiga migrator API client</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic|Noto+Serif:400,400italic,700,700italic|Droid+Sans+Mono:400">
+<link rel="stylesheet" href="./asciidoctor.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+<script>document.addEventListener('DOMContentLoaded', prettyPrint)</script>
+</head>
+<body class="article toc2 toc-left">
+<div id="header">
+<h1>Taiga migrator API client</h1>
+<div class="details">
+<span id="author" class="author">by Kaleidos</span><br>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_intro">1. Intro</a></li>
+<li><a href="#_authentication">2. Authentication</a></li>
+<li><a href="#_project_migration">3. Project migration</a></li>
+<li><a href="#_issue_migration">4. Issue migration</a></li>
+<li><a href="#_wiki_migration">5. Wiki migration</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_intro">1. Intro</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This is the documentation for using the <a href="https://github.com/taigaio/taiga-importer-api-client">Taiga Importer API Client</a> to create bulk data in Taiga to migrate your projects from external tools like Redmine.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_authentication">2. Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The first step to use the Taiga client is to create an instace to connect to the server and authenticate a user in Taiga.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">import net.kaleidos.taiga.TaigaClient
+
+TaigaClient client = new TaigaClient('http://taiga-server-url.com')
+client.authenticate('username' 'password')</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After the sucessful authentication you can use the client to connect to the Taiga Import API.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_project_migration">3. Project migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To import a new project in Taiga first you have to create a <code>Project</code> object.</p>
+</div>
+<div class="listingblock">
+<div class="title">Project.groovy</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">class Project {
+    String name
+    String description
+    Date createdDate
+
+    Long id
+
+    List&lt;IssueStatus&gt; issueStatuses
+    List&lt;String&gt; issueTypes
+    List&lt;String&gt; issuePriorities
+    List&lt;String&gt; issueSeverities
+
+    List&lt;String&gt; roles
+    List&lt;Membership&gt; memberships
+
+    List&lt;UserStoryStatus&gt; userStoryStatuses
+    List&lt;EstimationPoint&gt; points
+
+    List&lt;TaskStatus&gt; taskStatuses
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The only mandatory fields are <code>name</code> and <code>description</code>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Basic project creation</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">new Project()
+    .setName(name)
+    .setDescription(description)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>After creating the <code>Project</code> object you only have to use the client to import the project in Taiga:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">project = taigaClient.createProject(project)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>project</code> instance is populated with all the information returned from Taiga after the project creation.</p>
+</div>
+<div class="paragraph">
+<p>You can set all the fields you want:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">this.buildProject("name ${new Date().time}", "description")
+    .setIssueTypes(['Bug', 'Question', 'Enhancement'])
+    .setIssueStatuses(buildIssueStatuses())
+    .setIssuePriorities(['Low', 'Normal', 'High'])
+    .setIssueSeverities(['Minor', 'Normal', 'Important', 'Critical'])
+    .setRoles(['UX', 'Front', 'Back'])
+    .setMemberships([new Membership().setEmail('admin@admin.com').setRole('Back')])
+    .setPoints(buildEstimationPoints())
+    .setUserStoryStatuses(buildUserStoryStatuses())
+    .setTaskStatuses(buildTaskStatuses())</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please, check all <a href="https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/ProjectTaigaSpec.groovy" target="_blank">the tests</a> to see other examples:</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_issue_migration">4. Issue migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once you have created a project, you can now import issues related with this project:</p>
+</div>
+<div class="listingblock">
+<div class="title">Issue.groovy</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">class Issue {
+    Long ref
+
+    String type
+    String status
+    String priority
+    String severity
+
+    String subject
+    String description
+    Project project
+
+    String owner
+    Date createdDate
+
+    List&lt;Attachment&gt; attachments
+
+    List&lt;History&gt; history
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Basic issue creation</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">new Issue()
+    .setType('Bug')
+    .setStatus('New')
+    .setPriority('Normal')
+    .setSeverity('Normal')
+    .setSubject('The subject')
+    .setDescription('The description')
+    .setProject(project)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can import the issue in Taiga:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">issue = taigaClient.createIssue(issue)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>issue</code> instance is populated with all the information returned from Taiga after the issue creation.</p>
+</div>
+<div class="paragraph">
+<p>You can also include attachments, set the owner and the creation date, the history of changes.
+Please, check <a href="https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/IssueTaigaSpec.groovy" target="_blank">the tests</a> to see other examples.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_wiki_migration">5. Wiki migration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Once you have created a project, you can now import wiki pages related with this project:</p>
+</div>
+<div class="listingblock">
+<div class="title">Wikipage.groovy</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">class Wikipage {
+    Project project
+
+    String slug
+    String content
+    String owner
+    Date createdDate
+
+    List&lt;Attachment&gt; attachments
+}</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Basic wikipage creation</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">new Wikipage()
+    .setProject(project)
+    .setSlug('home')
+    .setContent('Lorem ipsum...')</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can import the wiki page in Taiga:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">wikipage = taigaClient.createWiki(wikipage)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>wikipage</code> instance is populated with all the information returned from Taiga after the wiki creation.</p>
+</div>
+<div class="paragraph">
+<p>You can also include attachments, set the owner and the creation date.
+Please, check <a href="https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/WikiTaigaSpec.groovy" target="_blank">the tests</a> to see other examples.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2014-10-02 16:57:40 CEST
+</div>
+</div>
+</body>
+</html>
