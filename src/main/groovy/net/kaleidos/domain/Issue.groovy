@@ -6,6 +6,7 @@ import groovy.transform.builder.SimpleStrategy
 
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
+// tag::issue[]
 class Issue {
     Long ref
 
@@ -25,3 +26,4 @@ class Issue {
 
     List<History> history
 }
+// end::issue[]

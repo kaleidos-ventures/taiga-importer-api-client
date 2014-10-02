@@ -6,6 +6,7 @@ import groovy.transform.builder.SimpleStrategy
 
 @ToString(includeNames = true)
 @Builder(builderStrategy = SimpleStrategy)
+// tag::wikipage[]
 class Wikipage {
     Project project
 
@@ -16,3 +17,4 @@ class Wikipage {
 
     List<Attachment> attachments
 }
+// end::wikipage[]

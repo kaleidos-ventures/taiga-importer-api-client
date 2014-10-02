@@ -6,6 +6,7 @@ import groovy.transform.builder.SimpleStrategy
 
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
+// tag::project[]
 class Project {
     String name
     String description
@@ -26,3 +27,4 @@ class Project {
 
     List<TaskStatus> taskStatuses
 }
+// end::project[]

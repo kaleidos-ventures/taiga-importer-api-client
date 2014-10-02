@@ -31,9 +31,11 @@ trait ProjectData {
     ]
 
     Project buildProject(String name, String description) {
+        // tag::createProject[]
         new Project()
             .setName(name)
             .setDescription(description)
+        // end::createProject[]
     }
 
     Project buildBasicProject() {
@@ -41,6 +43,7 @@ trait ProjectData {
     }
 
     Project buildProject() {
+        // tag::createProject2[]
         this.buildProject("name ${new Date().time}", "description")
             .setIssueTypes(['Bug', 'Question', 'Enhancement'])
             .setIssueStatuses(buildIssueStatuses())
@@ -51,6 +54,7 @@ trait ProjectData {
             .setPoints(buildEstimationPoints())
             .setUserStoryStatuses(buildUserStoryStatuses())
             .setTaskStatuses(buildTaskStatuses())
+        // end::createProject2[]
     }
 
     List<UserStoryStatus> buildUserStoryStatuses() {

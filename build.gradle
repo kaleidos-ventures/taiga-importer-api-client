@@ -6,6 +6,8 @@ apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'signing'
 
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+
 repositories {
     jcenter()
     mavenCentral()
@@ -18,6 +20,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5'
+        classpath "org.asciidoctor:asciidoctor-gradle-plugin:1.5.0"
     }
 }
 
@@ -56,6 +59,18 @@ bintray {
         licenses = ['AGPL-V3']
         labels = ['groovy', 'taigaio', 'rest', 'api']
     }
+}
+
+asciidoctor {
+    sourceDir = 'src/docs' as File
+    options = [
+        attributes: [
+            'icons': 'font',
+            'source-highlighter': 'prettify',
+            'toc': 'left',
+            'toclevels': 4
+        ]
+    ]
 }
 
 task wrapper(type: Wrapper) {

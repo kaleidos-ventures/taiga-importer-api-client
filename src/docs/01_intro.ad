@@ -1,0 +1,4 @@
+== Intro
+
+This is the documentation for using the https://github.com/taigaio/taiga-importer-api-client[Taiga Importer API Client] to create bulk data in Taiga to migrate your projects from external tools like Redmine.
+

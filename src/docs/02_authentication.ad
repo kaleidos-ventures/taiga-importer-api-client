@@ -1,0 +1,14 @@
+== Authentication
+
+The first step to use the Taiga client is to create an instace to connect to the server and authenticate a user in Taiga.
+
+
+[source, groovy]
+----
+import net.kaleidos.taiga.TaigaClient
+
+TaigaClient client = new TaigaClient('http://taiga-server-url.com')
+client.authenticate('username' 'password')
+----
+
+After the sucessful authentication you can use the client to connect to the Taiga Import API.
