@@ -42,3 +42,7 @@ Please note that although the client library is developed with Groovy, you can u
 ## Documentation
 
 A more detailed documentation of how to use the API client is available [here](http://taigaio.github.io/taiga-importer-api-client/)
+
+## License
+
+The project is distributed under the GNU Public License version 3. See [LICENSE](https://github.com/taigaio/taiga-importer-api-client/blob/master/LICENSE) for more info.
