@@ -1,0 +1,5 @@
+== Release notes
+
+* https://github.com/taigaio/taiga-importer-api-client/releases/tag/1.1.0[1.1.0^] - 06/Oct/2014 - Create issues, user stories and tags with tags
+* https://github.com/taigaio/taiga-importer-api-client/releases/tag/1.0.1[1.0.1^] - 02/Oct/2014 - Remove GPars dependency
+* https://github.com/taigaio/taiga-importer-api-client/releases/tag/1.0.0[1.0.0^] - 02/Oct/2014 - First public release
