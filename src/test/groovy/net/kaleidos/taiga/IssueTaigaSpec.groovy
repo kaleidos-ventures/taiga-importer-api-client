@@ -136,4 +136,20 @@ class IssueTaigaSpec extends TaigaSpecBase {
             createdAt = Date.parse("dd/MM/yyyy HH:mm", '01/01/2010 13:45')
             comment = 'The comment'
     }
+
+    void 'create an issue with tags'() {
+        given: 'a new issue with tags'
+            def issue = buildBasicIssue(project)
+                .setTags(tags)
+
+        when: 'creating a new issue'
+            issue = taigaClient.createIssue(issue)
+
+        then: 'the issue is created in Taiga with the tags'
+            issue != null
+            issue.tags == tags
+
+        where:
+            tags = ['foo', 'bar']
+    }
 }
