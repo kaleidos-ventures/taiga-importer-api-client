@@ -148,4 +148,20 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
             userStory != null
             userStory.rolePoints.size() == 3
     }
+
+    void 'create a user story with tags'() {
+        given: 'a new user story'
+            def userStory = buildBasicUserStory(project)
+                .setTags(tags)
+
+        when: 'creating the user story'
+            userStory = taigaClient.createUserStory(userStory)
+
+        then: 'the issue is created in Taiga with the tags'
+            userStory != null
+            userStory.tags == tags
+
+        where:
+            tags = ['foo', 'bar']
+    }
 }
