@@ -24,4 +24,6 @@ class Task {
     List<Attachment> attachments
 
     List<History> history
+
+    List<String> tags
 }

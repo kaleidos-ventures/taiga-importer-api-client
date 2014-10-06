@@ -164,4 +164,20 @@ class TaskTaigaSpec extends TaigaSpecBase {
             createdAt = Date.parse("dd/MM/yyyy HH:mm", '01/01/2010 13:45')
             comment = 'The comment'
     }
+
+    void 'create a task with tags'() {
+        given: 'a new task'
+            def task = buildBasicTask(project)
+                .setTags(tags)
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then: 'the task is created in Taiga with the tags'
+            task != null
+            task.tags == tags
+
+        where:
+            tags = ['foo', 'bar']
+    }
 }

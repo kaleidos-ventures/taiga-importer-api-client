@@ -19,6 +19,7 @@ class TaskMapper implements Mapper<Task>, DateConversions {
             milestone   : task.milestone?.name,
             attachments : task.attachments.collect { Mappers.map(it) },
             history     : task.history.collect { Mappers.map(it) },
+            tags        : task.tags,
         ]
     }
 }
