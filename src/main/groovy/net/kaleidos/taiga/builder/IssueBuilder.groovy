@@ -1,5 +1,6 @@
 package net.kaleidos.taiga.builder
 
+import groovy.json.JsonSlurper
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
@@ -22,6 +23,7 @@ class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions {
             createdDate = parse(json.created_date)
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
             history = json.history.collect { new HistoryBuilder().build(it, null) }
+            tags = new JsonSlurper().parseText(json.tags)
         }
 
         issue

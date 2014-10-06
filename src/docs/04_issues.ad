@@ -24,5 +24,5 @@ issue = taigaClient.createIssue(issue)
 
 The `issue` instance is populated with all the information returned from Taiga after the issue creation.
 
-You can also include attachments, set the owner and the creation date, the history of changes.
+You can also include attachments, set the owner and the creation date, the history of changes and set the tags.
 Please, check https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/IssueTaigaSpec.groovy[the tests^] to see other examples.

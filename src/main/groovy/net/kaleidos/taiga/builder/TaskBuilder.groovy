@@ -1,5 +1,6 @@
 package net.kaleidos.taiga.builder
 
+import groovy.json.JsonSlurper
 import net.kaleidos.domain.Milestone
 import net.kaleidos.domain.Project
 import net.kaleidos.domain.Task
@@ -24,6 +25,7 @@ class TaskBuilder implements TaigaEntityBuilder<Task>, DateConversions, SafeJson
             milestone = new Milestone(name: json.milestone)
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
             history = json.history.collect { new HistoryBuilder().build(it, null) }
+            tags = new JsonSlurper().parseText(json.tags)
         }
 
         task

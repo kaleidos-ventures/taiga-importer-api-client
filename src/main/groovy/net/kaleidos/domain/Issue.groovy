@@ -25,5 +25,7 @@ class Issue {
     List<Attachment> attachments
 
     List<History> history
+
+    List<String> tags
 }
 // end::issue[]
