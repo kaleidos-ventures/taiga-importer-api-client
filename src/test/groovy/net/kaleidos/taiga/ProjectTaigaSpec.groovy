@@ -28,6 +28,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             project != null
             project.id != null
             project.name == name
+            project.slug != null
             project.description == description
             project.issueStatuses.size() == 0
             project.issueTypes.size() == 0

@@ -11,6 +11,7 @@ class ProjectBuilder implements TaigaEntityBuilder<Project>, DateConversions {
         project.with {
             id = json.id
             name = json.name
+            slug = json.slug
             createdDate = parse(json.created_date)
             description = json.description
             issueStatuses = json.issue_statuses.collect { new IssueStatusBuilder().build(it, null) }
