@@ -28,6 +28,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             project != null
             project.id != null
             project.name == name
+            project.slug != null
             project.description == description
             project.issueStatuses.size() == 0
             project.issueTypes.size() == 0
@@ -200,5 +201,19 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
         where:
             taskStatuses = buildTaskStatuses()
+    }
+
+    void 'get the list of projects'() {
+        given: 'an existing project'
+            def project = buildBasicProject()
+            taigaClient.createProject(project)
+
+        when: 'getting the list of projects'
+            def projects = taigaClient.getProjects()
+
+        then:
+            projects != null
+            projects.size() > 0
+            projects.first().hasProperty('id')
     }
 }

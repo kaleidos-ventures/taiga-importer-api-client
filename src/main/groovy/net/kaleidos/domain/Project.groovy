@@ -11,6 +11,7 @@ class Project {
     String name
     String description
     Date createdDate
+    String slug
 
     Long id
 
