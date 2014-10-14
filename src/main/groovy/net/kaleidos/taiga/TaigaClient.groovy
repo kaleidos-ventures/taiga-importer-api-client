@@ -49,8 +49,10 @@ class TaigaClient extends BaseClient {
     }
 
     // PROJECTS
-    List<Map> getProjects() {
-        this.doGet("${URLS.projects}?page_size=500")
+    List<Project> getProjects() {
+        def json = this.doGet("${URLS.projects}?page_size=500")
+
+        json.collect { new ProjectBuilder().build(it, null) }
     }
 
     Project getProjectById(Long projectId) {
