@@ -27,5 +27,7 @@ class Issue {
     List<History> history
 
     List<String> tags
+
+    String assignedTo
 }
 // end::issue[]
