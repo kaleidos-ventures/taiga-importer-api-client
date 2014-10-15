@@ -21,6 +21,7 @@ class IssueMapper implements Mapper<Issue>, DateConversions {
             attachments : issue.attachments.collect { Mappers.map(it) },
             history     : issue.history.collect { Mappers.map(it) },
             tags        : issue.tags,
+            assigned_to : issue.assignedTo,
         ]
     }
 }

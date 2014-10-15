@@ -24,6 +24,7 @@ class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions {
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
             history = json.history.collect { new HistoryBuilder().build(it, null) }
             tags = new JsonSlurper().parseText(json.tags)
+            assignedTo = json.assigned_to
         }
 
         issue

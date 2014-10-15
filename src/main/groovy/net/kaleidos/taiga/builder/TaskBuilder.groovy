@@ -26,6 +26,7 @@ class TaskBuilder implements TaigaEntityBuilder<Task>, DateConversions, SafeJson
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
             history = json.history.collect { new HistoryBuilder().build(it, null) }
             tags = new JsonSlurper().parseText(json.tags)
+            assignedTo = json.assigned_to
         }
 
         task

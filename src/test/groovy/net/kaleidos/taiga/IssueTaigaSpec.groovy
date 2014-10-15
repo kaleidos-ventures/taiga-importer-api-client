@@ -152,4 +152,19 @@ class IssueTaigaSpec extends TaigaSpecBase {
         where:
             tags = ['foo', 'bar']
     }
+
+    void 'create an issue with assigned user'() {
+        given: 'a new issue with assigned user'
+            def issue = buildBasicIssue(project)
+                .setAssignedTo(assignedUser)
+
+        when: 'creating the issue'
+            issue = taigaClient.createIssue(issue)
+
+        then: 'the issue is assigned to the user'
+            issue.assignedTo == assignedUser
+
+        where:
+            assignedUser = 'admin@admin.com'
+    }
 }

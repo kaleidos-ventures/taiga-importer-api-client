@@ -164,4 +164,19 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
         where:
             tags = ['foo', 'bar']
     }
+
+    void 'create a user story with assigned user'() {
+        given: 'a new user story with assigned user'
+            def userStory = buildBasicUserStory(project)
+                .setAssignedTo(assignedUser)
+
+        when: 'creating the user story'
+            userStory = taigaClient.createUserStory(userStory)
+
+        then: 'the user story is assigned to the user'
+            userStory.assignedTo == assignedUser
+
+        where:
+            assignedUser = 'admin@admin.com'
+    }
 }

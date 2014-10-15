@@ -180,4 +180,19 @@ class TaskTaigaSpec extends TaigaSpecBase {
         where:
             tags = ['foo', 'bar']
     }
+
+    void 'create a task with assigned user'() {
+        given: 'a task with assigned user'
+            def task = buildBasicTask(project)
+                .setAssignedTo(assignedUser)
+
+        when: 'creating the task'
+            task = taigaClient.createTask(task)
+
+        then: 'the task is assigned to the user'
+            task.assignedTo == assignedUser
+
+        where:
+            assignedUser = 'admin@admin.com'
+    }
 }
