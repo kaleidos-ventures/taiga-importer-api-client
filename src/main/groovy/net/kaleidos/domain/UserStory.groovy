@@ -26,6 +26,8 @@ class UserStory {
 
     List<String> tags
 
+    String assignedTo
+
     @Builder(builderStrategy = SimpleStrategy)
     class RolePoint {
         String role

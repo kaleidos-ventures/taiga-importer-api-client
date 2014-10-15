@@ -19,6 +19,7 @@ class UserStoryMapper implements Mapper<UserStory>, DateConversions {
             history     : userStory.history.collect { Mappers.map(it) },
             role_points : userStory.rolePoints.collect { Mappers.map(it) },
             tags        : userStory.tags,
+            assigned_to : userStory.assignedTo,
         ]
     }
 }

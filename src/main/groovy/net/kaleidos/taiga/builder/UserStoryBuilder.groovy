@@ -22,6 +22,7 @@ class UserStoryBuilder implements TaigaEntityBuilder<UserStory>, DateConversions
             history = json.history.collect { new HistoryBuilder().build(it, null) }
             rolePoints = json.role_points.collect { new RolePointBuilder().build(it, null) }
             tags = new JsonSlurper().parseText(json.tags)
+            assignedTo = json.assigned_to
         }
 
         userStory
