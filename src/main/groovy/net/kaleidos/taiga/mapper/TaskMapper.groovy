@@ -20,6 +20,7 @@ class TaskMapper implements Mapper<Task>, DateConversions {
             attachments : task.attachments.collect { Mappers.map(it) },
             history     : task.history.collect { Mappers.map(it) },
             tags        : task.tags,
+            assigned_to : task.assignedTo,
         ]
     }
 }

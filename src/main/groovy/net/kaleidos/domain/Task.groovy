@@ -26,4 +26,6 @@ class Task {
     List<History> history
 
     List<String> tags
+
+    String assignedTo
 }
