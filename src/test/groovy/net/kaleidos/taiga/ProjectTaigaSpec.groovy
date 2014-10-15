@@ -205,8 +205,7 @@ class ProjectTaigaSpec extends TaigaSpecBase {
 
     void 'get the list of projects'() {
         given: 'an existing project'
-            def project = buildBasicProject()
-            taigaClient.createProject(project)
+            def project = taigaClient.createProject(buildBasicProject())
 
         when: 'getting the list of projects'
             def projects = taigaClient.getProjects()
@@ -215,5 +214,8 @@ class ProjectTaigaSpec extends TaigaSpecBase {
             projects != null
             projects.size() > 0
             projects.first().hasProperty('id')
+
+        cleanup:
+            taigaClient.deleteProject(project)
     }
 }
