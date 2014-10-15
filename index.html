@@ -165,6 +165,8 @@ client.authenticate('username' 'password')</code></pre>
     List&lt;History&gt; history
 
     List&lt;String&gt; tags
+
+    String assignedTo
 }</code></pre>
 </div>
 </div>
@@ -193,7 +195,7 @@ client.authenticate('username' 'password')</code></pre>
 <p>The <code>issue</code> instance is populated with all the information returned from Taiga after the issue creation.</p>
 </div>
 <div class="paragraph">
-<p>You can also include attachments, set the owner and the creation date, the history of changes and set the tags.
+<p>You can also include attachments, set the owner and the creation date, the assigned to user, the history of changes and set the tags.
 Please, check <a href="https://github.com/taigaio/taiga-importer-api-client/blob/master/src/test/groovy/net/kaleidos/taiga/IssueTaigaSpec.groovy" target="_blank">the tests</a> to see other examples.</p>
 </div>
 </div>
@@ -251,6 +253,9 @@ Please, check <a href="https://github.com/taigaio/taiga-importer-api-client/blob
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/taigaio/taiga-importer-api-client/releases/tag/1.3.0" target="_blank">1.3.0</a> - 15/Oct/2014 - Fix #1: Add assignedTo user to issues, tasks and user stories</p>
+</li>
+<li>
 <p><a href="https://github.com/taigaio/taiga-importer-api-client/releases/tag/1.2.0" target="_blank">1.2.0</a> - 14/Oct/2014 - Add slug to project and return list of projects instead of json</p>
 </li>
 <li>
@@ -269,7 +274,7 @@ Please, check <a href="https://github.com/taigaio/taiga-importer-api-client/blob
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-10-14 10:56:46 CEST
+Last updated 2014-10-15 16:18:56 CEST
 </div>
 </div>
 </body>
