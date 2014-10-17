@@ -42,6 +42,25 @@ class WikiTaigaSpec extends TaigaSpecBase {
             owner = 'admin@admin.com'
     }
 
+    void 'create a wiki page and let Taiga convert the name to slug'() {
+        given: 'a wiki page to save'
+            def wikipage = new Wikipage()
+                .setProject(project)
+                .setSlug(slug)
+                .setContent(content)
+
+        when: 'saving a wiki page'
+            wikipage = taigaClient.createWiki(wikipage)
+
+        then: 'the wiki page is created'
+            wikipage != null
+            wikipage.slug == 'this-is-the-name-of-the-page'
+
+        where:
+            slug = 'This is the name of the page'
+            content = 'Lorem ipsum...'
+    }
+
     void 'create a wiki page with attachments'() {
         given: 'two files to attach to a wiki page'
             def attachment0 = buildBasicAttachment(filename0, owner)
