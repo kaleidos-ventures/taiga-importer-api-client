@@ -17,6 +17,7 @@ class Task {
 
     String owner
     Date createdDate
+    Date finishedDate
 
     UserStory userStory
     Milestone milestone

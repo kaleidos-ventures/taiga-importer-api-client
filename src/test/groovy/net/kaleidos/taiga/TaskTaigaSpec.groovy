@@ -77,6 +77,7 @@ class TaskTaigaSpec extends TaigaSpecBase {
         given: 'a new task'
             def task = buildBasicTask(project)
                 .setCreatedDate(createdDate)
+                .setFinishedDate(finishedDate)
                 .setOwner(owner)
 
         when: 'creating the task'
@@ -86,9 +87,11 @@ class TaskTaigaSpec extends TaigaSpecBase {
             task != null
             task.owner == owner
             task.createdDate == createdDate
+            task.finishedDate == finishedDate
 
         where:
             createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
+            finishedDate = Date.parse("dd/MM/yyyy", '07/01/2010')
             owner = 'admin@admin.com'
     }
 
