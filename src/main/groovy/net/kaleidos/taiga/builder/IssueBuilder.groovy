@@ -4,8 +4,9 @@ import groovy.json.JsonSlurper
 import net.kaleidos.domain.Issue
 import net.kaleidos.domain.Project
 import net.kaleidos.taiga.common.DateConversions
+import net.kaleidos.taiga.common.SafeJson
 
-class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions {
+class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions, SafeJson {
 
     Issue build(Map json, Project project) {
         def issue = new Issue()
@@ -21,6 +22,7 @@ class IssueBuilder implements TaigaEntityBuilder<Issue>, DateConversions {
             delegate.project = project
             owner = json.owner
             createdDate = parse(json.created_date)
+            finishedDate = parse(nullSafe(json.finished_date))
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }
             history = json.history.collect { new HistoryBuilder().build(it, null) }
             tags = new JsonSlurper().parseText(json.tags)

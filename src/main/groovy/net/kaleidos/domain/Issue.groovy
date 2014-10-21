@@ -21,6 +21,7 @@ class Issue {
 
     String owner
     Date createdDate
+    Date finishedDate
 
     List<Attachment> attachments
 
