@@ -17,6 +17,7 @@ class UserStory {
 
     String owner
     Date createdDate
+    Date finishedDate
 
     List<Attachment> attachments
 
