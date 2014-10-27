@@ -43,7 +43,7 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
         given: 'a new user story'
             def userStory = buildBasicUserStory(project)
                 .setCreatedDate(createdDate)
-                .setFinishedDate(finishedDate)
+                .setFinishDate(finishDate)
                 .setOwner(owner)
 
         when: 'creating the user story'
@@ -53,11 +53,11 @@ class UserStoryTaigaSpec extends TaigaSpecBase {
             userStory != null
             userStory.owner == owner
             userStory.createdDate == createdDate
-            userStory.finishedDate == finishedDate
+            userStory.finishDate == finishDate
 
         where:
             createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
-            finishedDate = Date.parse("dd/MM/yyyy", '07/01/2010')
+            finishDate = Date.parse("dd/MM/yyyy", '07/01/2010')
             owner = 'admin@admin.com'
     }
 
