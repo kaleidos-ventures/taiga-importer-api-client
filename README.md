@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile 'net.kaleidos:taiga-importer-api-client:1.3.0'
+    compile 'net.kaleidos:taiga-importer-api-client:1.4.0'
 }
 ```
 
@@ -32,7 +32,7 @@ Or if you are using Maven:
 <dependency>
     <groupId>net.kaleidos</groupId>
     <artifactId>taiga-importer-api-client</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <type>pom</type>
 </dependency>
 ```
