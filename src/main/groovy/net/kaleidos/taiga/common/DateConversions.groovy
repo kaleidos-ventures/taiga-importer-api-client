@@ -6,11 +6,11 @@ trait DateConversions {
     final String TAIGA_DATE_FORMAT = "yyyy-MM-dd"
 
     Date parse(String stringDate) {
-        Date.parse(TAIGA_FULLDATE_FORMAT, stringDate)
+        stringDate ? Date.parse(TAIGA_FULLDATE_FORMAT, stringDate) : null
     }
 
     Date parse(String stringDate, String format) {
-        Date.parse(format, stringDate)
+        stringDate ? Date.parse(format, stringDate) : null
     }
 
     String format(Date date) {

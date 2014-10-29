@@ -21,6 +21,7 @@ class TaskBuilder implements TaigaEntityBuilder<Task>, DateConversions, SafeJson
             delegate.project = project
             owner = json.owner
             createdDate = parse(json.created_date)
+            finishedDate = parse(nullSafe(json.finished_date))
             userStory = new UserStory(ref: nullSafe(json.user_story))
             milestone = new Milestone(name: json.milestone)
             attachments = json.attachments.collect { new AttachmentBuilder().build(it, null) }

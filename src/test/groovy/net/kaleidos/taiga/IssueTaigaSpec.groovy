@@ -97,6 +97,7 @@ class IssueTaigaSpec extends TaigaSpecBase {
         given: 'a new issue with optional fields'
             def issue = buildBasicIssue(project)
                 .setCreatedDate(createdDate)
+                .setFinishedDate(finishedDate)
                 .setOwner(owner)
 
         when: 'creating a new issue'
@@ -106,9 +107,11 @@ class IssueTaigaSpec extends TaigaSpecBase {
             issue != null
             issue.owner == owner
             issue.createdDate == createdDate
+            issue.finishedDate == finishedDate
 
         where:
             createdDate = Date.parse("dd/MM/yyyy", '01/01/2010')
+            finishedDate = Date.parse("dd/MM/yyyy", '07/01/2010')
             owner = 'admin@admin.com'
     }
 
