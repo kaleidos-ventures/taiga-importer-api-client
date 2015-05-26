@@ -79,4 +79,12 @@ class BaseClient {
 
         template.toString()
     }
+
+    protected String mergeAttributes(String url, Map attributes){
+        if (attributes!=null && attributes.size()>0){
+            url+="?"
+            attributes.each{name,value -> url+="${name}=${value}&" }
+        }
+        return url
+    }
 }
