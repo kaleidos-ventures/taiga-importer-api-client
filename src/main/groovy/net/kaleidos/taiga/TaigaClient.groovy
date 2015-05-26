@@ -28,6 +28,7 @@ class TaigaClient extends BaseClient {
         userStory: '/api/v1/importer/${projectId}/us',
         milestone: '/api/v1/importer/${projectId}/milestone',
         milestones:'/api/v1/milestones',
+        userStories:'/api/v1/userstories',
         task     : '/api/v1/importer/${projectId}/task',
     ]
 
@@ -115,6 +116,12 @@ class TaigaClient extends BaseClient {
         new UserStoryBuilder().build(json, userStory.project)
     }
 
+    List<UserStory> getUserStories(Map<String,String> parameters){
+        def url = this.merge(URLS_IMPORTER.userStories, parameters)
+        def json = this.doGet(url)
+        json.collect { new UserStoryBuilder().build(it, null) }
+    }
+
     // MILESTONES
     Milestone createMilestone(Milestone milestone) {
         def url = this.merge(URLS_IMPORTER.milestone, [projectId: milestone.project.id])
@@ -126,10 +133,8 @@ class TaigaClient extends BaseClient {
     }
 
     List<Milestone> getMilestones(Long projectId){
-        def attributes = projectId!=null?"?project=${projectId}":""
-        println attributes
-        println "${URLS_IMPORTER.milestones}${attributes}"
-        def json = this.doGet("${URLS_IMPORTER.milestones}${attributes}")
+        def url = this.merge(URLS_IMPORTER.milestones, [projectId: projectId])
+        def json = this.doGet(url)
         json.collect { new MilestoneBuilder().build(it, null) }
     }
 
