@@ -27,6 +27,7 @@ class TaigaClient extends BaseClient {
         wikiLink : '/api/v1/importer/${projectId}/wiki_link',
         userStory: '/api/v1/importer/${projectId}/us',
         milestone: '/api/v1/importer/${projectId}/milestone',
+        milestones:'/api/v1/milestones',
         task     : '/api/v1/importer/${projectId}/task',
     ]
 
@@ -126,7 +127,9 @@ class TaigaClient extends BaseClient {
 
     List<Milestone> getMilestones(Long projectId){
         def attributes = projectId!=null?"?project=${projectId}":""
-        def json = this.doGet("${URLS.milestone}${attributes}")
+        println attributes
+        println "${URLS_IMPORTER.milestones}${attributes}"
+        def json = this.doGet("${URLS_IMPORTER.milestones}${attributes}")
         json.collect { new MilestoneBuilder().build(it, null) }
     }
 
