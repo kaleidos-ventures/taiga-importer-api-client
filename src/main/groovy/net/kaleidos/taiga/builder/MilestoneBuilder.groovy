@@ -10,6 +10,7 @@ class MilestoneBuilder implements TaigaEntityBuilder<Milestone>, DateConversions
         def milestone = new Milestone()
 
         milestone.with {
+            id = json.id
             name = json.name
             isClosed = json.closed
             delegate.project = project

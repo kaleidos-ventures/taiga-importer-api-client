@@ -7,6 +7,8 @@ import groovy.transform.builder.SimpleStrategy
 @ToString
 @Builder(builderStrategy = SimpleStrategy)
 class Milestone {
+    Long id
+
     String name
     Boolean isClosed
     Date startDate
