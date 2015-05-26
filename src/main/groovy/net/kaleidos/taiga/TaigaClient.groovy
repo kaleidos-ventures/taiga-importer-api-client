@@ -124,6 +124,12 @@ class TaigaClient extends BaseClient {
         new MilestoneBuilder().build(json, milestone.project)
     }
 
+    List<Milestone> getMilestones(Long projectId){
+        def attributes = projectId!=null?"?project=${projectId}":""
+        def json = this.doGet("${URLS.milestone}${attributes}")
+        json.collect { new MilestoneBuilder().build(it, null) }
+    }
+
     // TASKS
     Task createTask(Task task) {
         def url = this.merge(URLS_IMPORTER.task, [projectId: task.project.id])

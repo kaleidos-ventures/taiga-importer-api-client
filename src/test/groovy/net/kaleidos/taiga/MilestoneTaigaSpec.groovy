@@ -44,4 +44,29 @@ class MilestoneTaigaSpec extends TaigaSpecBase {
 
             milestoneDesc = isClosed ? 'close' : 'open'
     }
+
+    @Unroll
+    void 'get list of created milestones'() {
+        given: 'a list of new milestones'
+            def List<Milestone> milestones
+            (1..10).each{
+                def milestone = new Milestone()
+                        .setName(name)
+                        .setIsClosed(isClosed)
+                        .setStartDate(startDate)
+                        .setEndDate(endDate)
+                        .setProject(project)
+               taigaClient.createMilestone(milestone)
+            }
+        when: 'asking for the list of milestones that belong to this project'
+            milestones = taigaClient.getMilestones(project.id)
+        then: 'the number of milestones is the expected.'
+            milestones.size() == 10
+        where:
+            name = 'Sprint ${it}'
+            isClosed << [true, false]
+            startDate = Date.parse("dd/MM/yyyy", '01/08/2014')
+            endDate = Date.parse("dd/MM/yyyy", '10/08/2014')
+            milestoneDesc = isClosed ? 'close' : 'open'
+    }
 }
