@@ -8,6 +8,7 @@ class MilestoneMapper implements Mapper<Milestone>, DateConversions {
     @Override
     Map map(Milestone milestone) {
         [
+            id              : milestone.id,
             name            : milestone.name,
             closed          : milestone.isClosed,
             estimated_start : format(milestone.startDate, TAIGA_DATE_FORMAT),
