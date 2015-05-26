@@ -125,8 +125,8 @@ class TaigaClient extends BaseClient {
     }
 
     List<Milestone> getMilestones(Long projectId){
-        def attributes = projectId!=null?"?project=$projectId":""
-        def json = this.doGet("${URLS.milestone}$attributes")
+        def attributes = projectId!=null?"?project=${projectId}":""
+        def json = this.doGet("${URLS.milestone}${attributes}")
         json.collect { new MilestoneBuilder().build(it, null) }
     }
 
